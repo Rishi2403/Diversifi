@@ -158,7 +158,7 @@ Health check endpoint.
 API information.
 
 ## Supported Stock Symbols
-- Major US stocks: AAPL, MSFT, GOOGL, TSLA, etc.
+- Any stocks: ETERNAL,WIPRO,AAPL, MSFT, GOOGL, TSLA, etc.
 - The system will attempt to scrape news for any valid stock symbol
 
 ## Web Scraping Sources
