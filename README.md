@@ -100,9 +100,6 @@ Health check endpoint.
 ### GET /
 API information.
 
-## Supported Stock Symbols
-- Major US stocks: AAPL, MSFT, GOOGL, TSLA, etc.
-- The system will attempt to scrape news for any valid stock symbol
 
 ## Web Scraping Sources
 1. **Finviz** - Primary source (most reliable)
@@ -120,63 +117,16 @@ python test_scraping.py
 - Falls back to mock data if all scraping sources fail
 - Sentiment analysis uses TextBlob combined with financial keyword analysis
 - Results are stored in SQLite database for tracking
-
-## API Endpoints
-
-### POST /news-sentiment
-Fetches and analyzes news for a stock symbol.
-
-**Request:**
-```json
-{
-  "symbol": "AAPL"
-}
-```
-
-**Response:**
-```json
-{
-  "symbol": "AAPL",
-  "timestamp": "2025-01-31T12:00:00Z",
-  "headlines": [
-    {
-      "title": "Apple reports strong quarterly earnings",
-      "sentiment": "positive"
-    },
-    {
-      "title": "Tech sector faces market uncertainty",
-      "sentiment": "negative"
-    }
-  ]
-}
-```
-
-### GET /health
-Health check endpoint.
-
-### GET /
-API information.
-
 ## Supported Stock Symbols
 - Any stocks: ETERNAL,WIPRO,AAPL, MSFT, GOOGL, TSLA, etc.
 - The system will attempt to scrape news for any valid stock symbol
 
-## Web Scraping Sources
-1. **Finviz** - Primary source (most reliable)
-2. **Seeking Alpha** - RSS feeds and web search
-3. **MarketWatch** - Secondary fallback
 
 ## Testing
 Run the test script to verify scraping functionality:
 ```bash
 python test_scraping.py
 ```
-
-## Notes
-- The API includes rate limiting (1-3 second delays) to avoid being blocked
-- Falls back to mock data if all scraping sources fail
-- Sentiment analysis uses TextBlob combined with financial keyword analysis
-- Results are stored in SQLite database for tracking
 
 ## How I Used AI in This Project
 
