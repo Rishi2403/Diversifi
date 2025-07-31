@@ -177,3 +177,15 @@ python test_scraping.py
 - Falls back to mock data if all scraping sources fail
 - Sentiment analysis uses TextBlob combined with financial keyword analysis
 - Results are stored in SQLite database for tracking
+
+## How I Used AI in This Project
+
+During the development of this API, I leveraged GPT as a productivity and problem-solving assistant to speed up implementation and ensure high-quality results. Specifically, GPT helped me with:
+
+- **Research & Planning** – Quickly gathering information about different financial news sources (Finviz, Seeking Alpha, MarketWatch) and identifying optimal scraping strategies.  
+- **Code Assistance** – Generating initial boilerplate code for FastAPI endpoints, scraping functions, and sentiment analysis logic, which I then customized for our needs.  
+- **Debugging Support** – Explaining error messages, suggesting fixes for scraping issues, and optimizing API performance.  
+- **Documentation Writing** – Helping draft clear, structured documentation for the API so it’s easy to understand for both developers and non-technical stakeholders.  
+- **Best Practices** – Providing guidance on rate limiting, fallback handling, and database storage to make the API more robust.  
+
+By using AI tools in these ways, I was able to **deliver with cleaner code and better documentation**, while still maintaining full ownership of the development process.
