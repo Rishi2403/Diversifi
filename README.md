@@ -30,8 +30,10 @@ curl -X POST "http://localhost:8000/news-sentiment" \
 ```
 
 
-### Example - SS
+### Example -
+
 # Stock News Web Scraping API
+<img width="917" height="811" alt="image" src="https://github.com/user-attachments/assets/2b0fddfe-6270-42d9-bd2f-69377d62c812" />
 
 ## Overview
 This API provides real-time stock news scraping with sentiment analysis. When you provide a stock symbol, it will scrape news from multiple financial sources and analyze the sentiment of each headline.
