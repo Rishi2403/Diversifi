@@ -7,3 +7,16 @@ python-dateutil>=2.8.2
 pydantic>=2.5.0
 beautifulsoup4>=4.12.0
 lxml>=4.9.0
+
+
+langgraph==1.0.3
+langchain==1.0.7
+langchain_groq
+httpx
+python-dotenv
+fastmcp
+langchain_mcp_adapters
+mcp
+langchain-community
+langchain-core
+langchain_google_genai 
