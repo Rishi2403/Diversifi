@@ -55,7 +55,7 @@ class NewsService:
             return news_items
             
         except Exception as e:
-            logger.error(f"Error scraping Finviz: {e}")
+            # logger.error(f"Error scraping Finviz: {e}")
             return []
 
     def scrape_seeking_alpha_news(self, symbol: str, limit: int = 3) -> List[Dict[str, str]]:
@@ -88,7 +88,8 @@ class NewsService:
                 return news_items
             
         except Exception as e:
-            logger.error(f"Error scraping Seeking Alpha: {e}")
+            # logger.error(f"Error scraping Seeking Alpha: {e}")
+            return[]
         
         # Fallback to simple web search approach
         try:
@@ -115,7 +116,7 @@ class NewsService:
             return news_items
             
         except Exception as e:
-            logger.error(f"Error with web search fallback: {e}")
+            # logger.error(f"Error with web search fallback: {e}")
             return []
 
     def scrape_marketwatch_news(self, symbol: str, limit: int = 3) -> List[Dict[str, str]]:
