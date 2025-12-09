@@ -5,7 +5,7 @@ import re
 
 URL = "https://www.tickertape.in/mutualfunds/hdfc-flexi-cap-fund-M_HDCEQ"
 
-def scrape_parag_parikh(url):
+def scrape_mf(url):
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                              "AppleWebKit/537.36 (KHTML, like Gecko) "
                              "Chrome/100.0.4896.88 Safari/537.36"}
@@ -95,5 +95,5 @@ def scrape_parag_parikh(url):
     return data
 
 if __name__ == "__main__":
-    info = scrape_parag_parikh(URL)
+    info = scrape_mf(URL)
     print(json.dumps(info, indent=2))

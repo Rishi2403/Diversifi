@@ -11,7 +11,7 @@ import warnings
 from helper_func import analyze_sentiment
 from news_service import NewsService
 warnings.simplefilter(action='ignore', category=FutureWarning)
-#from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import find_dotenv, load_dotenv
 from langgraph.graph import StateGraph, END
 from typing import Optional, TypedDict, List

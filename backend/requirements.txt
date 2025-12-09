@@ -19,7 +19,11 @@ langchain_mcp_adapters
 mcp
 langchain-community
 langchain-core
-langchain_google_genai 
+langchain_google_genai
 requests
 bs4
 selenium
+langchain
+pypdf
+sentence-transformers
+chromadb

@@ -8,11 +8,37 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import find_dotenv, load_dotenv
 from langgraph.graph import StateGraph, END
 from typing import Optional, TypedDict, List
+from langchain.tools import tool
+from langchain_community.vectorstores import Chroma 
+from langchain_community.embeddings import HuggingFaceEmbeddings
 import os
+from langgraph.prebuilt import create_react_agent
 
 
 load_dotenv(find_dotenv())
 google_api_key = os.getenv("GOOGLE_API_KEY")
+
+CHROMA_DB = "./finance_db"
+embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+
+@tool
+def get_finance_info(query: str) -> str:
+    """
+    Query the stored finance knowledge base using similarity search.
+    Returns the top relevant chunks.
+    """
+    print("TOOL USED\n\n\n\n\n\n\n")
+    vectordb = Chroma(
+        persist_directory=CHROMA_DB,
+        embedding_function=embeddings
+    )
+
+    results = vectordb.similarity_search(query, k=4)
+
+    if not results:
+        return "No relevant finance info found in knowledge base."
+
+    return "\n\n---\n".join([r.page_content for r in results])
 
 class AgentState(TypedDict):
     question: str
@@ -35,6 +61,10 @@ llm = ChatGoogleGenerativeAI(
     api_key=google_api_key,
 )
 
+# llm_with_tools = llm.bind_tools([get_finance_info])
+
+tools = [get_finance_info]
+finance_agent  = create_react_agent(llm, tools=tools)
 
 ## same for stocks and mutual funds
 def classifier_node(state: AgentState) -> AgentState:
@@ -43,7 +73,7 @@ def classifier_node(state: AgentState) -> AgentState:
 
     - "mf" = Mutual fund / SIP / NAV / SIP amount / SIP performance related questions.
     - "stock" = Stock / shares / ticker / price target / technical analysis questions.
-    - "general_finance" = Budgeting, insurance, tax, loans, general investing concepts (not a specific fund or stock).
+    - "general_finance" = Personal Finance, Budgeting, insurance, tax, loans, general investing concepts (not a specific fund or stock).
     - "unknown" = The question doesn't fit or lacks clarity.
 
 
@@ -145,13 +175,15 @@ def general_finance_handler(state: AgentState) -> AgentState:
     savings, insurance, tax planning, and general investment strategy.
     Provide a simplified and helpful explanation.
 
-    Question: "{state["question"]}"
+    Question: "{state['question']}"
     """
-    resp = llm.invoke(prompt)
-    state["answer"] = resp.content.strip()
+    
+    # Invoke the agent directly
+    answer = finance_agent.run(prompt)  # use run() instead of invoke()
+    
+    state["answer"] = answer.strip()
     print("\n\n📍 Finance Advisor Response:\n", state["answer"])
     return state
-
 ## Stocks Related
 
 def symbol_extractor(state: AgentState) -> AgentState:
