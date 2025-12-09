@@ -114,13 +114,13 @@ def handle_classifier_decision(state: AgentState) -> str:
         return "clarifier"
 
     if state["category"] == "mf":
-        print("\n\n Question Classified Into Category Mutual Funds")
+        print("\n\nQuestion Classified Into Category Mutual Funds")
         return "mf_handler"
     if state["category"] == "stock":
-        print("\n\n Question Classified Into Category Stock Market")
+        print("\n\nQuestion Classified Into Category Stock Market")
         return "stock_handler"
     if state["category"] == "general_finance":
-        print("\n\n Question Classified Into Category General Finance")
+        print("\n\nQuestion Classified Into Category General Finance")
         return "general_finance_handler"
 
     return END
@@ -217,7 +217,6 @@ def bull_handler(state: AgentState) -> dict:
     bull_text = state["bull_analysis"]
     return {"bull_analysis": bull_text}
 
-
 def bear_handler(state: AgentState) -> dict:
     sentiment_data = state.get('stock_sentiment', {})
     headlines = sentiment_data.get('headlines', [])
@@ -239,7 +238,6 @@ def bear_handler(state: AgentState) -> dict:
     bear_text = state["bear_analysis"]
     print("\n\nBearish Analysis:\n",state["bear_analysis"])
     return {"bear_analysis": bear_text}
-
 
 def stock_handler(state: AgentState) -> AgentState:
     bull = state.get("bull_analysis", "No bullish analysis available")
