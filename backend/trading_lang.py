@@ -27,7 +27,7 @@ def get_finance_info(query: str) -> str:
     Query the stored finance knowledge base using similarity search.
     Returns the top relevant chunks.
     """
-    print("TOOL USED\n\n\n\n\n\n\n")
+    print("TOOL USED\n")
     vectordb = Chroma(
         persist_directory=CHROMA_DB,
         embedding_function=embeddings
@@ -53,7 +53,6 @@ class AgentState(TypedDict):
     mf_sentiment:Optional[dict]
     bear_analysis:Optional[dict]
     bull_analysis:Optional[dict]
-
 
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",    
@@ -178,8 +177,15 @@ def general_finance_handler(state: AgentState) -> AgentState:
     Question: "{state['question']}"
     """
     
-    # Invoke the agent directly
-    answer = finance_agent.run(prompt)  # use run() instead of invoke()
+    # Invoke the agent with proper input format
+    result = finance_agent.invoke({
+        "messages": [{"role": "user", "content": prompt}]
+    })
+    
+    # Extract the final answer from the result
+    # The result contains a list of messages, get the last one
+    final_message = result["messages"][-1]
+    answer = final_message.content if hasattr(final_message, 'content') else str(final_message)
     
     state["answer"] = answer.strip()
     print("\n\n📍 Finance Advisor Response:\n", state["answer"])
@@ -340,10 +346,10 @@ if __name__ == "__main__":
     question_input = input("\n\nEnter your question: ")
 
     graph = build_graph()
-    png = graph.get_graph().draw_mermaid_png()
-    with open("workflow.png","wb") as f:
-        f.write(png)
-    print("Saved workflow diagram to workflow.png")
+    # png = graph.get_graph().draw_mermaid_png()
+    # with open("workflow.png","wb") as f:
+    #     f.write(png)
+    # print("Saved workflow diagram to workflow.png")
     initial_state: AgentState = {
         "question": question_input,
         "category": "",

@@ -9,8 +9,8 @@ beautifulsoup4>=4.12.0
 lxml>=4.9.0
 
 
-langgraph==1.0.3
-langchain==1.0.7
+langgraph
+langchain
 langchain_groq
 httpx
 python-dotenv
@@ -27,3 +27,4 @@ langchain
 pypdf
 sentence-transformers
 chromadb
+langchain-chroma
