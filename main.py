@@ -1,114 +1,178 @@
-from fastapi import FastAPI, HTTPException, Depends
-from pydantic import BaseModel
-from typing import List, Optional
-from datetime import datetime
-import uvicorn
-import json
-from sqlalchemy.orm import Session
+import streamlit as st
+import requests
+import pandas as pd
 
-from database import get_db, create_tables, NewsRecord
-from news_service import NewsService
-from sentiment_service import SentimentAnalyzer
+# Your FastAPI backend URL
+API_BASE = "http://localhost:8000"
 
-app = FastAPI(title="Stock News Sentiment API", version="1.0.0")
+# ----------------------------------------------------
+# PAGE CONFIG
+# ----------------------------------------------------
+st.set_page_config(
+    page_title="Stock News Sentiment Dashboard",
+    page_icon="📈",
+    layout="wide"
+)
 
-# Initialize services
-news_service = NewsService()
-sentiment_analyzer = SentimentAnalyzer()
+# ----------------------------------------------------
+# CUSTOM DARK THEME CSS
+# ----------------------------------------------------
+dark_css = """
+<style>
 
-# Create database tables on startup
-create_tables()
+html, body, [class*="css"] {
+    background-color: #0e1117 !important;
+    color: #e0e0e0 !important;
+}
 
-class StockRequest(BaseModel):
-    symbol: str
+h1, h2, h3, h4 {
+    color: #ffffff !important;
+}
 
-class HeadlineResponse(BaseModel):
-    title: str
-    sentiment: str
+[data-testid="stSidebar"] {
+    background-color: #11141c !important;
+}
 
-class NewsResponse(BaseModel):
-    symbol: str
-    timestamp: str
-    headlines: List[HeadlineResponse]
+.card {
+    background: rgba(255,255,255,0.05);
+    padding: 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 12px;
+}
 
-@app.get("/")
-async def root():
-    return {"message": "Stock News Sentiment API"}
+.positive-badge { color: #00ff88; font-weight: 700; }
+.negative-badge { color: #ff4f4f; font-weight: 700; }
+.neutral-badge  { color: #bdbdbd; font-weight: 700; }
 
-@app.post("/news-sentiment", response_model=NewsResponse)
-async def get_news_sentiment(request: StockRequest, db: Session = Depends(get_db)):
-    try:
-        # Validate symbol
-        if not request.symbol or len(request.symbol.strip()) == 0:
-            raise HTTPException(status_code=400, detail="Symbol cannot be empty")
-        
-        symbol = request.symbol.strip().upper()
-        
-        # Fetch news headlines
-        news_headlines = news_service.fetch_stock_news(symbol)
-        
-        if not news_headlines:
-            raise HTTPException(status_code=404, detail=f"No news found for symbol: {symbol}")
-        
-        # Analyze sentiment for each headline
-        analyzed_headlines = sentiment_analyzer.analyze_headlines(news_headlines)
-        
-        # Convert to HeadlineResponse objects
-        headline_responses = [
-            HeadlineResponse(title=h['title'], sentiment=h['sentiment'])
-            for h in analyzed_headlines
-        ]
-        
-        # Create response
-        current_time = datetime.utcnow()
-        response = NewsResponse(
-            symbol=symbol,
-            timestamp=current_time.isoformat() + "Z",
-            headlines=headline_responses
-        )
-        
-        # Store in database
-        news_record = NewsRecord(
-            symbol=symbol,
-            timestamp=current_time,
-            headlines_json=json.dumps([headline.dict() for headline in headline_responses])
-        )
-        db.add(news_record)
-        db.commit()
-        
-        return response
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+</style>
+"""
+st.markdown(dark_css, unsafe_allow_html=True)
 
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat() + "Z"}
 
-@app.get("/database")
-async def view_database(db: Session = Depends(get_db)):
-    """View all stored news records"""
-    try:
-        records = db.query(NewsRecord).order_by(NewsRecord.timestamp.desc()).all()
-        
-        result = []
-        for record in records:
-            headlines_data = json.loads(record.headlines_json) if record.headlines_json else []
-            result.append({
-                "id": record.id,
-                "symbol": record.symbol,
-                "timestamp": record.timestamp.isoformat() + "Z",
-                "headlines": headlines_data
-            })
-        
-        return {
-            "total_records": len(result),
-            "records": result
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error reading database: {str(e)}")
+# ----------------------------------------------------
+# SIDEBAR NAVIGATION
+# ----------------------------------------------------
+st.sidebar.title("📊 Dashboard")
+menu = st.sidebar.radio(
+    "Navigate",
+    ["Home", "News Sentiment", "Database Records", "API Health"]
+)
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+st.sidebar.markdown("---")
+st.sidebar.write("Made by **Rishi** 🚀")
+
+# ----------------------------------------------------
+# HOME PAGE
+# ----------------------------------------------------
+if menu == "Home":
+    st.title("🌙 Stock News Sentiment Dashboard")
+    st.markdown("""
+    This dashboard connects to your FastAPI backend and gives you:
+
+    - 📰 Real-time stock news  
+    - 🔍 Sentiment analysis  
+    - 🗄 Stored database results  
+    - 💡 API health status  
+
+    Use the left sidebar to navigate.
+    """)
+
+# ----------------------------------------------------
+# NEWS SENTIMENT PAGE
+# ----------------------------------------------------
+elif menu == "News Sentiment":
+    st.title("📰 Stock News Sentiment Analysis")
+
+    symbol = st.text_input("Enter Stock Symbol (AAPL, TSLA, INFY, TCS):", "")
+
+    if st.button("Analyze News"):
+        if symbol.strip() == "":
+            st.error("⚠️ Stock symbol cannot be empty.")
+        else:
+            with st.spinner("Fetching news & analyzing sentiment..."):
+                try:
+                    response = requests.post(
+                        f"{API_BASE}/news-sentiment",
+                        json={"symbol": symbol}
+                    )
+
+                    if response.status_code == 200:
+                        data = response.json()
+
+                        st.success(f"Results for **{data['symbol']}** — {data['timestamp']}")
+
+                        headlines = data["headlines"]
+                        df = pd.DataFrame(headlines)
+
+                        # Display each headline
+                        st.subheader("🔎 Headlines & Sentiments")
+                        for item in headlines:
+                            sentiment = item["sentiment"].lower()
+
+                            badge_class = {
+                                "positive": "positive-badge",
+                                "negative": "negative-badge",
+                                "neutral": "neutral-badge"
+                            }.get(sentiment, "neutral-badge")
+
+                            st.markdown(
+                                f"""
+                                <div class="card">
+                                    <strong>{item['title']}</strong><br>
+                                    Sentiment: <span class="{badge_class}">{item['sentiment']}</span>
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
+
+                        # Chart
+                        st.subheader("📊 Sentiment Distribution")
+                        st.bar_chart(df["sentiment"].value_counts())
+
+                    else:
+                        st.error(f"❌ API Error: {response.json().get('detail')}")
+
+                except Exception as e:
+                    st.error(f"❌ Request failed: {e}")
+
+# ----------------------------------------------------
+# DATABASE PAGE
+# ----------------------------------------------------
+elif menu == "Database Records":
+    st.title("🗄 Stored News Records")
+
+    if st.button("Load Database Records"):
+        try:
+            res = requests.get(f"{API_BASE}/database")
+
+            if res.status_code == 200:
+                content = res.json()
+
+                st.info(f"Total Records: {content['total_records']}")
+
+                for record in content["records"]:
+                    with st.expander(f"{record['symbol']} — {record['timestamp']}"):
+                        st.json(record)
+
+            else:
+                st.error(res.json().get("detail"))
+
+        except Exception as e:
+            st.error(f"⚠️ Failed to load database: {e}")
+
+# ----------------------------------------------------
+# API HEALTH PAGE
+# ----------------------------------------------------
+elif menu == "API Health":
+    st.title("💡 API Health Status")
+
+    if st.button("Check Status"):
+        try:
+            res = requests.get(f"{API_BASE}/health")
+            if res.status_code == 200:
+                st.success(res.json())
+            else:
+                st.error("❌ API returned an error.")
+        except Exception as e:
+            st.error(f"⚠️ Could not reach API: {e}")

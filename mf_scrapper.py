@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import json
 import re
 
-URL = "https://www.tickertape.in/mutualfunds/hdfc-flexi-cap-fund-M_HDCEQ?ref=screener_int-asset-widget"
+URL = "https://www.tickertape.in/mutualfunds/hdfc-flexi-cap-fund-M_HDCEQ"
 
 def scrape_parag_parikh(url):
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
