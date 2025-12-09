@@ -22,7 +22,6 @@ langchain-core
 langchain_google_genai
 requests
 bs4
-selenium
 langchain
 pypdf
 sentence-transformers
