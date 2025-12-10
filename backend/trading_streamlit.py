@@ -278,14 +278,16 @@ def build_graph():
 
 # --- Streamlit integration (Option 1: show pretty thinking blocks for each node) ---
 
-def pretty_append(node_name: str, data: dict or str):
+from typing import Union
+
+def pretty_append(node_name: str, data: Union[dict, str]):
     if 'thinking_steps' not in st.session_state:
         st.session_state.thinking_steps = []
-# Format data prettily
-if isinstance(data, dict):
-    body = ''
-    for k, v in data.items():
-        body += f"- {k}: {v}\n"
+    # Format data prettily
+    if isinstance(data, dict):
+        body = ''
+        for k, v in data.items():
+            body += f"- {k}: {v}\n"
     else:
         body = str(data)
     st.session_state.thinking_steps.append({"title": node_name, "content": body})
