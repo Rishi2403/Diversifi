@@ -45,41 +45,6 @@ def scrape_mf(url):
     except Exception:
         data["AUM"] = None
 
-    # --- Expense Ratio ---
-    # Cannot be scraped via requests; set to None
-    # data["Expense Ratio"] = None
-
-    # # --- PE Ratio ---
-    # try:
-    #     pe_label = soup.find(lambda tag: tag.name in ["p","div","span","td"] and "PE Ratio" in tag.get_text())
-    #     if pe_label:
-    #         pe_value_tag = pe_label.find_next(lambda tag: tag.name in ["span","div","td"] and re.match(r"^\d+(\.\d+)?$", tag.get_text().strip()))
-    #         if pe_value_tag:
-    #             data["PE Ratio"] = pe_value_tag.get_text().strip()
-    #         else:
-    #             match = re.search(r"\b\d+\.\d+\b", pe_label.get_text())
-    #             data["PE Ratio"] = match.group(0) if match else None
-    #     else:
-    #         data["PE Ratio"] = None
-    # except Exception:
-    #     data["PE Ratio"] = None
-
-    # # --- Sharpe Ratio ---
-    # try:
-    #     sharpe_label = soup.find(lambda tag: tag.name in ["p","div","span","td"] and "Sharpe Ratio" in tag.get_text())
-    #     if sharpe_label:
-    #         sharpe_value_tag = sharpe_label.find_next(lambda tag: tag.name in ["span","div","td"] and re.match(r"^-?\d+(\.\d+)?$", tag.get_text().strip()))
-    #         if sharpe_value_tag:
-    #             data["Sharpe Ratio"] = sharpe_value_tag.get_text().strip()
-    #         else:
-    #             match = re.search(r"-?\d+\.\d+", sharpe_label.get_text())
-    #             data["Sharpe Ratio"] = match.group(0) if match else None
-    #     else:
-    #         data["Sharpe Ratio"] = None
-    # except Exception:
-    #     data["Sharpe Ratio"] = None
-
-    # --- Returns ---
     perf = {}
     for label in ["1 Year Returns", "3 Year Returns", "5 Year Returns"]:
         li = soup.find("li", string=lambda s: s and label in s)

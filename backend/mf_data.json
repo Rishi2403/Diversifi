@@ -1,0 +1,405 @@
+[
+  {
+    "s_no": 1,
+    "mutual_fund_name": "HDFC Flexi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/hdfc-flexi-cap-fund-M_HDCEQ"
+  },
+  {
+    "s_no": 2,
+    "mutual_fund_name": "Motilal Oswal Flexi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/motilal-oswal-flexi-cap-fund-M_MOI3"
+  },
+  {
+    "s_no": 3,
+    "mutual_fund_name": "Parag Parikh Flexi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/parag-parikh-flexi-cap-fund-M_PARO"
+  },
+  {
+    "s_no": 4,
+    "mutual_fund_name": "Kotak Flexicap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/kotak-flexicap-fund-M_KOSN"
+  },
+  {
+    "s_no": 5,
+    "mutual_fund_name": "Quant Flexi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/quant-flexi-cap-fund-M_QUTO"
+  },
+  {
+    "s_no": 6,
+    "mutual_fund_name": "DSP Flexi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/dsp-flexi-cap-fund-M_DSYE"
+  },
+  {
+    "s_no": 7,
+    "mutual_fund_name": "Axis Flexi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/axis-flexi-cap-fund-M_AXMM"
+  },
+  {
+    "s_no": 8,
+    "mutual_fund_name": "JM Flexicap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/jm-flexicap-fund-M_JMUU"
+  },
+  {
+    "s_no": 9,
+    "mutual_fund_name": "Franklin India Flexi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/franklin-india-flexi-cap-fund-M_FREE"
+  },
+  {
+    "s_no": 10,
+    "mutual_fund_name": "Bank of India Flexi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/bank-of-india-flexi-cap-fund-M_BOIX"
+  },
+  {
+    "s_no": 11,
+    "mutual_fund_name": "Edelweiss Flexi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/edelweiss-flexi-cap-fund-M_EDWU"
+  },
+  {
+    "s_no": 12,
+    "mutual_fund_name": "Canara Robeco Flexi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/canara-rob-flexi-cap-fund-M_CAOQ"
+  },
+  {
+    "s_no": 13,
+    "mutual_fund_name": "Tata Flexi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/tata-flexi-cap-fund-M_TAMC"
+  },
+  {
+    "s_no": 14,
+    "mutual_fund_name": "Union Flexi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/union-flexi-cap-fund-M_UNMN"
+  },
+  {
+    "s_no": 15,
+    "mutual_fund_name": "LIC MF Flexi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/lic-mf-flexi-cap-fund-M_LILU"
+  },
+  {
+    "s_no": 16,
+    "mutual_fund_name": "Aditya Birla Sun Life Flexi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/aditya-birla-sl-flexi-cap-fund-M_ADTUE"
+  },
+  {
+    "s_no": 17,
+    "mutual_fund_name": "HSBC Flexi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/hsbc-flexi-cap-fund-M_HSMY"
+  },
+  {
+    "s_no": 18,
+    "mutual_fund_name": "Mirae Asset Flexi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/mirae-asset-flexi-cap-fund-M_MIFE"
+  },
+  {
+    "s_no": 19,
+    "mutual_fund_name": "WhiteOak Capital Flexi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/woc-flexi-cap-fund-M_WOCE"
+  },
+  {
+    "s_no": 20,
+    "mutual_fund_name": "Baroda BNP Paribas Flexi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/baroda-bnp-paribas-flexi-cap-fund-M_BARX"
+  },
+  {
+    "s_no": 21,
+    "mutual_fund_name": "Nippon India Multi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/nippon-india-multi-cap-fund-M_NIMB"
+  },
+  {
+    "s_no": 22,
+    "mutual_fund_name": "Kotak Multicap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/kotak-multicap-fund-M_KOTMU"
+  },
+  {
+    "s_no": 23,
+    "mutual_fund_name": "Axis Multicap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/axis-multicap-fund-M_AXNM"
+  },
+  {
+    "s_no": 24,
+    "mutual_fund_name": "HDFC Multi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/hdfc-multi-cap-fund-M_HDCUI"
+  },
+  {
+    "s_no": 25,
+    "mutual_fund_name": "ICICI Prudential Multicap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/icici-pru-multicap-fund-M_ICPIU"
+  },
+  {
+    "s_no": 26,
+    "mutual_fund_name": "Baroda BNP Paribas Multi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/baroda-bnp-paribas-multi-cap-fund-M_BAMU"
+  },
+  {
+    "s_no": 27,
+    "mutual_fund_name": "ITI Multi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/iti-multi-cap-fund-M_ITMU"
+  },
+  {
+    "s_no": 28,
+    "mutual_fund_name": "Mahindra Manulife Multi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/mahindra-manulife-multi-cap-fund-M_MADN"
+  },
+  {
+    "s_no": 29,
+    "mutual_fund_name": "Bandhan Multi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/bandhan-multi-cap-fund-M_IDFUM"
+  },
+  {
+    "s_no": 30,
+    "mutual_fund_name": "SBI Multicap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/sbi-multicap-fund-M_SBIUC"
+  },
+  {
+    "s_no": 31,
+    "mutual_fund_name": "Sundaram Multi Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/sundaram-multi-cap-fund-M_PRPW"
+  },
+  {
+    "s_no": 32,
+    "mutual_fund_name": "HDFC Large Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/hdfc-large-cap-fund-M_HDCTP"
+  },
+  {
+    "s_no": 33,
+    "mutual_fund_name": "Invesco India Largecap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/invesco-india-largecap-fund-M_INRI"
+  },
+  {
+    "s_no": 34,
+    "mutual_fund_name": "Bandhan Large Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/bandhan-large-cap-fund-M_IDFLL"
+  },
+  {
+    "s_no": 35,
+    "mutual_fund_name": "Nippon India Large Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/nippon-india-large-cap-fund-M_NIRL"
+  },
+  {
+    "s_no": 36,
+    "mutual_fund_name": "Kotak Large Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/kotak-large-cap-fund-M_KOLB"
+  },
+  {
+    "s_no": 37,
+    "mutual_fund_name": "Canara Robeco Large Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/canara-rob-large-cap-fund-M_CANY"
+  },
+  {
+    "s_no": 38,
+    "mutual_fund_name": "Edelweiss Large Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/edelweiss-large-cap-fund-M_EDAI"
+  },
+  {
+    "s_no": 39,
+    "mutual_fund_name": "Axis Large Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/axis-large-cap-fund-M_AXLB"
+  },
+  {
+    "s_no": 40,
+    "mutual_fund_name": "Quant Large Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/quant-large-cap-fund-M_QULP"
+  },
+  {
+    "s_no": 41,
+    "mutual_fund_name": "PGIM India Large Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/pgim-india-large-cap-fund-M_PGLR"
+  },
+  {
+    "s_no": 42,
+    "mutual_fund_name": "ICICI Prudential Global Stable Equity Fund",
+    "url": "https://www.tickertape.in/mutualfunds/icici-pru-global-stable-equity-fund-M_ICCGP"
+  },
+  {
+    "s_no": 43,
+    "mutual_fund_name": "Motilal Oswal Large Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/motilal-oswal-large-cap-fund-M_MOSI"
+  },
+  {
+    "s_no": 44,
+    "mutual_fund_name": "Motilal Oswal Large & Midcap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/motilal-oswal-large--midcap-fund-M_MOTG"
+  },
+  {
+    "s_no": 45,
+    "mutual_fund_name": "HDFC Large and Mid Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/hdfc-large-and-mid-cap-fund-M_HDOW"
+  },
+  {
+    "s_no": 46,
+    "mutual_fund_name": "Invesco India Large & Mid Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/invesco-india-large--mid-cap-fund-M_INCW"
+  },
+  {
+    "s_no": 47,
+    "mutual_fund_name": "ICICI Prudential Large & Mid Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/icici-pru-large--mid-cap-fund-M_ICPIL"
+  },
+  {
+    "s_no": 48,
+    "mutual_fund_name": "DSP Large & Mid Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/dsp-large--mid-cap-fund-M_DSIY"
+  },
+  {
+    "s_no": 49,
+    "mutual_fund_name": "SBI Large & Midcap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/sbi-large--midcap-fund-M_SBRU"
+  },
+  {
+    "s_no": 50,
+    "mutual_fund_name": "Kotak Large & Midcap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/kotak-large--midcap-fund-M_KOEO"
+  },
+  {
+    "s_no": 51,
+    "mutual_fund_name": "Bandhan Large & Mid Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/bandhan-large--mid-cap-fund-M_IDFOC"
+  },
+  {
+    "s_no": 52,
+    "mutual_fund_name": "Nippon India Vision Large & Mid Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/nippon-india-vision-large--mid-cap-fund-M_NIVB"
+  },
+  {
+    "s_no": 53,
+    "mutual_fund_name": "Mahindra Manulife Large & Mid Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/mahindra-manulife-large--mid-cap-fund-M_MAHT"
+  },
+  {
+    "s_no": 54,
+    "mutual_fund_name": "Motilal Oswal Midcap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/motilal-oswal-midcap-fund-M_MOLS"
+  },
+  {
+    "s_no": 55,
+    "mutual_fund_name": "Nippon India Growth Mid Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/nippon-india-growth-mid-cap-fund-M_NIGW"
+  },
+  {
+    "s_no": 56,
+    "mutual_fund_name": "Mahindra Manulife Mid Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/mahindra-manulife-mid-cap-fund-M_MANC"
+  },
+  {
+    "s_no": 57,
+    "mutual_fund_name": "Sundaram Mid Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/sundaram-mid-cap-fund-M_SUNIU"
+  },
+  {
+    "s_no": 58,
+    "mutual_fund_name": "HSBC Midcap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/hsbc-midcap-fund-M_LTIU"
+  },
+  {
+    "s_no": 59,
+    "mutual_fund_name": "Quant Small Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/quant-small-cap-fund-M_QUNF"
+  },
+  {
+    "s_no": 60,
+    "mutual_fund_name": "Parag Parikh Conservative Hybrid Fund",
+    "url": "https://www.tickertape.in/mutualfunds/parag-parikh-conservative-hybrid-fund-M_PARS"
+  },
+  {
+    "s_no": 61,
+    "mutual_fund_name": "SBI Small Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/sbi-small-cap-fund-M_SBILM"
+  },
+  {
+    "s_no": 62,
+    "mutual_fund_name": "HDFC Small Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/hdfc-small-cap-fund-M_HDFSU"
+  },
+  {
+    "s_no": 63,
+    "mutual_fund_name": "Kotak Small Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/kotak-small-cap-fund-M_KOSM"
+  },
+  {
+    "s_no": 64,
+    "mutual_fund_name": "Nippon India Small Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/nippon-india-small-cap-fund-M_NISL"
+  },
+  {
+    "s_no": 65,
+    "mutual_fund_name": "ICICI Prudential Small Cap Fund",
+    "url": "https://www.tickertape.in/mutualfunds/tata-small-cap-fund-M_TASC"
+  },
+
+  {
+    "s_no": 66,
+    "mutual_fund_name": "Motilal Oswal Nifty200 Momentum 30 Index Fund",
+    "url": "https://www.tickertape.in/mutualfunds/motilal-oswal-nifty-200-momentum-30-index-fund-M_MOIX"
+  },
+  {
+    "s_no": 67,
+    "mutual_fund_name": "Quant Momentum Fund",
+    "url": "https://www.tickertape.in/mutualfunds/quant-momentum-fund-M_QUOE"
+  },
+  {
+    "s_no": 68,
+    "mutual_fund_name": "ICICI Prudential Momentum Fund",
+    "url": "https://www.tickertape.in/mutualfunds/icici-pru-active-momentum-fund-M_ICRUV"
+  },
+  {
+    "s_no": 69,
+    "mutual_fund_name": "SBI Momentum Index Fund",
+    "url": "https://www.tickertape.in/mutualfunds/sbi-nifty200-momentum-30-index-fund-M_SB3O"
+  },
+  {
+    "s_no": 70,
+    "mutual_fund_name": "HDFC Nifty200 Momentum 30 Index Fund",
+    "url": "https://www.tickertape.in/mutualfunds/hdfc-nifty200-momentum-30-index-fund-M_HDCYT"
+  },
+
+  {
+    "s_no": 71,
+    "mutual_fund_name": "SBI Technology Opportunities Fund",
+    "url": "https://www.tickertape.in/mutualfunds/sbi-technology-opp-fund-M_SBCY"
+  },
+  {
+    "s_no": 72,
+    "mutual_fund_name": "ICICI Prudential Technology Fund",
+    "url": "https://www.tickertape.in/mutualfunds/icici-pru-technology-fund-M_ICCHE"
+  },
+  {
+    "s_no": 73,
+    "mutual_fund_name": "Tata Digital India Fund",
+    "url": "https://www.tickertape.in/mutualfunds/tata-digital-india-fund-M_TADL"
+  },
+  {
+    "s_no": 74,
+    "mutual_fund_name": "Nippon India Pharma Fund",
+    "url": "https://www.tickertape.in/mutualfunds/nippon-india-pharma-fund-M_NIHM"
+  },
+  {
+    "s_no": 75,
+    "mutual_fund_name": "DSP Natural Resources and New Energy Fund",
+    "url": "https://www.tickertape.in/mutualfunds/dsp-natural-res--new-energy-fund-M_DSNW"
+  },
+
+  {
+    "s_no": 76,
+    "mutual_fund_name": "Quantum Long Term Value Fund",
+    "url": "https://www.tickertape.in/mutualfunds/quantum-value-fund-M_QUTR"
+  },
+  {
+    "s_no": 77,
+    "mutual_fund_name": "ICICI Prudential Value Discovery Fund",
+    "url": "https://www.tickertape.in/mutualfunds/icici-pru-value-fund-M_ICCYV"
+  },
+  {
+    "s_no": 78,
+    "mutual_fund_name": "Nippon India Value Fund",
+    "url": "https://www.tickertape.in/mutualfunds/nippon-india-value-fund-M_NIEV"
+  },
+  {
+    "s_no": 79,
+    "mutual_fund_name": "Tata Equity P/E Fund",
+    "url": "https://www.tickertape.in/mutualfunds/tata-equity-savings-fundp-idcw-M_TAQE"
+  },
+  {
+    "s_no": 80,
+    "mutual_fund_name": "HDFC Dividend Yield Fund",
+    "url": "https://www.tickertape.in/mutualfunds/hdfc-dividend-yield-fund-M_HDCEC"
+  }
+]
