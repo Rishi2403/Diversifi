@@ -338,12 +338,13 @@ def run_langgraph_like(state: AgentState) -> AgentState:
 
 def chat_message(role, content):
     align = 'flex-start' if role == 'user' else 'flex-end'
-    bg = '#DCF8C6' if role == 'user' else '#E8F0FE'
+    bg = 'var(--chat-user-bg)' if role == 'user' else 'var(--chat-assistant-bg)'
     label = 'You' if role == 'user' else 'Assistant'
+
     html = f"""
     <div style='display:flex; justify-content:{align}; margin:8px 0;'>
-        <div style='background:{bg}; padding:10px 14px; max-width:78%; border-radius:12px; white-space:pre-wrap;'>
-            <small style='color:gray'>{label}</small><br/>
+        <div class="chat-bubble" style='background:{bg};'>
+            <small style='opacity:0.6'>{label}</small><br/>
             {content}
         </div>
     </div>
@@ -353,6 +354,47 @@ def chat_message(role, content):
 
 def main():
     st.set_page_config(page_title="Finance Assistant — Integrated LangGraph", layout="wide")
+    # --- Dark/Light Mode Safe Styling ---
+    st.markdown("""
+    <style>
+    /* Streamlit auto D/L mode colors */
+    :root {
+        --chat-user-bg: rgba(75, 192, 120, 0.18);     /* greenish bubble */
+        --chat-assistant-bg: rgba(98, 132, 255, 0.18); /* bluish bubble */
+        --bubble-text: var(--text-color, #FFFFFF);
+    }
+
+    /* In light mode, override text color */
+    @media (prefers-color-scheme: light) {
+        :root {
+            --bubble-text: #000000;
+        }
+    }
+
+    /* Chat bubble styling */
+    .chat-bubble {
+        padding: 12px 16px;
+        border-radius: 12px;
+        max-width: 78%;
+        color: var(--bubble-text);
+        white-space: pre-wrap;
+        font-size: 15px;
+        line-height: 1.45;
+    }
+
+    /* Thinking blocks */
+    .think-block {
+        border-left: 4px solid #4A90E2;
+        padding: 12px;
+        border-radius: 6px;
+        margin: 8px;
+        max-width: 98%;
+        background: rgba(100, 150, 255, 0.08);
+        color: var(--bubble-text);
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
     st.title("💬 Finance Assistant — Full LangGraph Integration")
 
     if 'chat' not in st.session_state:
@@ -403,7 +445,7 @@ def main():
             }
             state = run_langgraph_like(initial_state)
             st.session_state.chat.append({"role": "assistant", "content": state.get('answer', '')})
-            st.experimental_rerun()
+            st.rerun()
 
         if send and user_input and user_input.strip():
             st.session_state.chat.append({"role": "user", "content": user_input})
@@ -429,17 +471,17 @@ def main():
                 err = str(e)
                 st.error(err)
                 st.session_state.chat.append({"role": "assistant", "content": err})
-                st.experimental_rerun()
+                st.rerun()
 
             # If clarifier needed, set pending and show message
             if state.get('missing_info') and not state.get('clarification_used'):
                 st.session_state.pending_clarifier = state.get('missing_info')
                 st.session_state.chat.append({"role": "assistant", "content": "I need more information: " + str(state.get('missing_info'))})
-                st.experimental_rerun()
+                st.rerun()
 
-            # otherwise append final
+
             st.session_state.chat.append({"role": "assistant", "content": state.get('answer', '')})
-            st.experimental_rerun()
+            st.rerun()
 
     with think_col:
         st.subheader("🧠 Thinking Blocks")
@@ -451,16 +493,15 @@ def main():
                 content = step.get('content', '')
                 html = f"""
                 <div style='display:flex; justify-content:flex-end;'>
-                    <div style=\"border-left:4px solid #4A90E2;padding:12px;border-radius:6px;margin:8px;max-width:98%;background:linear-gradient(90deg, #fafafa 0%, #f5f9ff 100%);\">
-                      <strong style=\"font-size:14px\">{title}</strong>
-                      <div style=\"margin-top:6px;white-space:pre-wrap\">{content}</div>
+                    <div class="think-block">
+                    <strong style="font-size:14px">{title}</strong>
+                    <div style="margin-top:6px;white-space:pre-wrap">{content}</div>
                     </div>
                 </div>
                 """
                 st.markdown(html, unsafe_allow_html=True)
 
     st.markdown("---")
-    st.caption("This UI runs your real LangGraph-style workflow. Make sure GOOGLE_API_KEY is set and helper modules (helper_func, news_service) are available.")
 
 if __name__ == '__main__':
     main()
