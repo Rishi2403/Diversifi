@@ -1,5 +1,14 @@
 from textblob import TextBlob
 
+def normalize_fund_name(name: str) -> str:
+    name = name.lower()
+    name = name.replace("flexicap", "flexi cap")
+    name = name.replace("multi cap", "multicap")
+    name = name.replace("mid cap", "midcap")
+    name = name.replace("large cap", "largecap")
+    name = name.replace("small cap", "smallcap")
+    name = name.replace(" fund", "")
+    return name.strip()
 
 def analyze_sentiment(texts: list) -> dict:
     """

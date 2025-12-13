@@ -27,3 +27,5 @@ pypdf
 sentence-transformers
 chromadb
 langchain-chroma
+rapidfuzz
+fastapi

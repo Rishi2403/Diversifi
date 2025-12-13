@@ -5,8 +5,6 @@ from typing import Optional, TypedDict, List
 
 import streamlit as st
 from dotenv import load_dotenv, find_dotenv
-
-# --- Original imports from your demo ---
 import warnings
 from helper_func import analyze_sentiment
 from news_service import NewsService
@@ -21,7 +19,7 @@ import os
 load_dotenv(find_dotenv())
 google_api_key = os.getenv("GOOGLE_API_KEY")
 
-# Initialize LLM (will raise helpful error if not configured)
+
 try:
     llm = ChatGoogleGenerativeAI(
         model="gemini-2.5-flash",
@@ -46,8 +44,6 @@ class AgentState(TypedDict):
     bear_analysis: Optional[dict]
     bull_analysis: Optional[dict]
 
-# --- Preserve your original node implementations with small adapter to use llm.invoke ---
-# (We re-use your exact logic; only change is using llm.invoke where needed.)
 
 def safe_llm_invoke(prompt: str) -> str:
     if llm is None:
@@ -55,7 +51,7 @@ def safe_llm_invoke(prompt: str) -> str:
     resp = llm.invoke(prompt)
     return resp.content.strip()
 
-# classifier_node (uses LLM)
+
 def classifier_node(state: AgentState) -> AgentState:
     prompt = f"""
     You are a classification assistant for a finance helpdesk. Classify the user's question into one of the following categories exactly: "mf", "stock", "general_finance", "unknown".

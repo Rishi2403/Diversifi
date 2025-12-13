@@ -2,13 +2,13 @@ import json
 import warnings
 
 from mf_scrapper import scrape_mf
-from helper_func import analyze_sentiment
+from helper_func import analyze_sentiment, normalize_fund_name
 from news_service import NewsService
 warnings.simplefilter(action='ignore', category=FutureWarning)
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import find_dotenv, load_dotenv
 from langgraph.graph import StateGraph, END
-from typing import Optional, TypedDict, List
+from typing import Dict, Optional, TypedDict, List
 from langchain.tools import tool
 from langchain_community.vectorstores import Chroma 
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -52,15 +52,18 @@ class AgentState(TypedDict):
     reasoning: str
     clarification_used: bool
     answer: str
-    symbol: Optional[str] 
+
+    status: str
+    events: List[Dict]
+
+    symbol: Optional[str]
     stock_sentiment: Optional[dict]
-    mf_sentiment:Optional[dict]
-    bear_analysis:Optional[dict]
-    bull_analysis:Optional[dict]
+    bull_analysis: Optional[str]
+    bear_analysis: Optional[str]
     mf_matches: Optional[list]
-    mf_category: Optional[list]
+    mf_categories: Optional[list]
     mf_scraped_data: Optional[list]
-    should_scrape: bool 
+    should_scrape: bool
 
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",    
@@ -122,23 +125,49 @@ def classifier_node(state: AgentState) -> AgentState:
     state["missing_info"] = data.get("missing_info")
     state["reasoning"] = data.get("reasoning", "")
 
+    state["events"].append({
+        "type": "result",
+        "title": "Classifier",
+        "message": f"Category: {state['category']}, missing info: {state['missing_info']}"
+    })
+
     return state
 
 
 def clarifier_node(state: AgentState) -> AgentState:
     """Ask ONE clarifying question only if missing_info exists."""
-
+    
     missing = state["missing_info"]
-    if not missing or missing.strip() == "" or missing=="null" or missing=="Null":
+    if not missing or missing.strip() == "" or missing.lower() == "null":
         state["clarification_used"] = True
         return state
 
-    print(f"\nClarifier: I need more info: {missing}")
-    ans = input("\nYour answer: ").strip()
 
+    if not state.get("_clarifier_response"):
+        state["clarification_used"] = False  
+        state["events"].append({
+            "type": "clarifier",
+            "title": "Clarifier",
+            "message": f"Waiting for clarification: {missing}"
+        })
+        return state
+
+
+    ans = state["_clarifier_response"]
     state["question"] = state["question"] + " | " + ans
     state["clarification_used"] = True
+    state["events"].append({
+        "type": "clarifier",
+        "title": "Clarification Received",
+        "message": f"User provided info: {ans}"
+    })
+    raise Exception("WAITING_FOR_CLARIFICATION")
+
+
+    state["_clarifier_response"] = None
+
     return state
+
 
 
 def handle_classifier_decision(state: AgentState) -> str:
@@ -183,6 +212,11 @@ def general_finance_handler(state: AgentState) -> AgentState:
     
     state["answer"] = answer.strip()
     print("\n\n📍 Finance Advisor Response:\n", state["answer"])
+    state["events"].append({
+        "type": "result",
+        "title": "General Finance",
+        "message": state["answer"]
+    })
     return state
 
 #MF Related
@@ -207,14 +241,18 @@ def extract_mf_name(state: AgentState) -> AgentState:
 
     resp = llm.invoke(prompt)
 
-    # -----------------------------
-    # Parse LLM response safely
-    # -----------------------------
+
+    raw = resp.content.strip()
+    if raw.startswith("```"):
+        raw = raw.strip("`")
+        raw = raw.replace("json", "", 1).strip()
+
     try:
-        result = json.loads(resp.content)
+        result = json.loads(raw)
         mf_names = result.get("names", [])
         mf_categories = result.get("categories", [])
-    except:
+    except Exception as e:
+        print("JSON parse failed:", e)
         mf_names = []
         mf_categories = []
 
@@ -223,24 +261,21 @@ def extract_mf_name(state: AgentState) -> AgentState:
 
     matched_urls = []
 
-    # ----------------------------------------------------
-    # 1️⃣ FUZZY MATCHING for mutual fund NAME extraction
-    # ----------------------------------------------------
     for user_name in mf_names:
         best_match = None
         best_score = 0
 
+        norm_user = normalize_fund_name(user_name)
+
         for entry in MF_LIST:
-            score = fuzz.token_sort_ratio(
-                user_name.lower(),
-                entry["mutual_fund_name"].lower()
-            )
+            norm_entry = normalize_fund_name(entry["mutual_fund_name"])
+
+            score = fuzz.token_set_ratio(norm_user, norm_entry)
 
             if score > best_score:
                 best_score = score
                 best_match = entry
 
-        # Threshold for accuracy
         if best_score >= 70:
             matched_urls.append({
                 "name": best_match["mutual_fund_name"],
@@ -267,6 +302,12 @@ def extract_mf_name(state: AgentState) -> AgentState:
     print("\nRaw LLM output:", resp.content)
 
     print(f"\n\nExtracted Fund names from prompt: {resp.content}")
+
+    state["events"].append({
+        "type": "result",
+        "title": "MF Extraction",
+        "message": f"Extracted MF matches: {matched_urls}"
+    })
     return state
 
 def mf_scrape_node(state: AgentState) -> AgentState:
@@ -297,6 +338,11 @@ def mf_scrape_node(state: AgentState) -> AgentState:
 
     state["mf_scraped_data"] = scraped_list
     print(f"\n\nExtracted mutual fund data from tkinter: {state['mf_scraped_data']}")
+    state["events"].append({
+        "type": "result",
+        "title": "MF Scraper",
+        "message": f"Scraped {len(scraped_list)} funds"
+    })
     return state
 
 def mf_handler(state: AgentState) -> AgentState:
@@ -329,6 +375,11 @@ def mf_handler(state: AgentState) -> AgentState:
     resp = llm.invoke(prompt)
     state["answer"] = resp.content.strip()
     print("\n\nFinal Mutual Fund Recommendation:\n", state["answer"])
+    state["events"].append({
+        "type": "result",
+        "title": "MF Answer",
+        "message": state["answer"]
+    })
     return state
 
 ## Stocks Related
@@ -351,6 +402,11 @@ def symbol_extractor(state: AgentState) -> AgentState:
 
     state["symbol"] = symbol
     print(f"\n\nExtracted Stock Symbol: {symbol}")
+    state["events"].append({
+        "type": "result",
+        "title": "Symbol Extractor",
+        "message": f"Extracted symbol: {symbol}"
+    })
     return state
 
 def stock_sentiment(state: AgentState) -> AgentState:
@@ -369,6 +425,11 @@ def stock_sentiment(state: AgentState) -> AgentState:
         "news_sentiment": sentiment_summary,
         # "twitter_sentiment": twitter_sentiment
     }
+    state["events"].append({
+        "type": "result",
+        "title": "Stock Sentiment",
+        "message": f"Sentiment  Summary: {sentiment_summary}"
+    })
     
     return state
 
@@ -392,6 +453,11 @@ def bull_handler(state: AgentState) -> dict:
     state["bull_analysis"] = resp.content.strip()
     print("\n\nBullish Analysis:\n",state["bull_analysis"])
     bull_text = state["bull_analysis"]
+    state["events"].append({
+        "type": "result",
+        "title": "Bullish Review",
+        "message": f"Bullish  Analysis: {bull_text}"
+    })
     return {"bull_analysis": bull_text}
 
 def bear_handler(state: AgentState) -> dict:
@@ -414,6 +480,11 @@ def bear_handler(state: AgentState) -> dict:
     state["bear_analysis"] = resp.content.strip()
     bear_text = state["bear_analysis"]
     print("\n\nBearish Analysis:\n",state["bear_analysis"])
+    state["events"].append({
+        "type": "result",
+        "title": "Bearish Review",
+        "message": f"Bearish Analysis: {bear_text}"
+    })
     return {"bear_analysis": bear_text}
 
 def stock_handler(state: AgentState) -> AgentState:
@@ -436,8 +507,14 @@ def stock_handler(state: AgentState) -> AgentState:
 
     resp = llm.invoke(prompt)
     state["answer"] = resp.content.strip()
+    final_ans=state["answer"]
 
-    print("\n\nFinal Balanced Stock Recommendation:\n", state["answer"])
+    print("\n\nFinal Balanced Stock Recommendation:\n", final_ans)
+    state["events"].append({
+        "type": "result",
+        "title": "Final Review",
+        "message": f"Stock Final Analysis: {final_ans}"
+    })
     return state
 
 def build_graph():
@@ -498,10 +575,10 @@ if __name__ == "__main__":
     question_input = input("\n\nEnter your question: ")
 
     graph = build_graph()
-    png = graph.get_graph().draw_mermaid_png()
-    with open("workflow.png","wb") as f:
-        f.write(png)
-    print("Saved workflow diagram to workflow.png")
+    # png = graph.get_graph().draw_mermaid_png()
+    # with open("workflow.png","wb") as f:
+    #     f.write(png)
+    # print("Saved workflow diagram to workflow.png")
     initial_state: AgentState = {
         "question": question_input,
         "category": "",
