@@ -11,7 +11,7 @@ from langgraph.graph import StateGraph, END
 from typing import Dict, Optional, TypedDict, List
 from langchain.tools import tool
 from langchain_community.vectorstores import Chroma 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 import os
 from langgraph.prebuilt import create_react_agent
 from rapidfuzz import fuzz
