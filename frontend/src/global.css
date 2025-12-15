@@ -1,0 +1,201 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* === Light Mode Colors === */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    
+    /* Brand colors - from design */
+    --primary: 237 100% 68%;
+    --primary-foreground: 0 0% 100%;
+    
+    --white: 0 0% 97%;
+    --soft-gray: 0 0% 30%;
+    --black: 0 0% 8%;
+    --secondary: 45 100% 95%;
+    
+    /* Surface colors */
+    --surface-primary: 0 0% 100%;
+    --surface-secondary: 45 100% 95%;
+    --surface-tertiary: 0 0% 97%;
+    
+    /* Card and container */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 8%;
+    
+    /* Borders */
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    
+    /* Text colors */
+    --text-primary: 0 0% 8%;
+    --text-secondary: 0 0% 30%;
+    --text-tertiary: 0 0% 60%;
+    
+    /* Muted */
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 50%;
+    
+    /* Popover */
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 8%;
+    
+    /* Ring */
+    --ring: 237 100% 68%;
+    
+    /* Radius */
+    --radius: 0.75rem;
+    
+    /* Sidebar */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 20%;
+    --sidebar-primary: 237 100% 68%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 45 100% 95%;
+    --sidebar-accent-foreground: 0 0% 8%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 237 100% 68%;
+    
+    /* Gradients */
+    --gradient-primary-to-secondary: linear-gradient(135deg, #9EA2F8 0%, #FBFAEE 100%);
+    --gradient-radial: radial-gradient(circle at 20% 50%, #9EA2F8 0%, #FBFAEE 100%);
+  }
+
+  .dark {
+    /* === Dark Mode Colors === */
+    --background: 262 40% 12%;
+    --foreground: 0 0% 97%;
+    
+    /* Brand colors - inverted for dark mode */
+    --primary: 237 100% 65%;
+    --primary-foreground: 0 0% 8%;
+    
+    --white: 0 0% 15%;
+    --soft-gray: 0 0% 70%;
+    --black: 0 0% 92%;
+    --secondary: 45 100% 20%;
+    
+    /* Surface colors */
+    --surface-primary: 262 30% 18%;
+    --surface-secondary: 262 35% 25%;
+    --surface-tertiary: 262 25% 22%;
+    
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 97%;
+    
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    
+    /* Text colors */
+    --text-primary: 0 0% 97%;
+    --text-secondary: 0 0% 70%;
+    --text-tertiary: 0 0% 50%;
+    
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 60%;
+    
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 97%;
+    
+    --ring: 237 100% 65%;
+    
+    --sidebar-background: 0 0% 10%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 237 100% 65%;
+    --sidebar-primary-foreground: 0 0% 8%;
+    --sidebar-accent: 45 20% 30%;
+    --sidebar-accent-foreground: 0 0% 97%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 237 100% 65%;
+
+    --gradient-primary-to-secondary: linear-gradient(135deg, #9EA2F8 0%, #FBFAEE 100%);
+    --gradient-radial: radial-gradient(circle at 20% 50%, #6366f1 0%, #1a0f3a 100%);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Roboto Mono", monospace;
+  }
+
+  :where(p, span, li, h1, h2, h3, h4, h5, h6, a, button, label, td, th) {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  pre,
+  code {
+    overflow-x: auto;
+    white-space: pre;
+    font-family: "Roboto Mono", monospace;
+  }
+
+  h1 {
+    @apply text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl font-bold tracking-tight;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl font-bold;
+  }
+
+  h4 {
+    @apply text-xl md:text-2xl font-semibold;
+  }
+
+  h5 {
+    @apply text-lg md:text-xl font-semibold;
+  }
+
+  h6 {
+    @apply text-base md:text-lg font-semibold;
+  }
+}
+
+@layer components {
+  .gradient-primary-to-secondary {
+    background: var(--gradient-primary-to-secondary);
+  }
+
+  .gradient-radial {
+    background: var(--gradient-radial);
+  }
+
+  .glass-effect {
+    @apply bg-white/10 dark:bg-slate-900/10 backdrop-blur-md border border-white/20 dark:border-slate-700/30;
+  }
+
+  .card-elevated {
+    @apply bg-card rounded-lg border border-border shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+
+  .button-primary {
+    @apply bg-primary text-primary-foreground hover:opacity-90 transition-opacity duration-200;
+  }
+
+  .input-base {
+    @apply px-4 py-2 rounded-lg border border-input text-foreground placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-0;
+    background-color: hsl(var(--surface-primary));
+  }
+
+  .pill-badge {
+    @apply inline-flex items-center px-4 py-2 rounded-full text-sm font-medium border border-border bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm;
+  }
+}
