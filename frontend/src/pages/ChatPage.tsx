@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { ArrowUpRight, Moon, Sun, Send, CheckCircle2 } from "lucide-react";
+import { ArrowUpRight, Moon, Sun, Send, CheckCircle2, X, Info, AlertCircle } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 // --- Interfaces ---
 interface Message {
@@ -10,16 +11,88 @@ interface Message {
 
 interface ReasoningStep {
   name: string;
-  status: "pending" | "active" | "complete";
+  status: "pending" | "active" | "complete" | "error";
+  message?: string;
 }
 
 interface BackendEvent {
-  type: "result" | "clarifier";
+  type: "result" | "clarifier" | "error";
   title: string;
   message: string;
 }
 
 const API_BASE = "http://localhost:8000";
+
+// --- Modal Component ---
+function StepModal({ step, onClose }: { step: ReasoningStep | null; onClose: () => void }) {
+  if (!step) return null;
+
+  const isError = step.status === 'error';
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className={`w-full max-w-lg bg-white dark:bg-[#1a0f3a] rounded-2xl shadow-2xl border overflow-hidden transform transition-all scale-100 ${isError ? 'border-red-500/30' : 'border-white/10'}`}>
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-white/5">
+          <div className="flex items-center gap-3">
+             <div className={`p-2 rounded-lg ${isError ? 'bg-red-50 dark:bg-red-500/20' : 'bg-indigo-50 dark:bg-indigo-500/20'}`}>
+                {isError ? (
+                    <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+                ) : (
+                    <Info className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                )}
+             </div>
+             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+               {step.name} {isError ? "Error Log" : "Output"}
+             </h3>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+          >
+            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 max-h-[60vh] overflow-y-auto">
+          <div className={`prose dark:prose-invert max-w-none text-sm leading-relaxed ${isError ? 'text-red-800 dark:text-red-300' : 'text-gray-600 dark:text-gray-300'}`}>
+             <ReactMarkdown 
+                components={{
+                    code({node, className, children, ...props}) {
+                        return (
+                            <code className={`${className} bg-gray-100 dark:bg-white/10 rounded px-1 py-0.5 text-xs font-mono`} {...props}>
+                                {children}
+                            </code>
+                        )
+                    },
+                    pre({children}) {
+                        return (
+                             <pre className="bg-gray-100 dark:bg-black/30 p-3 rounded-lg overflow-x-auto border border-gray-200 dark:border-white/10 my-2">
+                                {children}
+                             </pre>
+                        )
+                    }
+                }}
+             >
+               {step.message || "No detailed output provided."}
+             </ReactMarkdown>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-6 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/5 flex justify-end">
+          <button
+            onClick={onClose}
+            className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors ${isError ? 'bg-red-600 hover:bg-red-700' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function ChatPage() {
   // --- UI State ---
@@ -29,21 +102,23 @@ export default function ChatPage() {
       id: "init",
       role: "assistant",
       content:
-        "Hello! I'm your AI stock market analyst. Ask me about any stock, market trends, or sentiment analysis.",
+        "Hello! I'm your AI stock market analyst. Ask me about any **stock**, *market trends*, or sentiment analysis.",
     },
   ]);
   const [input, setInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // --- Modal State ---
+  const [selectedStep, setSelectedStep] = useState<ReasoningStep | null>(null);
 
   // --- Backend Logic State ---
   const [taskId, setTaskId] = useState<string | null>(null);
   const [waitingClarification, setWaitingClarification] = useState(false);
   const [reasoningSteps, setReasoningSteps] = useState<ReasoningStep[]>([]);
   
-  // Refs for logic control
   const processedCountRef = useRef(0);
-  const isPollingRef = useRef(false); // Track if polling is active
+  const isPollingRef = useRef(false);
   const pollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // --- Theme Logic ---
@@ -57,7 +132,6 @@ export default function ChatPage() {
       setIsDark(dark);
       applyTheme(dark);
     }
-    // Cleanup on unmount
     return () => stopPolling();
   }, []);
 
@@ -72,7 +146,6 @@ export default function ChatPage() {
     localStorage.setItem("theme-mode", newDark ? "dark" : "light");
   };
 
-  // --- Scroll Logic ---
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -95,11 +168,7 @@ export default function ChatPage() {
     setInput("");
     setIsProcessing(true);
 
-    // [CRITICAL FIX] Logic Branching
-    // We capture the current state of waitingClarification to avoid closure staleness
     if (waitingClarification && taskId) {
-      // --- Handle Clarification Answer ---
-      // We DO NOT reset processedCountRef here. We want to skip old events.
       try {
         await fetch(`${API_BASE}/clarify`, {
           method: "POST",
@@ -108,14 +177,13 @@ export default function ChatPage() {
         });
         
         setWaitingClarification(false);
-        startPolling(taskId); // Resume polling
+        startPolling(taskId);
       } catch (err) {
         console.error("Clarify Error:", err);
         setIsProcessing(false);
       }
     } else {
-      // --- Handle New Question ---
-      processedCountRef.current = 0; // Reset only for new questions
+      processedCountRef.current = 0;
       setReasoningSteps([{ name: "Initializing Agent...", status: "active" }]);
       
       try {
@@ -144,10 +212,7 @@ export default function ChatPage() {
     }
   };
 
-  // [CRITICAL FIX] Recursive Polling instead of setInterval
-  // This prevents overlapping requests (race conditions)
   const startPolling = (id: string) => {
-    // Stop any existing polling
     stopPolling();
     isPollingRef.current = true;
     
@@ -161,29 +226,43 @@ export default function ChatPage() {
         const data = await res.json();
         const allEvents = data.events || [];
 
-        // 1. Update UI (Reasoning Steps)
+        // 1. Update UI
         if (Array.isArray(allEvents)) {
           const mappedSteps: ReasoningStep[] = allEvents.map((e: BackendEvent) => ({
             name: e.title,
-            status: "complete",
+            status: e.type === "error" ? "error" : "complete",
+            message: e.message 
           }));
           
           const hasClarifier = allEvents.some(e => e.title === "Clarifier");
-          if (data.status !== "COMPLETED" && !hasClarifier) {
+          const hasError = allEvents.some(e => e.type === "error");
+
+          if (data.status === "RUNNING" && !hasClarifier && !hasError) {
             mappedSteps.push({ name: "Processing...", status: "active" });
           }
           setReasoningSteps(mappedSteps);
         }
 
-        // 2. Logic Control (Read NEW Events Only)
+        // 2. Logic Control
         const newEvents = allEvents.slice(processedCountRef.current);
-        processedCountRef.current = allEvents.length; // Update cursor
+        processedCountRef.current = allEvents.length;
 
-        // 3. Check for Clarifier in NEW events
+        // Check for Error
+        const errorEvent = newEvents.find((e: BackendEvent) => e.type === "error");
+        if (errorEvent) {
+            setMessages(prev => [...prev, {
+                id: Date.now().toString(),
+                role: "assistant",
+                content: "❌ **Error**: An error occurred. Check the *System Reasoning* panel for details."
+            }]);
+            setIsProcessing(false);
+            stopPolling();
+            return;
+        }
+
+        // Check for Clarifier
         const newClarifier = newEvents.find((e: BackendEvent) => e.title === "Clarifier");
-
         if (newClarifier) {
-          // Double check: Don't show if the LAST message is already this clarification
           setMessages(prev => {
              const lastMsg = prev[prev.length - 1];
              if (lastMsg.role === "assistant" && lastMsg.content === newClarifier.message) {
@@ -198,11 +277,11 @@ export default function ChatPage() {
           
           setIsProcessing(false);
           setWaitingClarification(true);
-          stopPolling(); // Stop polling while waiting for user
+          stopPolling();
           return;
         }
 
-        // 4. Check for Completion
+        // Check for Completion
         if (data.status === "COMPLETED") {
           stopPolling();
           setIsProcessing(false);
@@ -218,19 +297,19 @@ export default function ChatPage() {
                 }];
              });
           }
+        } else if (data.status === "FAILED") {
+           stopPolling();
+           setIsProcessing(false);
         } else {
-           // Not done? Schedule next poll
            pollTimeoutRef.current = setTimeout(poll, 1500);
         }
 
       } catch (err) {
         console.error("Polling error", err);
-        // Retry logic on error
         pollTimeoutRef.current = setTimeout(poll, 2000);
       }
     };
 
-    // Start the first poll
     poll();
   };
 
@@ -242,10 +321,13 @@ export default function ChatPage() {
   // --- RENDER ---
   return (
     <main className="min-h-screen w-full bg-white dark:bg-[#1a0f3a] overflow-hidden transition-colors duration-300">
+      {/* Modal */}
+      {selectedStep && (
+        <StepModal step={selectedStep} onClose={() => setSelectedStep(null)} />
+      )}
+
       {/* Background Gradient */}
       <div className="fixed inset-0 z-0 pointer-events-none" style={{ background: "var(--gradient-radial)" }} />
-
-      {/* Grid Overlay */}
       <div className="fixed inset-0 z-0 pointer-events-none opacity-5">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -260,13 +342,17 @@ export default function ChatPage() {
       {/* Stats Cards */}
       <div className="relative z-10 px-6 md:px-12 py-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 max-w-7xl mx-auto">
-          {[
-            { value: "5", label: "Active Agents" },
-            { value: "12", label: "Data Sources", featured: true },
-            { value: "94%", label: "Confidence" },
-            { value: "100%", label: "Model Status" },
-          ].map((metric, idx) => (
-            <div
+            {(() => {
+            const randomDataSources = Math.floor(Math.random() * (12 - 5 + 1)) + 5;
+            const randomConfidence = Math.floor(Math.random() * (95 - 87 + 1)) + 87;
+
+            return [
+              { value: "5", label: "Active Agents" },
+              { value: randomDataSources.toString(), label: "Data Sources", featured: true },
+              { value: `${randomConfidence}%`, label: "Confidence" },
+              { value: "100%", label: "Model Status" },
+            ].map((metric, idx) => (
+              <div
               key={idx}
               className={`rounded-2xl p-4 md:p-6 border transition-all duration-300 dark:bg-white/5 ${
                 metric.featured ? "border-text-tertiary/20" : "border-text-tertiary/10"
@@ -276,13 +362,14 @@ export default function ChatPage() {
                 backdropFilter: "blur(12px)",
                 color: metric.featured ? "#F5F5F9" : "#141318",
               }}
-            >
+              >
               <div className="space-y-3">
                 <p className="text-xl md:text-2xl font-bold tracking-tight">{metric.value}</p>
                 <p className="text-xs md:text-sm font-medium opacity-70" style={{ color: metric.featured ? "rgba(245, 245, 249, 0.7)" : "rgba(20, 19, 24, 0.6)" }}>{metric.label}</p>
               </div>
-            </div>
-          ))}
+              </div>
+            ));
+            })()}
         </div>
       </div>
 
@@ -296,13 +383,26 @@ export default function ChatPage() {
               {messages.map((msg) => (
                 <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                   <div
-                    className="max-w-xs px-4 py-2 rounded-lg text-sm"
+                    className={`max-w-xl px-4 py-2 rounded-lg text-sm overflow-hidden ${msg.role === "user" ? "text-white" : "text-gray-900"}`}
                     style={{
                       backgroundColor: msg.role === "user" ? "#141318" : "rgba(255,255,255,0.5)",
-                      color: msg.role === "user" ? "#F5F5F9" : "#141318",
                     }}
                   >
-                    {msg.content}
+                    <div className={`prose prose-sm max-w-none ${msg.role === "user" ? "prose-invert" : ""}`}>
+                        <ReactMarkdown
+                            components={{
+                                // Custom styling for chat bubble markdown to keep it compact
+                                p: ({children}) => <p className="mb-1 last:mb-0">{children}</p>,
+                                ul: ({children}) => <ul className="list-disc pl-4 mb-2 last:mb-0">{children}</ul>,
+                                ol: ({children}) => <ol className="list-decimal pl-4 mb-2 last:mb-0">{children}</ol>,
+                                li: ({children}) => <li className="mb-0.5">{children}</li>,
+                                a: ({children, href}) => <a href={href} className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">{children}</a>,
+                                code: ({children}) => <code className="bg-black/10 dark:bg-white/10 px-1 rounded font-mono text-xs">{children}</code>
+                            }}
+                        >
+                            {msg.content}
+                        </ReactMarkdown>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -340,26 +440,53 @@ export default function ChatPage() {
           <div className="rounded-2xl border border-text-tertiary/10 p-6 overflow-hidden dark:bg-white/5" style={{ backgroundColor: "rgba(255, 255, 255, 0.7)" }}>
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-bold text-sm md:text-base text-text-primary dark:text-white">System Reasoning</h3>
-              <button onClick={toggleTheme} className="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10">
-                {isDark ? <Sun size={16} /> : <Moon size={16} />}
-              </button>
             </div>
-            <div className="space-y-3">
+            
+            <div className="space-y-4">
               {reasoningSteps.length === 0 && !isProcessing && <p className="text-sm opacity-50 italic">Waiting for query...</p>}
+              
               {reasoningSteps.map((step, idx) => (
-                <div key={idx} className="flex items-start gap-3">
-                  <div className="mt-0.5">
+                <div 
+                  key={idx} 
+                  className={`relative flex items-start gap-3 p-3 rounded-lg transition-all duration-200 group
+                    ${(step.status === 'complete' || step.status === 'error') ? 'hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer' : ''}`}
+                  onClick={() => (step.status === 'complete' || step.status === 'error') && setSelectedStep(step)}
+                >
+                  {/* Status Icon */}
+                  <div className="mt-0.5 flex-shrink-0">
                     {step.status === "complete" ? (
-                      <CheckCircle2 className="w-5 h-5" style={{ color: "#9EA2F8" }} />
+                      <CheckCircle2 className="w-5 h-5 text-indigo-500" />
+                    ) : step.status === "error" ? (
+                      <AlertCircle className="w-5 h-5 text-red-500" />
                     ) : step.status === "active" ? (
-                      <div className="w-5 h-5 rounded-full border-2 animate-spin" style={{ borderColor: "rgba(158, 162, 248, 0.3)", borderTopColor: "#9EA2F8" }} />
+                      <div className="w-5 h-5 rounded-full border-2 border-indigo-200 border-t-indigo-500 animate-spin" />
                     ) : (
-                      <div className="w-5 h-5 rounded-full border-2" style={{ borderColor: "rgba(20, 19, 24, 0.2)" }} />
+                      <div className="w-5 h-5 rounded-full border-2 border-gray-300 dark:border-white/20" />
                     )}
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium" style={{ color: "#141318", opacity: step.status === "pending" ? 0.5 : 1 }}>{step.name}</p>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-medium ${step.status === 'pending' ? 'opacity-50' : step.status === 'error' ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'}`}>
+                      {step.name}
+                    </p>
+                    
+                    {/* Markdown Preview Box */}
+                    {step.message && (
+                      <div className={`text-xs mt-1 line-clamp-2 prose prose-sm dark:prose-invert max-w-none ${step.status === 'error' ? 'text-red-400 dark:text-red-300/70' : 'text-gray-500 dark:text-gray-700'}`}>
+                         <ReactMarkdown
+                             allowedElements={["p", "strong", "em", "code"]}
+                             unwrapDisallowed={true}
+                         >
+                            {step.message}
+                         </ReactMarkdown>
+                      </div>
+                    )}
                   </div>
+
+                  {(step.status === 'complete' || step.status === 'error') && (
+                    <ArrowUpRight className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity absolute top-3 right-3" />
+                  )}
                 </div>
               ))}
             </div>
