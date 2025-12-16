@@ -19,7 +19,7 @@ interface BackendEvent {
   message: string;
 }
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "http://localhost:8000";
 
 export default function ChatPage() {
   // --- UI State ---
@@ -35,7 +35,7 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+
   // --- Backend Logic State ---
   const [taskId, setTaskId] = useState<string | null>(null);
   const [waitingClarification, setWaitingClarification] = useState(false);
@@ -102,10 +102,10 @@ export default function ChatPage() {
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsProcessing(true);
-    
+
     // Reset reasoning steps for new query unless it's a clarification
     if (!waitingClarification) {
-        setReasoningSteps([{ name: "Initializing Agent...", status: "active" }]);
+      setReasoningSteps([{ name: "Initializing Agent...", status: "active" }]);
     }
 
     try {
@@ -116,7 +116,7 @@ export default function ChatPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ task_id: taskId, answer: userText }),
         });
-        
+
         setWaitingClarification(false);
         // Resume polling existing task
         startPolling(taskId);
@@ -147,7 +147,9 @@ export default function ChatPage() {
           content: "Error: Could not connect to the analyst backend.",
         },
       ]);
-      setReasoningSteps((prev) => prev.map(s => ({...s, status: "complete"}))); // Stop spinners
+      setReasoningSteps((prev) =>
+        prev.map((s) => ({ ...s, status: "complete" })),
+      ); // Stop spinners
     }
   };
 
@@ -158,27 +160,32 @@ export default function ChatPage() {
       try {
         const res = await fetch(`${API_BASE}/get/${id}`);
         if (!res.ok) return; // Skip if network blip
-        
+
         const data = await res.json();
 
         // Update Reasoning Steps
         if (data.events && Array.isArray(data.events)) {
-            const mappedSteps: ReasoningStep[] = data.events.map((e: BackendEvent) => ({
-                name: e.title,
-                status: "complete"
-            }));
-            
-            // If still running, add a generic "active" step at the bottom
-            if (data.status !== "COMPLETED" && !data.events.some((e: BackendEvent) => e.type === "clarifier")) {
-                mappedSteps.push({ name: "Processing...", status: "active" });
-            }
-            
-            setReasoningSteps(mappedSteps);
+          const mappedSteps: ReasoningStep[] = data.events.map(
+            (e: BackendEvent) => ({
+              name: e.title,
+              status: "complete",
+            }),
+          );
+
+          // If still running, add a generic "active" step at the bottom
+          if (
+            data.status !== "COMPLETED" &&
+            !data.events.some((e: BackendEvent) => e.type === "clarifier")
+          ) {
+            mappedSteps.push({ name: "Processing...", status: "active" });
+          }
+
+          setReasoningSteps(mappedSteps);
         }
 
         // Handle Clarification Request
         const clarifier = data.events?.find(
-          (e: BackendEvent) => e.type === "clarifier"
+          (e: BackendEvent) => e.type === "clarifier",
         );
 
         if (clarifier) {
@@ -263,8 +270,11 @@ export default function ChatPage() {
           ].map((metric, idx) => (
             <div
               key={idx}
-              className={`rounded-2xl p-4 md:p-6 border transition-all duration-300 dark:bg-white/5 ${metric.featured ? "border-text-tertiary/20" : "border-text-tertiary/10"
-                }`}
+              className={`rounded-2xl p-4 md:p-6 border transition-all duration-300 dark:bg-white/5 ${
+                metric.featured
+                  ? "border-text-tertiary/20"
+                  : "border-text-tertiary/10"
+              }`}
               style={{
                 backgroundColor: metric.featured
                   ? "rgba(20, 19, 24, 0.9)"
@@ -297,14 +307,18 @@ export default function ChatPage() {
       <div className="relative z-10 px-6 md:px-12 py-8">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Chat Panel */}
-          <div className="lg:col-span-2 rounded-2xl border border-text-tertiary/10 overflow-hidden dark:bg-white/5" style={{ backgroundColor: "rgba(255, 255, 255, 0.7)" }}>
+          <div
+            className="lg:col-span-2 rounded-2xl border border-text-tertiary/10 overflow-hidden dark:bg-white/5"
+            style={{ backgroundColor: "rgba(255, 255, 255, 0.7)" }}
+          >
             {/* Chat Messages */}
             <div className="h-96 md:h-[500px] overflow-y-auto p-6 space-y-4">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"
-                    }`}
+                  className={`flex ${
+                    msg.role === "user" ? "justify-end" : "justify-start"
+                  }`}
                 >
                   <div
                     className="max-w-xs px-4 py-2 rounded-lg text-sm"
@@ -344,7 +358,11 @@ export default function ChatPage() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={waitingClarification ? "Please provide the required clarification..." : "Ask about a stock, market trend, or sentiment…"}
+                  placeholder={
+                    waitingClarification
+                      ? "Please provide the required clarification..."
+                      : "Ask about a stock, market trend, or sentiment…"
+                  }
                   className="flex-1 px-4 py-2 rounded-lg text-sm border border-text-tertiary/20 focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all"
                   style={{
                     backgroundColor: "rgba(255,255,255,0.5)",
@@ -368,14 +386,19 @@ export default function ChatPage() {
           </div>
 
           {/* System Reasoning Panel */}
-          <div className="rounded-2xl border border-text-tertiary/10 p-6 overflow-hidden dark:bg-white/5" style={{ backgroundColor: "rgba(255, 255, 255, 0.7)" }}>
+          <div
+            className="rounded-2xl border border-text-tertiary/10 p-6 overflow-hidden dark:bg-white/5"
+            style={{ backgroundColor: "rgba(255, 255, 255, 0.7)" }}
+          >
             <h3 className="font-bold text-sm md:text-base mb-6 text-text-primary dark:text-white">
               System Reasoning
             </h3>
 
             <div className="space-y-3">
               {reasoningSteps.length === 0 && !isProcessing && (
-                   <p className="text-sm opacity-50 italic">Waiting for query...</p>
+                <p className="text-sm opacity-50 italic">
+                  Waiting for query...
+                </p>
               )}
               {reasoningSteps.map((step, idx) => (
                 <div key={idx} className="flex items-start gap-3">
