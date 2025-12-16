@@ -110,7 +110,8 @@ def send_clarifier(req: ClarifierRequest, background: BackgroundTasks):
 
     state = task["state"]
 
-    state["_clarifier_response"] = req.answer
+    state["question"] = state["question"] + " | " + req.answer
+    state["clarification_used"] = True
     state["status"] = "RUNNING"
 
     TASKS[req.task_id]["state"] = state

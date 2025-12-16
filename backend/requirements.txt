@@ -29,3 +29,4 @@ chromadb
 langchain-chroma
 rapidfuzz
 fastapi
+langchain_huggingface

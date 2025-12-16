@@ -122,7 +122,10 @@ def classifier_node(state: AgentState) -> AgentState:
 
     state["category"] = data.get("category", "unknown")
     state["confidence"] = data.get("confidence", 0.0)
-    state["missing_info"] = data.get("missing_info")
+    if not state.get("clarification_used"):
+        state["missing_info"] = data.get("missing_info")
+    else:
+        state["missing_info"] = None
     state["reasoning"] = data.get("reasoning", "")
 
     state["events"].append({
@@ -137,22 +140,28 @@ def classifier_node(state: AgentState) -> AgentState:
 def clarifier_node(state: AgentState) -> AgentState:
     missing = state.get("missing_info")
 
+    if state.get("clarification_used"):
+        return state
+
     if not missing or missing.strip() == "" or missing.lower() == "null":
         state["clarification_used"] = True
         return state
 
     if "_clarifier_response" not in state:
+        state["clarification_used"] = True   
         state["status"] = "WAITING"
+
         state["events"].append({
             "type": "clarifier",
             "title": "Clarifier",
             "message": f"Waiting for clarification: {missing}"
         })
+
         raise Exception("WAITING_FOR_CLARIFICATION")
 
+    # Response received
     ans = state.pop("_clarifier_response")
     state["question"] += " | " + ans
-    state["clarification_used"] = True
 
     state["events"].append({
         "type": "clarifier",
@@ -161,6 +170,8 @@ def clarifier_node(state: AgentState) -> AgentState:
     })
 
     return state
+
+
 
 
 def handle_classifier_decision(state: AgentState) -> str:
