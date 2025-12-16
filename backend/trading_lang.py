@@ -135,39 +135,32 @@ def classifier_node(state: AgentState) -> AgentState:
 
 
 def clarifier_node(state: AgentState) -> AgentState:
-    """Ask ONE clarifying question only if missing_info exists."""
-    
-    missing = state["missing_info"]
+    missing = state.get("missing_info")
+
     if not missing or missing.strip() == "" or missing.lower() == "null":
         state["clarification_used"] = True
         return state
 
-
-    if not state.get("_clarifier_response"):
-        state["clarification_used"] = False  
+    if "_clarifier_response" not in state:
+        state["status"] = "WAITING"
         state["events"].append({
             "type": "clarifier",
             "title": "Clarifier",
             "message": f"Waiting for clarification: {missing}"
         })
-        return state
+        raise Exception("WAITING_FOR_CLARIFICATION")
 
-
-    ans = state["_clarifier_response"]
-    state["question"] = state["question"] + " | " + ans
+    ans = state.pop("_clarifier_response")
+    state["question"] += " | " + ans
     state["clarification_used"] = True
+
     state["events"].append({
         "type": "clarifier",
         "title": "Clarification Received",
-        "message": f"User provided info: {ans}"
+        "message": f"User provided: {ans}"
     })
-    raise Exception("WAITING_FOR_CLARIFICATION")
-
-
-    state["_clarifier_response"] = None
 
     return state
-
 
 
 def handle_classifier_decision(state: AgentState) -> str:

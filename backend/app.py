@@ -73,6 +73,7 @@ def run_graph(task_id: str):
         final_state = graph.invoke(state)
         final_state["status"] = "COMPLETED"
         TASKS[task_id]["state"] = final_state
+
     except Exception as e:
         if str(e) == "WAITING_FOR_CLARIFICATION":
             state["status"] = "WAITING"
@@ -86,6 +87,8 @@ def run_graph(task_id: str):
             TASKS[task_id]["state"] = state
 
 
+
+
 @app.post("/clarify")
 def send_clarifier(req: ClarifierRequest, background: BackgroundTasks):
     task = TASKS.get(req.task_id)
@@ -94,12 +97,10 @@ def send_clarifier(req: ClarifierRequest, background: BackgroundTasks):
 
     state = task["state"]
 
-    state["question"] = state["question"] + " | " + req.answer
-    state["clarification_used"] = True
-
+    state["_clarifier_response"] = req.answer
     state["status"] = "RUNNING"
+
     TASKS[req.task_id]["state"] = state
-
-
     background.add_task(run_graph, req.task_id)
+
     return {"success": True}
