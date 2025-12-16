@@ -118,7 +118,7 @@ def classifier_node(state: AgentState) -> AgentState:
         else:
             data = {}
 
-    print(f"\n\nMissing Data: {data.get('missing_info')}")
+    # print(f"\n\nMissing Data: {data.get('missing_info')}")
 
     state["category"] = data.get("category", "unknown")
     state["confidence"] = data.get("confidence", 0.0)
@@ -176,20 +176,20 @@ def clarifier_node(state: AgentState) -> AgentState:
 
 def handle_classifier_decision(state: AgentState) -> str:
     if state["category"] == "unknown":
-        print("\n\n Question out of model's scope. Exiting.")
+        # print("\n\n Question out of model's scope. Exiting.")
         return END
 
     if state["missing_info"] and not state["clarification_used"]:
         return "clarifier"
 
     if state["category"] == "mf":
-        print("\n\nQuestion Classified Into Category Mutual Funds")
+        # print("\n\nQuestion Classified Into Category Mutual Funds")
         return "mf_handler"
     if state["category"] == "stock":
-        print("\n\nQuestion Classified Into Category Stock Market")
+        # print("\n\nQuestion Classified Into Category Stock Market")
         return "stock_handler"
     if state["category"] == "general_finance":
-        print("\n\nQuestion Classified Into Category General Finance")
+        # print("\n\nQuestion Classified Into Category General Finance")
         return "general_finance_handler"
 
     return END
@@ -199,23 +199,21 @@ def general_finance_handler(state: AgentState) -> AgentState:
     prompt = f"""
     You are a financial advisor focused on personal finance topics like budgeting,
     savings, insurance, tax planning, and general investment strategy.
-    Provide a simplified and helpful explanation.
+    Provide a simplified and short explanation.
 
     Question: "{state['question']}"
     """
     
-    # Invoke the agent with proper input format
     result = finance_agent.invoke({
         "messages": [{"role": "user", "content": prompt}]
     })
     
-    # Extract the final answer from the result
-    # The result contains a list of messages, get the last one
+
     final_message = result["messages"][-1]
     answer = final_message.content if hasattr(final_message, 'content') else str(final_message)
     
     state["answer"] = answer.strip()
-    print("\n\n📍 Finance Advisor Response:\n", state["answer"])
+    # print("\n\n📍 Finance Advisor Response:\n", state["answer"])
     state["events"].append({
         "type": "result",
         "title": "General Finance",
@@ -260,8 +258,8 @@ def extract_mf_name(state: AgentState) -> AgentState:
         mf_names = []
         mf_categories = []
 
-    print("\nExtracted Names:", mf_names)
-    print("Extracted Categories:", mf_categories)
+    # print("\nExtracted Names:", mf_names)
+    # print("Extracted Categories:", mf_categories)
 
     matched_urls = []
 
@@ -302,10 +300,10 @@ def extract_mf_name(state: AgentState) -> AgentState:
     state["mf_categories"] = mf_categories
     state["should_scrape"] = len(matched_urls) > 0
 
-    print("\nMatched Funds:", matched_urls)
-    print("\nRaw LLM output:", resp.content)
+    # print("\nMatched Funds:", matched_urls)
+    # print("\nRaw LLM output:", resp.content)
 
-    print(f"\n\nExtracted Fund names from prompt: {resp.content}")
+    # print(f"\n\nExtracted Fund names from prompt: {resp.content}")
 
     state["events"].append({
         "type": "result",
@@ -316,14 +314,14 @@ def extract_mf_name(state: AgentState) -> AgentState:
 
 def mf_scrape_node(state: AgentState) -> AgentState:
     if not state.get("should_scrape"):
-        print("\nSkipping scraper → No MF match found.")
+        # print("\nSkipping scraper → No MF match found.")
         state["mf_scraped_data"] = []
         return state
 
     matches = state.get("mf_matches", [])
     scraped_list = []
 
-    print("\nScraping matched mutual funds...\n")
+    # print("\nScraping matched mutual funds...\n")
 
     for m in matches:
         try:
@@ -341,7 +339,7 @@ def mf_scrape_node(state: AgentState) -> AgentState:
             })
 
     state["mf_scraped_data"] = scraped_list
-    print(f"\n\nExtracted mutual fund data from tkinter: {state['mf_scraped_data']}")
+    # print(f"\n\nExtracted mutual fund data from tkinter: {state['mf_scraped_data']}")
     state["events"].append({
         "type": "result",
         "title": "MF Scraper",
@@ -378,7 +376,7 @@ def mf_handler(state: AgentState) -> AgentState:
 
     resp = llm.invoke(prompt)
     state["answer"] = resp.content.strip()
-    print("\n\nFinal Mutual Fund Recommendation:\n", state["answer"])
+    # print("\n\nFinal Mutual Fund Recommendation:\n", state["answer"])
     state["events"].append({
         "type": "result",
         "title": "MF Answer",
@@ -400,12 +398,12 @@ def symbol_extractor(state: AgentState) -> AgentState:
     symbol = resp.content.strip().upper()
 
     if symbol == "NONE" or len(symbol) > 15: 
-        print("\n\n Could not determine the stock symbol. Ask again.")
+        # print("\n\n Could not determine the stock symbol. Ask again.")
         state["missing_info"] = "Which stock symbol are you referring to?"
         return state  
 
     state["symbol"] = symbol
-    print(f"\n\nExtracted Stock Symbol: {symbol}")
+    # print(f"\n\nExtracted Stock Symbol: {symbol}")
     state["events"].append({
         "type": "result",
         "title": "Symbol Extractor",
@@ -422,7 +420,7 @@ def stock_sentiment(state: AgentState) -> AgentState:
     
     sentiment_summary = analyze_sentiment(headlines)
     
-    print(f"\n\n{sentiment_summary}")
+    # print(f"\n\n{sentiment_summary}")
     
     state['stock_sentiment'] = {
         "headlines": headlines,
@@ -450,12 +448,12 @@ def bull_handler(state: AgentState) -> dict:
     Sentiment: {sentiment_summary}
 
     Explain why the stock may rise, opportunities, catalysts, investor confidence, and upside targets.
-    Provide a bullish Buy recommendation if justified. Keep all of it very concise.
+    Provide a bullish Buy recommendation if justified. Keep the output super concise under 100 words.
     """
 
     resp = llm.invoke(prompt)
     state["bull_analysis"] = resp.content.strip()
-    print("\n\nBullish Analysis:\n",state["bull_analysis"])
+    # print("\n\nBullish Analysis:\n",state["bull_analysis"])
     bull_text = state["bull_analysis"]
     state["events"].append({
         "type": "result",
@@ -477,13 +475,13 @@ def bear_handler(state: AgentState) -> dict:
     Sentiment: {sentiment_summary}
 
     Explain risks, weaknesses, uncertainty, red flags, and downside price levels.
-    Provide a Sell recommendation if justified. Keep all of it very concise.
+    Provide a Sell recommendation if justified. Keep the output super concise under 100 words.
     """
 
     resp = llm.invoke(prompt)
     state["bear_analysis"] = resp.content.strip()
     bear_text = state["bear_analysis"]
-    print("\n\nBearish Analysis:\n",state["bear_analysis"])
+    # print("\n\nBearish Analysis:\n",state["bear_analysis"])
     state["events"].append({
         "type": "result",
         "title": "Bearish Review",
@@ -513,7 +511,7 @@ def stock_handler(state: AgentState) -> AgentState:
     state["answer"] = resp.content.strip()
     final_ans=state["answer"]
 
-    print("\n\nFinal Balanced Stock Recommendation:\n", final_ans)
+    # print("\n\nFinal Balanced Stock Recommendation:\n", final_ans)
     state["events"].append({
         "type": "result",
         "title": "Final Review",
@@ -594,7 +592,7 @@ if __name__ == "__main__":
     }
 
     result = graph.invoke(initial_state)
-    print("\n\n\n--- Workflow Completed ---")
+    # print("\n\n\n--- Workflow Completed ---")
     # print(result)
 
 

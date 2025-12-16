@@ -1,4 +1,3 @@
-fastapi>=0.104.1
 uvicorn[standard]>=0.24.0
 sqlalchemy>=2.0.23
 requests>=2.31.0
@@ -28,5 +27,7 @@ sentence-transformers
 chromadb
 langchain-chroma
 rapidfuzz
-fastapi
 langchain_huggingface
+flask
+flask_cors
+flask_swagger_ui

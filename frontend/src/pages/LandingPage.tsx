@@ -43,12 +43,11 @@ export default function LandingPage() {
   };
 
   const stats: StatCard[] = [
-    { value: "5+", label: "AI Agents" },
+    { value: "8+", label: "AI Agents" },
     { value: "Real-Time", label: "Market Signals", featured: true },
     { value: "Multi-Source", label: "Data Fusion" },
     { value: "Explainable", label: "Predictions" },
   ];
-
 
   return (
     <main className="min-h-screen w-full bg-white dark:bg-[#1a0f3a] overflow-hidden">
@@ -91,17 +90,21 @@ export default function LandingPage() {
 
           {/* Menu Items - Hidden on mobile */}
           <div className="hidden md:flex items-center gap-8 text-sm font-medium">
-            {["Platform", "Agents", "Research", "Insights", "Documentation"].map(
-              (item) => (
-                <a
-                  key={item}
-                  href="#"
-                  className="text-text-secondary dark:text-text-secondary hover:text-text-primary dark:hover:text-text-primary transition-colors duration-200"
-                >
-                  {item}
-                </a>
-              )
-            )}
+            {[
+              "Platform",
+              "Agents",
+              "Research",
+              "Insights",
+              "Documentation",
+            ].map((item) => (
+              <a
+                key={item}
+                href="#"
+                className="text-text-secondary dark:text-text-secondary hover:text-text-primary dark:hover:text-text-primary transition-colors duration-200"
+              >
+                {item}
+              </a>
+            ))}
           </div>
         </div>
 
@@ -152,7 +155,8 @@ export default function LandingPage() {
 
           {/* Subtitle */}
           <p className="text-lg md:text-xl text-text-secondary dark:text-text-secondary max-w-2xl mx-auto">
-            An AI-powered system using RAG, multi-agent intelligence, and real-time market data.
+            An AI-powered system using RAG, multi-agent intelligence, and
+            real-time market data.
           </p>
 
           {/* CTA Button */}
@@ -247,9 +251,12 @@ export default function LandingPage() {
       <section className="relative z-10 px-6 md:px-12 py-20 md:py-32">
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-6 mb-16">
-            <h2 className="text-text-primary dark:text-white">Why This System Matters</h2>
+            <h2 className="text-text-primary dark:text-white">
+              Why This System Matters
+            </h2>
             <p className="text-lg text-text-secondary dark:text-text-secondary max-w-2xl mx-auto">
-              Designed to analyze complex market behavior using coordinated AI agents
+              Designed to analyze complex market behavior using coordinated AI
+              agents
             </p>
           </div>
 
@@ -278,8 +285,12 @@ export default function LandingPage() {
                   backgroundColor: "rgba(255, 255, 255, 0.5)",
                 }}
               >
-                <h3 className="text-xl font-bold mb-3 text-text-primary dark:text-white">{feature.title}</h3>
-                <p className="text-text-secondary dark:text-black">{feature.description}</p>
+                <h3 className="text-xl font-bold mb-3 text-text-primary dark:text-white">
+                  {feature.title}
+                </h3>
+                <p className="text-text-secondary dark:text-black">
+                  {feature.description}
+                </p>
               </div>
             ))}
           </div>
@@ -288,40 +299,46 @@ export default function LandingPage() {
 
       {/* Team Section */}
       <section className="relative z-10 px-6 md:px-12 py-20 md:py-32 border-t border-border">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-text-primary dark:text-white">Meet Our Team</h2>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-text-primary dark:text-white">
+              Meet Our Team
+            </h2>
             <p className="text-lg text-text-secondary dark:text-text-secondary max-w-2xl mx-auto">
-              Pioneering AI-driven stock market analysis with expertise in machine learning, finance, and software engineering
+              Pioneering AI-driven stock market analysis with expertise in
+              machine learning, finance, and software engineering
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {[
               {
                 name: "Satyaki Dey",
-                role: "Lead Architect",
-                expertise: "ML & AI Systems",
+                role: "Full Stack Engineer",
+                expertise: "React, Next.js, API Integration, System Design",
               },
               {
-                name: "Research Lead",
-                role: "Data Science",
-                expertise: "Market Analysis",
+                name: "Priyanshu Dutta",
+                role: "AI Engineer",
+                expertise:
+                  "RAG Systems, Backend APIs, Data Pipelines, ML Deployment",
               },
               {
-                name: "Backend Engineer",
-                role: "System Design",
-                expertise: "RAG & LLMs",
+                name: "Rishi Bhattasali",
+                role: "Backend Engineer",
+                expertise:
+                  "Backend Architecture, API Design, Distributed Systems",
               },
               {
-                name: "Frontend Engineer",
-                role: "UI/UX",
-                expertise: "User Experience",
+                name: "Shristy Dutta",
+                role: "Research Analyst",
+                expertise:
+                  "Market Research, Financial Analysis, Data Interpretation",
               },
               {
-                name: "Frontend Engineer",
-                role: "UI/UX",
-                expertise: "User Experience",
+                name: "Sonika Biswas",
+                role: "Frontend Engineer",
+                expertise: "UI/UX, Responsive Design, Component Architecture",
               },
             ].map((member, idx) => (
               <div
@@ -331,12 +348,18 @@ export default function LandingPage() {
                   backgroundColor: "rgba(255, 255, 255, 0.5)",
                 }}
               >
-                <div className="w-16 h-16 rounded-full mb-4 bg-gradient-primary-to-secondary flex items-center justify-center text-white font-bold text-lg">
+                {/* <div className="w-16 h-16 rounded-full mb-4 bg-gradient-primary-to-secondary flex items-center justify-center text-white font-bold text-lg">
                   {member.name.charAt(0)}
-                </div>
-                <h3 className="text-lg font-bold mb-1 text-text-primary dark:text-white">{member.name}</h3>
-                <p className="text-sm font-medium text-primary dark:text-primary mb-2">{member.role}</p>
-                <p className="text-sm text-text-secondary dark:text-black">{member.expertise}</p>
+                </div> */}
+                <h3 className="text-lg font-bold mb-1 text-text-primary dark:text-white mt-6">
+                  {member.name}
+                </h3>
+                <p className="text-sm font-medium text-primary dark:text-primary mb-2">
+                  {member.role}
+                </p>
+                <p className="text-sm text-text-secondary dark:text-black mb-4">
+                  {member.expertise}
+                </p>
               </div>
             ))}
           </div>
@@ -351,20 +374,30 @@ export default function LandingPage() {
               © 2025 Automated Stock Market Prediction Pipeline
             </p>
             <div className="flex items-center gap-6">
-              <a href="#" className="text-sm text-text-secondary hover:text-text-primary dark:hover:text-text-primary transition-colors">
+              <a
+                href="#"
+                className="text-sm text-text-secondary hover:text-text-primary dark:hover:text-text-primary transition-colors"
+              >
                 Privacy
               </a>
-              <a href="#" className="text-sm text-text-secondary hover:text-text-primary dark:hover:text-text-primary transition-colors">
+              <a
+                href="#"
+                className="text-sm text-text-secondary hover:text-text-primary dark:hover:text-text-primary transition-colors"
+              >
                 Terms
               </a>
-              <a href="#" className="text-sm text-text-secondary hover:text-text-primary dark:hover:text-text-primary transition-colors">
+              <a
+                href="#"
+                className="text-sm text-text-secondary hover:text-text-primary dark:hover:text-text-primary transition-colors"
+              >
                 Contact
               </a>
             </div>
           </div>
           <p className="text-sm text-text-secondary dark:text-text-secondary mt-12">
-            Disclaimer: This system is developed for academic and research purposes only.
-            It does not provide <br />financial or investment advice.
+            Disclaimer: This system is developed for academic and research
+            purposes only. It does not provide <br />
+            financial or investment advice.
           </p>
         </div>
       </footer>
