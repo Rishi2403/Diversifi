@@ -82,6 +82,7 @@ Final Answer
 ## 📸 System Flow
 
 ### Stock Analysis Flow
+
 ```
 User: "Should I buy TCS stock?"
     ↓
@@ -101,6 +102,7 @@ Final Recommendation: "HOLD - Mixed signals..."
 ```
 
 ### Mutual Fund Flow
+
 ```
 User: "Compare HDFC Flexi Cap and Parag Parikh Flexi Cap"
     ↓
@@ -108,7 +110,7 @@ Classifier: category="mf"
     ↓
 MF Extractor: Fuzzy match → 2 funds found
     ↓
-MF Scraper: 
+MF Scraper:
     - NAV: ₹756.32 vs ₹598.45
     - Returns: 18.2% vs 21.5% (3Y)
     - AUM: ₹54,231 Cr vs ₹87,432 Cr
@@ -121,6 +123,7 @@ MF Handler: "Parag Parikh shows stronger returns..."
 ## 🛠️ Tech Stack
 
 ### Backend Core
+
 - **LangGraph** - Multi-agent workflow orchestration
 - **LangChain** - LLM abstraction and tooling
 - **Google Gemini 2.5 Flash** - Primary reasoning model
@@ -129,17 +132,20 @@ MF Handler: "Parag Parikh shows stronger returns..."
 - **SQLAlchemy** - Database ORM
 
 ### AI & NLP
+
 - **TextBlob** - Sentiment analysis
 - **HuggingFace Embeddings** - Sentence transformers (all-MiniLM-L6-v2)
 - **RapidFuzz** - Fuzzy string matching
 - **BeautifulSoup4** - Web scraping
 
 ### Frontend
+
 - **Streamlit** - Interactive dashboard
 - **TypeScript** - Type-safe frontend (alternate UI)
 - **CSS3** - Custom styling
 
 ### Data & Tools
+
 - **PyPDF** - PDF document processing
 - **Requests** - HTTP client
 - **Python-dotenv** - Environment management
@@ -149,6 +155,7 @@ MF Handler: "Parag Parikh shows stronger returns..."
 ## 📦 Installation
 
 ### Prerequisites
+
 ```bash
 Python 3.8+
 pip or conda
@@ -158,23 +165,27 @@ Google Gemini API key
 ### Setup Instructions
 
 1. **Clone the repository**
+
 ```bash
 git clone https://github.com/Rishi2403/Diversifi.git
 cd Diversifi/backend
 ```
 
 2. **Install dependencies**
+
 ```bash
 pip install -r requirements.txt
 ```
 
 3. **Configure environment variables**
+
 ```bash
 cp .env.example .env
 # Edit .env and add your API keys
 ```
 
 Required environment variables:
+
 ```env
 GOOGLE_API_KEY=your_gemini_api_key_here
 GROWW_API_KEY=your_groww_api_key  # Optional
@@ -182,12 +193,14 @@ GROWW_SECRET=your_groww_secret    # Optional
 ```
 
 4. **Build the finance knowledge base** (Optional - for RAG)
+
 ```bash
 # Place PDF documents in ./finance_pdfs/
 python build_finance_kb.py
 ```
 
 5. **Initialize the database**
+
 ```bash
 python -c "from database import create_tables; create_tables()"
 ```
@@ -203,6 +216,7 @@ streamlit run trading_streamlit.py
 ```
 
 Features:
+
 - 💬 Chat interface with conversation history
 - 🧠 Real-time "thinking blocks" visualization
 - 📊 Sentiment charts and analysis
@@ -217,6 +231,7 @@ uvicorn app:app --reload --port 8000
 **API Endpoints:**
 
 #### 1. Ask a Question
+
 ```bash
 POST /ask
 Content-Type: application/json
@@ -233,6 +248,7 @@ Response:
 ```
 
 #### 2. Get Task Status
+
 ```bash
 GET /get/{task_id}
 
@@ -249,6 +265,7 @@ Response:
 ```
 
 #### 3. Provide Clarification
+
 ```bash
 POST /clarify
 Content-Type: application/json
@@ -281,17 +298,17 @@ class AgentState(TypedDict):
     reasoning: str                   # Classification reasoning
     clarification_used: bool         # Whether clarifier was triggered
     answer: str                      # Final answer
-    
+
     # API Management
     status: str                      # "RUNNING" | "WAITING" | "COMPLETED" | "FAILED"
     events: List[Dict]               # Event log for debugging
-    
+
     # Stock Analysis
     symbol: Optional[str]            # Stock ticker (e.g., "TCS")
     stock_sentiment: Optional[dict]  # News headlines + sentiment
     bull_analysis: Optional[str]     # Bullish perspective
     bear_analysis: Optional[str]     # Bearish perspective
-    
+
     # Mutual Fund Analysis
     mf_matches: Optional[list]       # Matched fund URLs
     mf_categories: Optional[list]    # Fund categories (flexi cap, etc.)
@@ -306,21 +323,25 @@ class AgentState(TypedDict):
 ### Test Individual Components
 
 **Test News Scraping:**
+
 ```bash
 python -c "from news_service import NewsService; print(NewsService().fetch_stock_news('AAPL', 3))"
 ```
 
 **Test Sentiment Analysis:**
+
 ```bash
 python -c "from helper_func import analyze_sentiment; print(analyze_sentiment(['Stock prices surge', 'Market faces uncertainty']))"
 ```
 
 **Test MF Scraping:**
+
 ```bash
 python mf_scrapper.py
 ```
 
 **Test LangGraph Workflow:**
+
 ```bash
 python trading_lang.py
 # Enter: "What is the sentiment for Reliance stock?"
@@ -453,7 +474,9 @@ Assistant: [Proceeds with analysis]
 ## 📈 Supported Instruments
 
 ### Stocks
+
 All major exchanges supported:
+
 - **Indian Stocks**: TCS, INFY, RELIANCE, WIPRO, HDFC, ICICI, etc.
 - **US Stocks**: AAPL, MSFT, GOOGL, TSLA, AMZN, etc.
 - **Global**: Any valid ticker symbol
@@ -461,6 +484,7 @@ All major exchanges supported:
 ### Mutual Funds (80+ Funds Tracked)
 
 Categories:
+
 - **Flexi Cap** - 20 funds (HDFC, Parag Parikh, Kotak, etc.)
 - **Multi Cap** - 11 funds (Nippon, Kotak, Axis, etc.)
 - **Large Cap** - 11 funds (HDFC, Invesco, Bandhan, etc.)
@@ -480,12 +504,14 @@ See `mf_data.json` for complete list with URLs.
 ### LLM Usage
 
 **Primary Model**: Google Gemini 2.5 Flash
+
 - Temperature: 0 (deterministic outputs)
 - Used for: Classification, symbol extraction, analysis generation
 
 ### Prompt Engineering
 
 **Classifier Prompt**:
+
 ```python
 """
 Classify into: "mf", "stock", "general_finance", "unknown"
@@ -494,6 +520,7 @@ Return JSON with: category, confidence, missing_info, reasoning
 ```
 
 **Stock Analysis Prompt**:
+
 ```python
 """
 Bullish Analyst: Focus on positives, catalysts, upside
@@ -551,30 +578,35 @@ if best_score >= 70:  # 70% similarity required
 ## 🚧 Roadmap
 
 ### Phase 1: Enhanced Analysis
+
 - [ ] Technical indicator integration (RSI, MACD, etc.)
 - [ ] Portfolio optimization algorithms
 - [ ] Risk assessment scoring
 - [ ] Backtesting engine
 
 ### Phase 2: Real-Time Features
+
 - [ ] WebSocket live price updates
 - [ ] Real-time alert system
 - [ ] Social media sentiment (Twitter/Reddit)
 - [ ] News push notifications
 
 ### Phase 3: Advanced AI
+
 - [ ] Fine-tuned finance LLM
 - [ ] Multi-modal analysis (charts + text)
 - [ ] Predictive modeling
 - [ ] Personalized recommendations based on user history
 
 ### Phase 4: Integration
+
 - [ ] Broker API integration (Zerodha, Groww)
 - [ ] Automated trading capabilities
 - [ ] Portfolio tracking dashboard
 - [ ] Tax calculation and reporting
 
 ### Phase 5: Expansion
+
 - [ ] Mobile app (React Native)
 - [ ] Multi-language support
 - [ ] Cryptocurrency analysis
@@ -649,7 +681,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## ⚠️ Disclaimer
 
-**IMPORTANT**: This tool is for **educational and informational purposes only**. 
+**IMPORTANT**: This tool is for **educational and informational purposes only**.
 
 - ❌ Not financial advice
 - ❌ Not investment recommendations
@@ -657,6 +689,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - ❌ Past performance ≠ future results
 
 **Always**:
+
 - ✅ Conduct your own research
 - ✅ Consult licensed financial advisors
 - ✅ Understand risks before investing
@@ -669,6 +702,7 @@ The developers are not responsible for any financial losses incurred from using 
 ## 🙏 Acknowledgments
 
 ### Technologies
+
 - **LangGraph** - Agent orchestration framework
 - **Google Gemini** - Powering AI reasoning
 - **LangChain** - LLM tooling and abstractions
@@ -676,17 +710,17 @@ The developers are not responsible for any financial losses incurred from using 
 - **HuggingFace** - Embedding models
 
 ### Data Sources
+
 - **Finviz** - Stock news and data
 - **Seeking Alpha** - Financial articles
 - **MarketWatch** - Market news
 - **TickerTape** - Mutual fund data
 
 ### Inspiration
+
 Built with ❤️ for the Indian investing community, inspired by the need for accessible, AI-powered financial intelligence.
 
 ---
-
-
 
 ## 🌟 Star History
 

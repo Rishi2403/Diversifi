@@ -372,6 +372,7 @@ def mf_handler(state: AgentState) -> AgentState:
     - Give a clear comparison, reasoning, and a final actionable recommendation.
 
     Keep the output concise, structured, and expert-level.
+    If user asks for suggestions like which mutual funds to buy. Then return with actual fund suggestions and not just categories.
     """
 
     resp = llm.invoke(prompt)
@@ -505,6 +506,7 @@ def stock_handler(state: AgentState) -> AgentState:
 
     Give a clear final decision (Buy / Hold / Sell), including price action expectations,
     risk factors, and short-term vs long-term outlook. Be concise and professional.
+    If user asks for suggestions like which stocks funds to buy. Then return with actual stock suggestions and not just sectors.
     """
 
     resp = llm.invoke(prompt)
