@@ -1,6 +1,5 @@
 import json
 import warnings
-
 from mf_scrapper import scrape_mf
 from helper_func import analyze_sentiment, normalize_fund_name
 from news_service import NewsService
@@ -24,6 +23,79 @@ embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
 with open("mf_data.json", "r", encoding="utf-8") as f:
     MF_LIST = json.load(f)
+
+# Add category mapping to MF_LIST entries based on fund names
+def categorize_funds():
+    """Add category tags to funds based on their names"""
+    for entry in MF_LIST:
+        name = entry["mutual_fund_name"].lower()
+        
+        # Categorize based on name
+        if "flexi cap" in name or "flexicap" in name:
+            entry["category"] = "flexi cap"
+        elif "multi cap" in name or "multicap" in name:
+            entry["category"] = "multi cap"
+        elif "large cap" in name and "mid" not in name:
+            entry["category"] = "large cap"
+        elif "large" in name and "mid" in name:
+            entry["category"] = "large & mid cap"
+        elif "mid cap" in name or "midcap" in name:
+            entry["category"] = "mid cap"
+        elif "small cap" in name or "smallcap" in name:
+            entry["category"] = "small cap"
+        elif "momentum" in name:
+            entry["category"] = "momentum"
+        elif "technology" in name or "digital" in name or "pharma" in name:
+            entry["category"] = "sectoral"
+        elif "value" in name or "dividend" in name:
+            entry["category"] = "value/dividend"
+        elif "conservative" in name or "hybrid" in name:
+            entry["category"] = "hybrid"
+        else:
+            entry["category"] = "other"
+
+categorize_funds()
+
+def auto_suggest_categories(risk: str, horizon: str, goal: str) -> list:
+    """Auto-suggest fund categories based on investment profile"""
+    categories = []
+    
+    # Risk-based suggestions
+    if risk:
+        risk_lower = risk.lower()
+        if "low" in risk_lower:
+            categories.extend(["large cap", "hybrid"])
+        elif "medium" in risk_lower or "moderate" in risk_lower:
+            categories.extend(["flexi cap", "multi cap", "large & mid cap"])
+        elif "high" in risk_lower or "aggressive" in risk_lower:
+            categories.extend(["small cap", "mid cap", "momentum"])
+    
+    # Horizon-based suggestions
+    if horizon:
+        horizon_lower = horizon.lower()
+        if "short" in horizon_lower or ("1" in horizon_lower and "year" in horizon_lower):
+            if "large cap" not in categories:
+                categories.append("large cap")
+            categories.append("hybrid")
+        elif "medium" in horizon_lower or ("3" in horizon_lower or "5" in horizon_lower):
+            categories.extend(["flexi cap", "multi cap"])
+        elif "long" in horizon_lower or ("7" in horizon_lower or "10" in horizon_lower):
+            categories.extend(["small cap", "momentum"])
+    
+    # Goal-based suggestions
+    if goal:
+        goal_lower = goal.lower()
+        if "wealth" in goal_lower or "growth" in goal_lower:
+            categories.extend(["flexi cap", "small cap"])
+        elif "steady" in goal_lower or "stable" in goal_lower:
+            categories.extend(["large cap", "value/dividend"])
+        elif "aggressive" in goal_lower:
+            categories.extend(["small cap", "momentum", "sectoral"])
+        elif "balanced" in goal_lower:
+            categories.extend(["large & mid cap", "multi cap"])
+    
+    # Remove duplicates and return
+    return list(set(categories))
 
 @tool
 def get_finance_info(query: str) -> str:
@@ -71,40 +143,45 @@ llm = ChatGoogleGenerativeAI(
     api_key=google_api_key,
 )
 
-
 tools = [get_finance_info]
-finance_agent  = create_react_agent(llm, tools=tools)
+finance_agent = create_react_agent(llm, tools=tools)
 
-## same for stocks and mutual funds
 def classifier_node(state: AgentState) -> AgentState:
     prompt = f"""
     You are a classification assistant for a finance helpdesk. Classify the user's question into one of the following categories exactly: "mf", "stock", "general_finance", "unknown".
 
-    - "mf" = Mutual fund / SIP / NAV / SIP amount / SIP performance related questions.
+    - "mf" = Mutual fund / SIP / NAV / SIP amount / SIP performance / fund recommendations / risk-based fund queries.
+      * Examples: "suggest good mutual funds", "5 years medium risk", "best flexi cap funds", "SIP for aggressive growth"
+    
     - "stock" = Stock / shares / ticker / price target / technical analysis questions.
+      * Examples: "should I buy TCS", "RELIANCE analysis", "stock recommendation"
+    
     - "general_finance" = Personal Finance, Budgeting, insurance, tax, loans, general investing concepts (not a specific fund or stock).
-    - "unknown" = The question doesn't fit or lacks clarity.
+      * Examples: "how to save money", "tax planning tips", "insurance guide"
+    
+    - "unknown" = The question doesn't fit or lacks clarity OR is completely out of scope (like weather, recipes, general chat).
+      * Examples: "hello", "what's the weather", "tell me a joke"
 
+    IMPORTANT: 
+    - Even vague MF queries like "tell me good funds" or "5 years medium risk" should be classified as "mf"
+    - Mark as "unknown" ONLY if truly not related to finance
+    - If it mentions risk/horizon/goals without specific fund names, still classify as "mf"
 
     For the given question, return a JSON object **only** (no extra commentary) with the following keys:
     - category: one of the four categories above
     - confidence: a float from 0.0 to 1.0 (how confident you are)
-    - missing_info: a short string describing what essential information is missing (e.g., "stock ticker", "timeframe, amount"), or null if nothing missing
+    - missing_info: For MF queries, ask for: "specific investment goals, risk tolerance, or investment horizon" if none mentioned. For other categories, note what's missing or null.
     - reasoning: a 1-2 sentence explanation for your classification
 
-
     Question: "{state["question"]}"
-
 
     Respond only with valid JSON.
     """
 
     resp = llm.invoke(prompt)
     text = resp.content.strip()
-   
 
-
-# Try to parse JSON
+    # Try to parse JSON
     try:
         data = json.loads(text)
     except Exception:
@@ -117,8 +194,6 @@ def classifier_node(state: AgentState) -> AgentState:
                 data = {}
         else:
             data = {}
-
-    # print(f"\n\nMissing Data: {data.get('missing_info')}")
 
     state["category"] = data.get("category", "unknown")
     state["confidence"] = data.get("confidence", 0.0)
@@ -135,7 +210,6 @@ def classifier_node(state: AgentState) -> AgentState:
     })
 
     return state
-
 
 def clarifier_node(state: AgentState) -> AgentState:
     missing = state.get("missing_info")
@@ -171,30 +245,47 @@ def clarifier_node(state: AgentState) -> AgentState:
 
     return state
 
-
-
-
 def handle_classifier_decision(state: AgentState) -> str:
     if state["category"] == "unknown":
-        # print("\n\n Question out of model's scope. Exiting.")
-        return END
+        return "unknown_handler"
 
     if state["missing_info"] and not state["clarification_used"]:
         return "clarifier"
 
     if state["category"] == "mf":
-        # print("\n\nQuestion Classified Into Category Mutual Funds")
         return "mf_handler"
     if state["category"] == "stock":
-        # print("\n\nQuestion Classified Into Category Stock Market")
         return "stock_handler"
     if state["category"] == "general_finance":
-        # print("\n\nQuestion Classified Into Category General Finance")
         return "general_finance_handler"
 
     return END
 
-#General finance
+# NEW: Handle invalid/unknown questions
+def unknown_handler(state: AgentState) -> AgentState:
+    """Handle questions that are out of scope or invalid"""
+    state["answer"] = """❌ **Invalid Question**
+
+I apologize, but I cannot process your question because:
+- It appears to be outside the scope of finance/investment topics
+- The question is too vague or unclear
+- It doesn't relate to stocks, mutual funds, or financial planning
+
+**I can help you with:**
+✅ Stock analysis and recommendations
+✅ Mutual fund comparisons and suggestions
+✅ Investment strategies and portfolio advice
+✅ Financial planning, budgeting, and taxation
+
+Please ask a finance-related question, and I'll be happy to assist!"""
+    
+    state["events"].append({
+        "type": "result",
+        "title": "Invalid Question",
+        "message": "Question is out of scope"
+    })
+    return state
+
 def general_finance_handler(state: AgentState) -> AgentState:
     prompt = f"""
     You are a financial advisor focused on personal finance topics like budgeting,
@@ -208,12 +299,10 @@ def general_finance_handler(state: AgentState) -> AgentState:
         "messages": [{"role": "user", "content": prompt}]
     })
     
-
     final_message = result["messages"][-1]
     answer = final_message.content if hasattr(final_message, 'content') else str(final_message)
     
     state["answer"] = answer.strip()
-    # print("\n\n📍 Finance Advisor Response:\n", state["answer"])
     state["events"].append({
         "type": "result",
         "title": "General Finance",
@@ -221,29 +310,52 @@ def general_finance_handler(state: AgentState) -> AgentState:
     })
     return state
 
-#MF Related
-from rapidfuzz import fuzz
-import json
-
 def extract_mf_name(state: AgentState) -> AgentState:
     prompt = f"""
-    From the user question, extract:
+    You are a mutual fund category expert. Analyze the user's question and extract:
 
-    1. Mutual fund NAMES (if mentioned)
-    2. Mutual fund CATEGORIES (large cap, mid cap, multicap, flexicap, elss, debt, etc.)
+    1. **Mutual fund NAMES** (if mentioned) - extract full names like "HDFC Flexi Cap Fund", "Parag Parikh Flexi Cap"
+    
+    2. **Mutual fund CATEGORIES** - Based on the question, identify appropriate categories:
+       - If risk tolerance mentioned:
+         * Low risk → Large Cap, Hybrid, Debt funds
+         * Medium risk → Flexi Cap, Multi Cap, Large & Mid Cap
+         * High risk → Mid Cap, Small Cap, Sectoral
+       
+       - If investment horizon mentioned:
+         * Short term (1-3 years) → Large Cap, Hybrid, Debt
+         * Medium term (3-5 years) → Flexi Cap, Multi Cap, Large & Mid Cap
+         * Long term (5+ years) → Small Cap, Mid Cap, Sectoral, Momentum
+       
+       - If goals mentioned:
+         * Wealth creation → Flexi Cap, Multi Cap, Small Cap
+         * Steady returns → Large Cap, Value/Dividend
+         * Aggressive growth → Small Cap, Momentum, Sectoral
+         * Balanced → Large & Mid Cap, Flexi Cap
+
+    3. **Investment Profile** extracted:
+       - Risk: low/medium/high (if mentioned)
+       - Horizon: short/medium/long (if mentioned)
+       - Goal: wealth/steady/aggressive/balanced (if inferred)
 
     Return ONLY a JSON object like:
     {{
         "names": [...],
-        "categories": [...]
+        "categories": [...],
+        "risk": "low/medium/high or null",
+        "horizon": "short/medium/long or null",
+        "goal": "wealth/steady/aggressive/balanced or null"
     }}
+
+    Examples:
+    - "5 years, medium risk" → categories: ["flexi cap", "multi cap", "large & mid cap"]
+    - "high risk, long term" → categories: ["small cap", "mid cap", "momentum"]
+    - "conservative investor" → categories: ["large cap", "hybrid"]
 
     Question: "{state['question']}"
     """
 
     resp = llm.invoke(prompt)
-
-
     raw = resp.content.strip()
     if raw.startswith("```"):
         raw = raw.strip("`")
@@ -253,25 +365,32 @@ def extract_mf_name(state: AgentState) -> AgentState:
         result = json.loads(raw)
         mf_names = result.get("names", [])
         mf_categories = result.get("categories", [])
+        risk_profile = result.get("risk")
+        horizon = result.get("horizon")
+        goal = result.get("goal")
     except Exception as e:
         print("JSON parse failed:", e)
         mf_names = []
         mf_categories = []
+        risk_profile = None
+        horizon = None
+        goal = None
 
-    # print("\nExtracted Names:", mf_names)
-    # print("Extracted Categories:", mf_categories)
+    # Auto-suggest categories if none extracted but risk/horizon/goal present
+    if not mf_categories and (risk_profile or horizon or goal):
+        mf_categories = auto_suggest_categories(risk_profile, horizon, goal)
+        print(f"Auto-suggested categories based on profile: {mf_categories}")
 
     matched_urls = []
 
+    # Match by specific fund names first
     for user_name in mf_names:
         best_match = None
         best_score = 0
-
         norm_user = normalize_fund_name(user_name)
 
         for entry in MF_LIST:
             norm_entry = normalize_fund_name(entry["mutual_fund_name"])
-
             score = fuzz.token_set_ratio(norm_user, norm_entry)
 
             if score > best_score:
@@ -282,46 +401,48 @@ def extract_mf_name(state: AgentState) -> AgentState:
             matched_urls.append({
                 "name": best_match["mutual_fund_name"],
                 "url": best_match["url"],
-                "category": best_match.get("category")
+                "category": best_match.get("category", "")
             })
 
-
+    # If no specific names matched, match by categories
     if not matched_urls and mf_categories:
         for category in mf_categories:
+            cat_lower = category.lower()
             for entry in MF_LIST:
-                if category.lower() in entry.get("category", "").lower():
+                entry_cat = entry.get("category", "").lower()
+                if cat_lower in entry_cat or entry_cat in cat_lower:
                     matched_urls.append({
                         "name": entry["mutual_fund_name"],
                         "url": entry["url"],
-                        "category": entry.get("category")
+                        "category": entry.get("category", "")
                     })
 
-    state["mf_matches"] = matched_urls
+    # Remove duplicates
+    seen = set()
+    unique_matches = []
+    for match in matched_urls:
+        if match["name"] not in seen:
+            seen.add(match["name"])
+            unique_matches.append(match)
+
+    state["mf_matches"] = unique_matches[:5]  # Limit to top 5
     state["mf_categories"] = mf_categories
-    state["should_scrape"] = len(matched_urls) > 0
-
-    # print("\nMatched Funds:", matched_urls)
-    # print("\nRaw LLM output:", resp.content)
-
-    # print(f"\n\nExtracted Fund names from prompt: {resp.content}")
+    state["should_scrape"] = len(unique_matches) > 0
 
     state["events"].append({
         "type": "result",
         "title": "MF Extraction",
-        "message": f"Extracted MF matches: {matched_urls}"
+        "message": f"Extracted {len(unique_matches)} MF matches"
     })
     return state
 
 def mf_scrape_node(state: AgentState) -> AgentState:
     if not state.get("should_scrape"):
-        # print("\nSkipping scraper → No MF match found.")
         state["mf_scraped_data"] = []
         return state
 
     matches = state.get("mf_matches", [])
     scraped_list = []
-
-    # print("\nScraping matched mutual funds...\n")
 
     for m in matches:
         try:
@@ -329,17 +450,18 @@ def mf_scrape_node(state: AgentState) -> AgentState:
             scraped_list.append({
                 "name": m["name"],
                 "url": m["url"],
+                "category": m.get("category", ""),
                 "data": data
             })
         except Exception as e:
             scraped_list.append({
                 "name": m["name"],
                 "url": m["url"],
-                "data": f"Scraping failed: {str(e)}"
+                "category": m.get("category", ""),
+                "data": {"error": f"Scraping failed: {str(e)}"}
             })
 
     state["mf_scraped_data"] = scraped_list
-    # print(f"\n\nExtracted mutual fund data from tkinter: {state['mf_scraped_data']}")
     state["events"].append({
         "type": "result",
         "title": "MF Scraper",
@@ -348,35 +470,101 @@ def mf_scrape_node(state: AgentState) -> AgentState:
     return state
 
 def mf_handler(state: AgentState) -> AgentState:
+    """Enhanced MF handler with precise fund name recommendations"""
     extracted = state.get("mf_scraped_data", [])
     query = state.get("question", "")
+    categories = state.get("mf_categories", [])
 
-    extracted_summary = ""
-    if extracted:
-        extracted_summary = "\n\n".join([
-            f"{item['name']}:\nURL: {item['url']}\nExtracted Data:\n{json.dumps(item['data'], indent=2)}"
-            for item in extracted
-        ])
+    if not extracted:
+        # No specific funds found - provide helpful guidance
+        category_text = ", ".join(categories) if categories else "your criteria"
+        
+        state["answer"] = f"""❌ **No Matching Funds Found**
+
+I couldn't find specific mutual funds matching your query.
+
+**Based on your question, I recommend exploring these categories:**
+{f"📊 **Suggested Categories:** {category_text}" if categories else ""}
+
+**How to get better recommendations:**
+1. Specify your risk tolerance (low/medium/high)
+2. Mention investment horizon (3 years, 5 years, 10 years)
+3. State your goal (wealth creation, steady returns, aggressive growth)
+
+**Example queries:**
+- "Suggest flexi cap funds for 5 years with medium risk"
+- "Best large cap funds for conservative investors"
+- "High growth small cap funds for 10 year horizon"
+
+**Available categories:**
+- **Low Risk:** Large Cap, Hybrid
+- **Medium Risk:** Flexi Cap, Multi Cap, Large & Mid Cap
+- **High Risk:** Small Cap, Mid Cap, Momentum, Sectoral
+"""
+        state["events"].append({
+            "type": "result",
+            "title": "MF Answer",
+            "message": "No funds matched - provided guidance"
+        })
+        return state
+
+    # Build detailed summary with fund names
+    fund_details = []
+    for item in extracted:
+        name = item['name']
+        category = item.get('category', 'N/A')
+        data = item.get('data', {})
+        
+        detail = f"""
+**{name}** ({category})
+- NAV: ₹{data.get('NAV', 'N/A')}
+- AUM: {data.get('AUM', 'N/A')}
+- 1Y Return: {data.get('Returns', {}).get('1 Year Returns', 'N/A')}
+- 3Y Return: {data.get('Returns', {}).get('3 Year Returns', 'N/A')}
+- 5Y Return: {data.get('Returns', {}).get('5 Year Returns', 'N/A')}
+"""
+        fund_details.append(detail)
+
+    funds_summary = "\n".join(fund_details)
+    category_context = f" for {', '.join(categories)}" if categories else ""
 
     prompt = f"""
-    You are a mutual fund research analyst.
+    You are a mutual fund research analyst providing PRECISE recommendations{category_context}.
 
     User question: "{query}"
 
-    Below is any scraped data (if available):
-    {extracted_summary or "No scraped data available."}
+    **Analyzed Funds:**
+    {funds_summary}
 
-    Your tasks:
-    - Interpret whatever data is available.
-    - If some requested funds have no data, provide category-level or general insights.
-    - Give a clear comparison, reasoning, and a final actionable recommendation.
+    **Instructions:**
+    1. ALWAYS mention the EXACT fund names in your response
+    2. Compare the specific funds listed above with their actual data
+    3. Explain WHY these funds suit the user's risk/horizon/goal
+    4. Provide clear ranking: Best → Good → Average
+    5. Give actionable recommendation with specific fund name(s)
+    6. Mention key metrics (NAV, returns, AUM) for each fund
+    7. Be concise but data-driven
 
-    Keep the output concise, structured, and expert-level.
+    **Output Format:**
+    📊 **Analysis of {categories[0] if categories else 'Selected'} Funds:**
+
+    🥇 **Top Pick:** [Exact Fund Name]
+    - NAV: [value] | 1Y: [%] | 3Y: [%] | 5Y: [%]
+    - Why: [specific reasons - relates to user's risk/horizon/goal]
+
+    🥈 **Runner-up:** [Exact Fund Name]  
+    - NAV: [value] | 1Y: [%] | 3Y: [%] | 5Y: [%]
+    - Why: [specific reasons]
+
+    💡 **Final Recommendation:** 
+    Invest in [Exact Fund Name(s)] because [clear reasoning that addresses user's investment profile]
+
+    **Risk Note:** [Brief risk assessment matching user's risk tolerance]
     """
 
     resp = llm.invoke(prompt)
     state["answer"] = resp.content.strip()
-    # print("\n\nFinal Mutual Fund Recommendation:\n", state["answer"])
+    
     state["events"].append({
         "type": "result",
         "title": "MF Answer",
@@ -384,7 +572,7 @@ def mf_handler(state: AgentState) -> AgentState:
     })
     return state
 
-## Stocks Related
+# Stock handlers remain the same...
 def symbol_extractor(state: AgentState) -> AgentState:
     prompt = f"""
     You are an AI whose job is to extract the Stock Ticker Symbol from a user question, usually based on Indian stock market.
@@ -398,12 +586,10 @@ def symbol_extractor(state: AgentState) -> AgentState:
     symbol = resp.content.strip().upper()
 
     if symbol == "NONE" or len(symbol) > 15: 
-        # print("\n\n Could not determine the stock symbol. Ask again.")
         state["missing_info"] = "Which stock symbol are you referring to?"
         return state  
 
     state["symbol"] = symbol
-    # print(f"\n\nExtracted Stock Symbol: {symbol}")
     state["events"].append({
         "type": "result",
         "title": "Symbol Extractor",
@@ -412,7 +598,6 @@ def symbol_extractor(state: AgentState) -> AgentState:
     return state
 
 def stock_sentiment(state: AgentState) -> AgentState:
-
     symbol = state.get("symbol", "")
     news_service = NewsService()
     news_items = news_service.fetch_stock_news(symbol, limit=5)
@@ -420,17 +605,14 @@ def stock_sentiment(state: AgentState) -> AgentState:
     
     sentiment_summary = analyze_sentiment(headlines)
     
-    # print(f"\n\n{sentiment_summary}")
-    
     state['stock_sentiment'] = {
         "headlines": headlines,
         "news_sentiment": sentiment_summary,
-        # "twitter_sentiment": twitter_sentiment
     }
     state["events"].append({
         "type": "result",
         "title": "Stock Sentiment",
-        "message": f"Sentiment  Summary: {sentiment_summary}"
+        "message": f"Sentiment Summary: {sentiment_summary}"
     })
     
     return state
@@ -453,12 +635,11 @@ def bull_handler(state: AgentState) -> dict:
 
     resp = llm.invoke(prompt)
     state["bull_analysis"] = resp.content.strip()
-    # print("\n\nBullish Analysis:\n",state["bull_analysis"])
     bull_text = state["bull_analysis"]
     state["events"].append({
         "type": "result",
         "title": "Bullish Review",
-        "message": f"Bullish  Analysis: {bull_text}"
+        "message": f"Bullish Analysis: {bull_text}"
     })
     return {"bull_analysis": bull_text}
 
@@ -481,7 +662,6 @@ def bear_handler(state: AgentState) -> dict:
     resp = llm.invoke(prompt)
     state["bear_analysis"] = resp.content.strip()
     bear_text = state["bear_analysis"]
-    # print("\n\nBearish Analysis:\n",state["bear_analysis"])
     state["events"].append({
         "type": "result",
         "title": "Bearish Review",
@@ -509,9 +689,8 @@ def stock_handler(state: AgentState) -> AgentState:
 
     resp = llm.invoke(prompt)
     state["answer"] = resp.content.strip()
-    final_ans=state["answer"]
+    final_ans = state["answer"]
 
-    # print("\n\nFinal Balanced Stock Recommendation:\n", final_ans)
     state["events"].append({
         "type": "result",
         "title": "Final Review",
@@ -520,16 +699,16 @@ def stock_handler(state: AgentState) -> AgentState:
     return state
 
 def build_graph():
-
     workflow = StateGraph(AgentState)
     workflow.add_node("classifier", classifier_node)
     workflow.add_node("clarifier", clarifier_node)
+    workflow.add_node("unknown_handler", unknown_handler)  # NEW
 
     workflow.add_node("stock_sentiment", stock_sentiment)
     workflow.add_node("stock_handler", stock_handler)
     workflow.add_node("bull_handler", bull_handler)
     workflow.add_node("bear_handler", bear_handler)
-    workflow.add_node("symbol_extractor",symbol_extractor)
+    workflow.add_node("symbol_extractor", symbol_extractor)
 
     workflow.add_node("mf_extract", extract_mf_name)
     workflow.add_node("mf_scrape", mf_scrape_node)
@@ -547,10 +726,12 @@ def build_graph():
             "mf_handler": "mf_extract",
             "stock_handler": "symbol_extractor",
             "general_finance_handler": "general_finance_handler",
+            "unknown_handler": "unknown_handler",  # NEW
             END: END
         }
     )
     workflow.add_edge("clarifier", "classifier")
+    workflow.add_edge("unknown_handler", END)  # NEW
     workflow.add_edge("symbol_extractor", "stock_sentiment")
 
     workflow.add_edge("stock_sentiment", "bull_handler")
@@ -558,7 +739,6 @@ def build_graph():
 
     workflow.add_edge("bull_handler", "stock_handler")
     workflow.add_edge("bear_handler", "stock_handler")
-
 
     workflow.add_conditional_edges(
         "mf_extract",
@@ -572,15 +752,10 @@ def build_graph():
 
     return workflow.compile()
 
-
 if __name__ == "__main__":
     question_input = input("\n\nEnter your question: ")
 
     graph = build_graph()
-    # png = graph.get_graph().draw_mermaid_png()
-    # with open("workflow.png","wb") as f:
-    #     f.write(png)
-    # print("Saved workflow diagram to workflow.png")
     initial_state: AgentState = {
         "question": question_input,
         "category": "",
@@ -589,10 +764,18 @@ if __name__ == "__main__":
         "reasoning": "",
         "clarification_used": False,
         "answer": "",
+        "status": "RUNNING",
+        "events": [],
+        "symbol": None,
+        "stock_sentiment": None,
+        "bull_analysis": None,
+        "bear_analysis": None,
+        "mf_matches": None,
+        "mf_categories": None,
+        "mf_scraped_data": None,
+        "should_scrape": False
     }
 
     result = graph.invoke(initial_state)
-    # print("\n\n\n--- Workflow Completed ---")
-    # print(result)
-
-
+    print("\n\n✅ Final Answer:\n")
+    print(result.get("answer", "No answer generated"))
