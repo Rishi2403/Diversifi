@@ -325,9 +325,9 @@ export default function LandingPage() {
               },
               {
                 name: "Rishi Bhattasali",
-                role: "Backend Engineer",
+                role: "ML Engineer & Backend Developer",
                 expertise:
-                  "Backend Architecture, API Design, Distributed Systems",
+                  " ML Ops, Backend Architecture, API Design, Distributed Systems",
               },
               {
                 name: "Shristy Dutta",
