@@ -176,8 +176,7 @@ The developers are not responsible for any financial losses incurred from using 
 
 ## Contact
 
-- **Project Maintainer**: [@Rishi2403](https://github.com/Rishi2403)
-- **Issues**: [GitHub Issues](https://github.com/Rishi2403/Diversifi/issues)
+- **Project Maintainer**: Rishi Bhattasali, Priyanshu Dutta, Satyaki Dey, Sonika Biswas, Shristy Dutta
 
 ---
 
