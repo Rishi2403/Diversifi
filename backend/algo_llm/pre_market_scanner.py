@@ -1,5 +1,5 @@
 # pre_market_scanner.py
-from groww_data import fetch_live_data
+from .groww_data import fetch_live_data
 
 
 def pre_market_scan(

@@ -1,8 +1,8 @@
 # execution_engine.py
 from datetime import datetime
 from growwapi import GrowwAPI
-from groww_data import fetch_live_data
-from trading_state import TradingState
+from .groww_data import fetch_live_data
+from .trading_state import TradingState
 
 
 class ExecutionEngine:

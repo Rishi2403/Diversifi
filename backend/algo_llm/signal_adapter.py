@@ -1,8 +1,8 @@
 # signal_adapter.py
 from datetime import datetime
-from trading_state import TradingState
-from execution_engine import ExecutionEngine
-from trading_lang import build_graph
+from .trading_state import TradingState
+from .execution_engine import ExecutionEngine
+from .trading_lang import build_graph
 
 
 class SignalAdapter:
@@ -55,6 +55,7 @@ class SignalAdapter:
             print(f"[HOLD] No trade signal for {symbol}")
             return
 
+        print("Received response:", result)
         action = signal.get("action")
         confidence = signal.get("confidence", 0.0)
 

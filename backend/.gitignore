@@ -5,3 +5,4 @@ venv
 .dive
 dive
 .env.local
+vertex.json

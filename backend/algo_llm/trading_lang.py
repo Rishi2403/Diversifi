@@ -139,9 +139,10 @@ class AgentState(TypedDict):
     trade_signal: Optional[Dict]
 
 llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash-lite",    
+    model="gemini-2.5-flash-lite",
     temperature=0,
-    api_key=google_api_key,
+    project=os.getenv("GCP_PROJECT_ID"),
+    location=os.getenv("GCP_LOCATION"),
 )
 
 tools = [get_finance_info]
@@ -700,14 +701,24 @@ def stock_handler(state: AgentState) -> AgentState:
     resp = llm.invoke(prompt)
     raw = resp.content.strip()
 
-    try:
-        decision = json.loads(raw)
-    except Exception:
+    # --- Robust JSON extraction ---
+    start = raw.find("{")
+    end = raw.rfind("}")
+
+    decision = None
+    if start != -1 and end != -1 and end > start:
+        try:
+            decision = json.loads(raw[start:end+1])
+        except Exception:
+            decision = None
+
+    if not decision or "action" not in decision:
         decision = {
             "action": "HOLD",
             "confidence": 0.0,
-            "reason": "Parsing failed"
+            "reason": "Invalid or unparsable LLM output"
         }
+
 
     state["trade_signal"] = decision
 
