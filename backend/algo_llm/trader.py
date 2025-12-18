@@ -4,6 +4,7 @@ from growwapi import GrowwAPI
 from trading_state import TradingState
 from execution_engine import ExecutionEngine
 from signal_adapter import SignalAdapter
+from pre_market_scanner import pre_market_scan
 import os
 from dotenv import load_dotenv
 from datetime import datetime
@@ -21,6 +22,9 @@ state = TradingState()
 engine = ExecutionEngine(groww, state)
 adapter = SignalAdapter(engine, state, confidence_threshold=0.75)
 
+print("Running pre-market scan...")
+candidates = pre_market_scan(NIFTY_50)
+
 
 while True:
     now = datetime.now()
@@ -33,7 +37,8 @@ while True:
         print("[STOP] Max trades reached. Shutting down trader.")
         break
     print("\n=== New Scan Cycle ===")
-    for symbol in NIFTY_50:
+    for item in candidates:
+        symbol = item["symbol"]
         adapter.process_symbol(symbol)
         time.sleep(1)  # avoid rate limit
 
