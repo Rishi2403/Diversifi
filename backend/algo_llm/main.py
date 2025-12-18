@@ -1,15 +1,14 @@
 from groww_data import fetch_live_data
-
-from risk import RiskManager
-
-
-risk = RiskManager()
+import json
 
 NIFTY_50 = [
-    "RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK",
-    "LT", "SBIN", "AXISBANK", "ITC"
+    "RELIANCE"
 ]
+resp = {}
 for i in NIFTY_50:
-    print(fetch_live_data(i))
+    resp = fetch_live_data(i)
+
+    print(resp, type(resp))
 
 
+print(resp['upper_circuit_limit'])

@@ -32,3 +32,4 @@ flask
 flask_cors
 flask_swagger_ui
 growwapi
+openai
