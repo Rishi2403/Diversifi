@@ -10,25 +10,25 @@ secret = os.getenv("GROWW_SECRET")
 access_token = GrowwAPI.get_access_token(api_key=api_key, secret=secret)
 groww = GrowwAPI(access_token)
 
-# holdings_response = groww.get_holdings_for_user(timeout=5)
-# print(holdings_response)
+# # holdings_response = groww.get_holdings_for_user(timeout=5)
+# # print(holdings_response)
 
-groww = GrowwAPI(access_token)
+# groww = GrowwAPI(access_token)
  
-place_order_response = groww.place_order(
-    trading_symbol="IREDA",
-    quantity=1, 
-    validity=groww.VALIDITY_DAY,
-    exchange=groww.EXCHANGE_NSE,
-    segment=groww.SEGMENT_CASH,
-    product=groww.PRODUCT_CNC,
-    order_type=groww.ORDER_TYPE_MARKET, # You can also use ORDER_TYPE_MARKET, ORDER_TYPE_STOP_LOSS, ORDER_TYPE_STOP_LOSS_MARKET for 
-    transaction_type=groww.TRANSACTION_TYPE_SELL,
-    # price=250,               # Optional: Price of the stock (for Limit orders)
-    # trigger_price=245,       # Optional: Trigger price (if applicable)
-    # order_reference_id="Ab-654321234-1628190"  # Optional: User provided 8 to 20 length alphanumeric reference ID to track the order
-)
-print(place_order_response)
+# place_order_response = groww.place_order(
+#     trading_symbol="IREDA",
+#     quantity=1, 
+#     validity=groww.VALIDITY_DAY,
+#     exchange=groww.EXCHANGE_NSE,
+#     segment=groww.SEGMENT_CASH,
+#     product=groww.PRODUCT_CNC,
+#     order_type=groww.ORDER_TYPE_MARKET, # You can also use ORDER_TYPE_MARKET, ORDER_TYPE_STOP_LOSS, ORDER_TYPE_STOP_LOSS_MARKET for 
+#     transaction_type=groww.TRANSACTION_TYPE_SELL,
+#     # price=250,               # Optional: Price of the stock (for Limit orders)
+#     # trigger_price=245,       # Optional: Trigger price (if applicable)
+#     # order_reference_id="Ab-654321234-1628190"  # Optional: User provided 8 to 20 length alphanumeric reference ID to track the order
+# )
+# print(place_order_response)
 
 
 
@@ -40,8 +40,8 @@ print(place_order_response)
 # print(quote_response)
 
 
-end_time_in_millis = int(time.time() * 1000) # epoch time in milliseconds
-start_time_in_millis = end_time_in_millis - (24 * 60 * 60 * 1000) # last 24 hours
+# end_time_in_millis = int(time.time() * 1000) # epoch time in milliseconds
+# start_time_in_millis = end_time_in_millis - (24 * 60 * 60 * 1000) # last 24 hours
  
 # OR
  
@@ -84,3 +84,12 @@ start_time_in_millis = end_time_in_millis - (24 * 60 * 60 * 1000) # last 24 hour
 #   print(feed.get_ltp())
  
 # feed.unsubscribe_ltp(instruments_list)
+
+
+ohlc_response = groww.get_quote(
+   exchange=groww.EXCHANGE_NSE,
+segment=groww.SEGMENT_CASH,
+    trading_symbol="TCS"
+)
+print(ohlc_response)
+
