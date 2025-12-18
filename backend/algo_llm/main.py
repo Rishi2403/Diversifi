@@ -5,8 +5,6 @@ from risk import RiskManager
 
 risk = RiskManager()
 
-
-print("\n⏳ Running market scan")
 NIFTY_50 = [
     "RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK",
     "LT", "SBIN", "AXISBANK", "ITC"

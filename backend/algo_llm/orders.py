@@ -1,38 +1,37 @@
 import time
 from growwapi import GrowwAPI
+import os
+from dotenv import find_dotenv, load_dotenv
 
-groww = GrowwAPI("YOUR_GROWW_API_TOKEN")
+load_dotenv(find_dotenv())
+api_key =os.getenv("GROWW_API_KEY")
+secret = os.getenv("GROWW_SECRET")
+ 
+access_token = GrowwAPI.get_access_token(api_key=api_key, secret=secret)
+groww = GrowwAPI(access_token)
 
-def place_entry_exit(symbol, ltp, qty):
-    sl = round(ltp * 0.99, 2)
-    target = round(ltp * 1.02, 2)
-
-    groww.create_smart_order(
-        smart_order_type="GTT",
-        reference_id=f"{symbol}-BUY-{int(time.time())}",
-        segment="CASH",
+def place_order(symbol, quantity, target_trigger_price,stop_trigger_price,net_position_qty):
+    oco_response = groww.create_smart_order(
+        smart_order_type=groww.SMART_ORDER_TYPE_OCO,
+        reference_id="oco-ref-unique456",
+        segment=groww.SEGMENT_CASH,
         trading_symbol=symbol,
-        exchange="NSE",
-        quantity=qty,
-        product_type="CNC",
-        trigger_price=str(ltp),
-        trigger_direction="DOWN",
-        order={
-            "transaction_type": "BUY",
-            "order_type": "LIMIT",
-            "price": str(ltp)
+        quantity=quantity,
+        product_type=groww.PRODUCT_MIS,
+        exchange=groww.EXCHANGE_NSE,
+        duration=groww.VALIDITY_DAY,
+
+        net_position_quantity=net_position_qty,
+        transaction_type=groww.TRANSACTION_TYPE_SELL,
+        target={
+            "trigger_price": target_trigger_price,
+            "order_type": groww.ORDER_TYPE_LIMIT,
+            "price": "121.00"
+        },
+        stop_loss={
+            "trigger_price": stop_trigger_price,
+            "order_type": groww.ORDER_TYPE_STOP_LOSS_MARKET,
+            "price": None
         }
     )
-
-    groww.create_smart_order(
-        smart_order_type="OCO",
-        reference_id=f"{symbol}-SELL-{int(time.time())}",
-        segment="CASH",
-        trading_symbol=symbol,
-        exchange="NSE",
-        quantity=qty,
-        product_type=groww.PRODUCT_CNC,
-        stop_loss_price=str(sl),
-        target_price=str(target),
-        transaction_type="SELL"
-    )
+    return oco_response
