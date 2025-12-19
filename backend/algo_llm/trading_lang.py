@@ -681,6 +681,8 @@ def stock_handler(state: AgentState) -> AgentState:
     Based on the analysis below, decide ONLY one:
     - BUY
     - HOLD
+    
+    Give more preference to the BULLISH analysis (BUY) if both sides have valid points.
 
     Also provide a confidence score between 0 and 1.
 

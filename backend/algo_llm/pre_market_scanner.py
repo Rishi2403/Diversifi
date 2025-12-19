@@ -18,7 +18,6 @@ def pre_market_scan(
     for symbol in symbols:
         try:
             data = fetch_live_data(symbol)
-
             ohlc = data.get("ohlc", {})
             prev_close = ohlc.get("close")
             open_price = ohlc.get("open")

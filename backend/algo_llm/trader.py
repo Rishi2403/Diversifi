@@ -6,12 +6,16 @@ from .execution_engine import ExecutionEngine
 from .signal_adapter import SignalAdapter
 from .pre_market_scanner import pre_market_scan
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 from datetime import datetime
 
-load_dotenv()
+load_dotenv(find_dotenv())
 
-groww = GrowwAPI(os.getenv("GROWW_API_KEY"))
+api_key =os.getenv("GROWW_API_KEY")
+secret = os.getenv("GROWW_SECRET")
+ 
+access_token = GrowwAPI.get_access_token(api_key=api_key, secret=secret)
+groww = GrowwAPI(access_token)
 
 NIFTY_50 = [
     "INDIGO", "TCS", "MAXHEALTH", "TECHM",
@@ -37,19 +41,30 @@ NIFTY_NEXT_50 = [
     "IRFC", "NAUKRI", "PNB", "BOSCHLTD", "ZYDUSLIFE", "IOC",
     "GAIL", "ADANIGREEN", "DLF", "TVSMOTOR", "JSWENERGY", "TATAPOWER",
     "BRITANNIA", "AMBUJACEM", "SHREECEM", "CGPOWER", "BPCL", "ADANIPOWER",
-    "ABB", "BAJAJHLDNG", "JINDALSTEL", "DMART", "SIEMENS", "MOTHERSOHN",
+    "ABB", "BAJAJHLDNG", "JINDALSTEL", "DMART", "SIEMENS", "MOTHERSON",
     "UNITDSPR", "ENRIN"
 ]
 
+nse_tickers = [
+    "BEL",
+    "COALINDIA",
+    "ITC",
+    "JIOFIN",
+    "NTPC",
+    "ONGC",
+    "POWERGRID",
+    "TATASTEEL",
+    "WIPRO"
+]
 
 
 state = TradingState()
 engine = ExecutionEngine(groww, state)
-adapter = SignalAdapter(engine, state, confidence_threshold=0.75)
+adapter = SignalAdapter(engine, state, confidence_threshold=0.65)
 
-print("Running pre-market scan...")
-candidates = pre_market_scan(NIFTY_NEXT_50)
-print([i["symbol"] for i in candidates])
+# print("Running pre-market scan...")
+# candidates = pre_market_scan(NIFTY_50)
+# print([i["symbol"] for i in candidates])
 
 
 while True:
@@ -62,8 +77,8 @@ while True:
         print("[STOP] Max trades reached. Shutting down trader.")
         break
     print("\n=== New Scan Cycle ===")
-    for item in candidates:
-        symbol = item["symbol"]
+    for item in nse_tickers:
+        symbol = item
         adapter.process_symbol(symbol)
         time.sleep(1)  # avoid rate limit
 

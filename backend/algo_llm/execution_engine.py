@@ -15,26 +15,35 @@ class ExecutionEngine:
         quote = fetch_live_data(symbol)
         ltp = quote["last_price"]
 
-        quantity = int(self.state.capital_per_trade // ltp)
-        if quantity <= 0:
-            raise ValueError("Quantity computed as zero")
+        try: 
+            quantity = int(self.state.capital_per_trade // ltp)
+            if quantity <= 0:
+                raise ValueError("Quantity computed as zero")
+                
 
-        response = self.groww.place_order(
-            trading_symbol=symbol,
-            quantity=quantity,
-            validity=self.groww.VALIDITY_DAY,
-            exchange=self.groww.EXCHANGE_NSE,
-            segment=self.groww.SEGMENT_CASH,
-            product=self.groww.PRODUCT_MIS,
-            order_type=self.groww.ORDER_TYPE_MARKET,
-            transaction_type=self.groww.TRANSACTION_TYPE_BUY
-        )
+            response = self.groww.place_order(
+                trading_symbol=symbol,
+                quantity=quantity,
+                validity=self.groww.VALIDITY_DAY,
+                exchange=self.groww.EXCHANGE_NSE,
+                segment=self.groww.SEGMENT_CASH,
+                product=self.groww.PRODUCT_MIS,
+                order_type=self.groww.ORDER_TYPE_MARKET,
+                transaction_type=self.groww.TRANSACTION_TYPE_BUY
+            )
 
-        return {
-            "order_id": response["groww_order_id"],
-            "quantity": quantity,
-            "ltp": ltp
-        }
+            return {
+                "order_id": response["groww_order_id"],
+                "quantity": quantity,
+                "ltp": ltp
+            }
+        except Exception as e:
+            print(f"[ORDER ERROR] Failed to place entry order for {symbol}: {e}")
+            return {
+                "order_id": "",
+                "quantity": 0,
+                "ltp": ltp
+            }
 
     def confirm_entry(self, order_id: str) -> dict:
         status = self.groww.get_order_status(
