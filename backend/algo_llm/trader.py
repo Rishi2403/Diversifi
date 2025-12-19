@@ -46,15 +46,7 @@ NIFTY_NEXT_50 = [
 ]
 
 nse_tickers = [
-    "BEL",
-    "COALINDIA",
-    "ITC",
-    "JIOFIN",
-    "NTPC",
-    "ONGC",
-    "POWERGRID",
-    "TATASTEEL",
-    "WIPRO"
+    "BEL"
 ]
 
 

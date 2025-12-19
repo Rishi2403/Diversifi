@@ -19,7 +19,7 @@ class TradingState:
     # ---- CONFIG (LOCKED) ----
     max_trades_per_day: int = 6
     max_capital_per_day: float = 5000
-    capital_per_trade: float = 2000
+    capital_per_trade: float = 1000
 
     # ---- RUNTIME STATE ----
     trades_today: int = 0
