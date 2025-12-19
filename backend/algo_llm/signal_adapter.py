@@ -89,19 +89,19 @@ class SignalAdapter:
         )
 
         # ---------- EXIT (OCO) ----------
-        target_price = round(ltp * 1.01, 2)   # +1%
-        stop_price = round(ltp * 0.995, 2)    # -0.5%
+        # target_price = round(ltp * 1.01, 2)   # +1%
+        # stop_price = round(ltp * 0.995, 2)    # -0.5%
 
-        oco = self.execution_engine.place_exit_oco(
-            symbol=symbol,
-            quantity=quantity,
-            target_price=target_price,
-            stop_price=stop_price
-        )
+        # oco = self.execution_engine.place_exit_oco(
+        #     symbol=symbol,
+        #     quantity=quantity,
+        #     target_price=target_price,
+        #     stop_price=stop_price
+        # )
 
-        self.state.register_exit_oco(
-            symbol=symbol,
-            oco_order_id=oco.get("smart_order_id")
-        )
+        # self.state.register_exit_oco(
+        #     symbol=symbol,
+        #     oco_order_id=oco.get("smart_order_id")
+        # )
 
         print(f"[ACTIVE] {symbol} trade live with OCO attached")
