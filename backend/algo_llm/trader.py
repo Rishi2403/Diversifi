@@ -1,5 +1,6 @@
 # trader.py
 import time
+from backend.algo_llm.symbols_stack import NIFTY_200
 from growwapi import GrowwAPI
 from .trading_state import TradingState
 from .execution_engine import ExecutionEngine
@@ -45,18 +46,14 @@ NIFTY_NEXT_50 = [
     "UNITDSPR", "ENRIN"
 ]
 
-nse_tickers = [
-    "BEL"
-]
-
 
 state = TradingState()
 engine = ExecutionEngine(groww, state)
 adapter = SignalAdapter(engine, state, confidence_threshold=0.65)
 
-# print("Running pre-market scan...")
-# candidates = pre_market_scan(NIFTY_50)
-# print([i["symbol"] for i in candidates])
+print("Running pre-market scan...")
+candidates = pre_market_scan(NIFTY_200)
+print([i["symbol"] for i in candidates])
 
 
 while True:
