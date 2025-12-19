@@ -27,7 +27,7 @@ class ExecutionEngine:
                 validity=self.groww.VALIDITY_DAY,
                 exchange=self.groww.EXCHANGE_NSE,
                 segment=self.groww.SEGMENT_CASH,
-                product=self.groww.PRODUCT_MIS,
+                product=self.groww.PRODUCT_CNC,
                 order_type=self.groww.ORDER_TYPE_MARKET,
                 transaction_type=self.groww.TRANSACTION_TYPE_BUY
             )
