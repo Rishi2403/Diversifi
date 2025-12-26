@@ -174,9 +174,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 The developers are not responsible for any financial losses incurred from using this tool.
 
-## Contact
-
-- **Project Maintainer**: Rishi Bhattasali, Priyanshu Dutta, Satyaki Dey, Sonika Biswas, Shristy Dutta
 
 ---
 
