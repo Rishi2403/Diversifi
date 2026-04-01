@@ -3,11 +3,64 @@ import Globe, { GlobeMethods } from "react-globe.gl";
 import { fetchCountryGeopolitics, fetchGlobalBreakingNews, NewsArticle } from "@/services/newsService";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Loader2, ExternalLink, TrendingUp, TrendingDown, Newspaper, BarChart3, Maximize2, X } from "lucide-react";
+import { ArrowLeft, Loader2, ExternalLink, TrendingUp, TrendingDown, Newspaper, BarChart3, Maximize2, X, AlertTriangle } from "lucide-react";
 
 const TARGET_COUNTRIES = ["IND", "USA", "JPN", "AUS", "CHN"];
 
-// --- MOCK DATA ---
+// --- MOCK CONFLICT & ALERT DATA ---
+const CONFLICT_ARCS = [
+  // USA -> Iran (Distant Conflict - Missiles/Trajectories)
+  { startLat: 38.0, startLng: -97.0, endLat: 32.42, endLng: 53.68 },
+];
+
+type AlertPoint = {
+    lat: number;
+    lng: number;
+    name: string;
+    type: 'chokepoint' | 'conflict';
+    description: string;
+    affectedSectors: { name: string, risk: string }[];
+    alerts: { time: string, msg: string }[];
+};
+
+const STRATEGIC_ALERTS: AlertPoint[] = [
+  { 
+      lat: 26.56, lng: 56.25, name: 'Strait of Hormuz', type: 'chokepoint',
+      description: `Strait of Hormuz is a global strategic chokepoint currently experiencing severe naval escalation. Tensions involve frequent maritime domain awareness operations and threats of full blockade.`,
+      affectedSectors: [
+          { name: "Global Energy & Oil", risk: "Critical Disruption" },
+          { name: "Maritime Logistics", risk: "Severe Rerouting" },
+          { name: "Insurance Underwriting", risk: "Premium Spikes" }
+      ],
+      alerts: [
+          { time: "1H Ago", msg: "Naval exercises escalated in transit corridor." },
+          { time: "4H Ago", msg: "Oil tankers diverted to Cape of Good Hope." }
+      ]
+  },
+  { 
+      lat: 50.5, lng: 35.0, name: 'Eastern Europe Conflict', type: 'conflict',
+      description: `Active conventional warfare zone causing massive regional disruption. Supply chains for essential raw materials remain highly constrained.`,
+      affectedSectors: [
+          { name: "Global Agriculture", risk: "Severe Shortages" },
+          { name: "European Energy Supply", risk: "Price Volatility" }
+      ],
+      alerts: [
+          { time: "10M Ago", msg: "Kinetic exchange reported near major transit routes." }
+      ]
+  },
+  { 
+      lat: 33.5, lng: 69.5, name: 'Durand Line Skirmishes', type: 'conflict',
+      description: `Border skirmishes leading to regional instability. Affecting critical overland trade routes through central Asia and regional logistics.`,
+      affectedSectors: [
+          { name: "Regional Logistics", risk: "Route Closures" }
+      ],
+      alerts: [
+          { time: "1H Ago", msg: "Major border crossing closed indefinitely." }
+      ]
+  }
+];
+
+// --- MOCK STOCK DATA ---
 const getMockSectors = (countryIso: string) => {
   const data: Record<string, { name: string; changePct: number }[]> = {
     USA: [{ name: "Technology", changePct: 2.15 }, { name: "Financials", changePct: -0.52 }, { name: "Energy", changePct: 1.24 }, { name: "Healthcare", changePct: -1.05 }],
@@ -89,8 +142,25 @@ const InteractiveCandlestickChart = ({ data }: { data: ReturnType<typeof generat
   const yRange = (adjMax - adjMin) || 1;
   const barWidth = 100 / data.length;
 
+  // Calculate Simple Moving Average (SMA - 5 period)
+  const smaPoints = data.map((d, i, arr) => {
+    const startIdx = Math.max(0, i - 4);
+    const subset = arr.slice(startIdx, i + 1);
+    const avg = subset.reduce((sum, item) => sum + item.close, 0) / subset.length;
+    
+    const xC = barWidth * i + barWidth / 2;
+    const yC = 100 - ((avg - adjMin) / yRange) * 100;
+    return `${xC},${yC}`;
+  }).join(' ');
+
   return (
     <div className="w-full h-full relative" onMouseLeave={() => setHoverIdx(null)}>
+      {/* Chart Indicators Info */}
+      <div className="absolute top-2 left-16 flex gap-4 text-[10px] font-bold tracking-widest pointer-events-none select-none text-white/40">
+          <span className="text-blue-400">SMA(5) • ADV</span>
+          <span className="text-purple-400">VOL • AVG</span>
+      </div>
+
       {/* Y-axis labels */}
       <div className="absolute left-0 top-0 bottom-6 w-14 flex flex-col justify-between text-[10px] font-mono text-white/40 pointer-events-none select-none">
         <span>${adjMax.toFixed(0)}</span>
@@ -123,6 +193,15 @@ const InteractiveCandlestickChart = ({ data }: { data: ReturnType<typeof generat
               </g>
             );
           })}
+
+          {/* Indicator: Moving Average */}
+          <polyline 
+             points={smaPoints} 
+             fill="none" 
+             stroke="#60a5fa" 
+             strokeWidth="0.5" 
+             strokeDasharray="1 1"
+          />
         </svg>
 
         {/* X-axis labels */}
@@ -138,7 +217,7 @@ const InteractiveCandlestickChart = ({ data }: { data: ReturnType<typeof generat
             className="absolute top-0 h-full pointer-events-none"
             style={{ left: `${hoverIdx * barWidth + barWidth / 2}%`, width: "1px", background: "rgba(255,255,255,0.2)" }}
           >
-            <div className="absolute top-2 bg-[#1e1b2e] border border-white/15 rounded-xl p-3 text-xs shadow-2xl whitespace-nowrap -translate-x-1/2 min-w-[148px]">
+            <div className="absolute top-8 bg-[#1e1b2e] border border-white/15 rounded-xl p-3 text-xs shadow-2xl whitespace-nowrap -translate-x-1/2 min-w-[148px] z-50">
               <p className="text-center font-bold text-white/70 mb-2 pb-1 border-b border-white/10">{data[hoverIdx].date}</p>
               {[["O", data[hoverIdx].open], ["H", data[hoverIdx].high], ["L", data[hoverIdx].low], ["C", data[hoverIdx].close]].map(([label, val]) => (
                 <div key={label as string} className="flex justify-between gap-4 mb-0.5">
@@ -216,14 +295,22 @@ const StockModal = ({ stock, onClose }: { stock: any; onClose: () => void }) => 
             <h2 className="text-3xl font-black text-white">{stock.ticker}</h2>
             <p className="text-sm font-medium uppercase tracking-widest text-white/40">{stock.name}</p>
           </div>
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-6">
             <div className="text-right">
               <p className="text-3xl font-bold text-white">${stock.price.toFixed(2)}</p>
               <p className={`font-bold text-sm ${isUp ? "text-green-400" : "text-red-400"}`}>
                 {isUp ? "+" : ""}{stock.changePct.toFixed(2)}% Today
               </p>
             </div>
-            <button onClick={onClose} className="p-2 rounded-full bg-white/5 hover:bg-white/15 transition-colors">
+            
+            {/* BUY BUTTON (MOCK) */}
+            <button 
+                className="bg-green-500 hover:bg-green-400 text-black font-extrabold uppercase px-8 py-2.5 rounded-xl shadow-[0_0_15px_rgba(74,222,128,0.2)] ml-4 transition-colors cursor-not-allowed opacity-90"
+                onClick={() => {}}
+            >
+                Buy
+            </button>
+            <button onClick={onClose} className="p-2 ml-4 rounded-full bg-white/5 hover:bg-white/15 transition-colors">
               <X className="w-6 h-6 text-white" />
             </button>
           </div>
@@ -232,7 +319,7 @@ const StockModal = ({ stock, onClose }: { stock: any; onClose: () => void }) => 
         {/* Chart area */}
         <div className="p-6 md:p-8 flex flex-col gap-6">
           {/* Timeframe pills */}
-          <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl self-start border border-white/5">
+          <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl self-start border border-white/5 relative z-10">
             {(["1D", "1W", "1M", "6M", "1Y"] as Timeframe[]).map((t) => (
               <button
                 key={t}
@@ -271,7 +358,11 @@ export default function GlobalTradePage() {
   const globeRef = useRef<GlobeMethods>();
   const [countries, setCountries] = useState<any>({ features: [] });
   const [hoverD, setHoverD] = useState<any>(null);
+  
+  // Selection Contexts
   const [selectedCountry, setSelectedCountry] = useState<any>(null);
+  const [selectedAlert, setSelectedAlert] = useState<AlertPoint | null>(null);
+  
   const [countryNews, setCountryNews] = useState<NewsArticle[]>([]);
   const [globalNews, setGlobalNews] = useState<NewsArticle[]>([]);
   const [loadingNews, setLoadingNews] = useState(false);
@@ -304,6 +395,12 @@ export default function GlobalTradePage() {
     return c[isoA3] || { LAT: 0, LON: 0 };
   };
 
+  const clearSelections = () => {
+      setSelectedCountry(null);
+      setSelectedAlert(null);
+      if (globeRef.current) globeRef.current.controls().autoRotate = true;
+  }
+
   const handleCountryClick = (polygon: any) => {
     if (!TARGET_COUNTRIES.includes(polygon.properties.ISO_A3)) return;
     const { LAT, LON } = getCountryCenter(polygon.properties.ISO_A3);
@@ -311,6 +408,7 @@ export default function GlobalTradePage() {
       globeRef.current.pointOfView({ lat: LAT, lng: LON, altitude: 1.5 }, 1000);
       globeRef.current.controls().autoRotate = false;
     }
+    setSelectedAlert(null);
     setSelectedCountry(polygon);
     setActiveTab("news");
     setModalStock(null);
@@ -319,6 +417,15 @@ export default function GlobalTradePage() {
       setCountryNews(news);
       setLoadingNews(false);
     });
+  };
+
+  const handleAlertClick = (alertItem: AlertPoint) => {
+    if (globeRef.current) {
+      globeRef.current.pointOfView({ lat: alertItem.lat, lng: alertItem.lng, altitude: 0.8 }, 1000);
+      globeRef.current.controls().autoRotate = false;
+    }
+    setSelectedCountry(null);
+    setSelectedAlert(alertItem);
   };
 
   const polygonColor = (d: any) => {
@@ -331,6 +438,9 @@ export default function GlobalTradePage() {
     if (selectedCountry) return "rgba(255,255,255,0.1)";
     return "rgba(255,255,255,0.28)";
   };
+
+  const chokepoints = STRATEGIC_ALERTS.filter(a => a.type === 'chokepoint');
+  const conflicts = STRATEGIC_ALERTS.filter(a => a.type === 'conflict');
 
   return (
     <div className="relative w-full h-screen bg-[#1a0f3a] overflow-hidden text-white font-sans">
@@ -351,8 +461,8 @@ export default function GlobalTradePage() {
           Global <span style={{ color: "#9EA2F8" }}>Trade</span>
         </h1>
         <div className="inline-flex items-center gap-2 mt-3 px-4 py-1.5 rounded-full border border-[#9EA2F8]/30 bg-black/40 backdrop-blur-sm">
-          <div className="w-2 h-2 rounded-full animate-pulse bg-[#9EA2F8]" />
-          <p className="text-white/80 text-sm font-medium">Live Geopolitical Insights & Markets</p>
+          <div className="w-2 h-2 rounded-full animate-pulse bg-red-500" />
+          <p className="text-white/80 text-sm font-medium">Live Escalations & Markets</p>
         </div>
       </div>
 
@@ -410,10 +520,7 @@ export default function GlobalTradePage() {
                 </span>
               </div>
               <button
-                onClick={() => {
-                  setSelectedCountry(null);
-                  if (globeRef.current) globeRef.current.controls().autoRotate = true;
-                }}
+                onClick={clearSelections}
                 className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-xl"
               >
                 ×
@@ -512,6 +619,77 @@ export default function GlobalTradePage() {
         )}
       </AnimatePresence>
 
+      {/* ── LEFT SIDEBAR ─ Unified Strategic Alert Panel ── */}
+      <AnimatePresence>
+        {selectedAlert && (
+          <motion.div
+            initial={{ x: -500, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -500, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="absolute top-28 left-6 bottom-8 w-[450px] bg-[#141318]/92 backdrop-blur-2xl border border-red-500/30 rounded-3xl z-40 flex flex-col p-6 shadow-[0_0_25px_rgba(255,0,0,0.1)]"
+          >
+            {/* Panel header */}
+            <div className="flex justify-between items-start mb-6 pb-4 border-b border-red-500/20 relative">
+              <div>
+                <h2 className="text-4xl font-black text-red-500 tracking-tight flex items-center gap-2 drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]">
+                    <AlertTriangle className="w-8 h-8" /> Alert
+                </h2>
+                <span className="mt-2 inline-block px-2.5 py-1 bg-red-500/10 text-red-400 text-[10px] uppercase font-bold tracking-widest rounded-md border border-red-500/20">
+                  Strategic {selectedAlert.type} • {selectedAlert.name}
+                </span>
+              </div>
+              <button
+                onClick={clearSelections}
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-red-500/20 hover:text-red-400 transition-colors text-xl"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Tab content */}
+            <div className="flex-1 overflow-y-auto pr-1 relative space-y-6" style={{ scrollbarWidth: "none" }}>
+                
+                {/* Description */}
+                <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-5 shadow-inner">
+                    <p className="text-sm text-red-100/90 leading-relaxed font-medium">
+                        {selectedAlert.description}
+                    </p>
+                </div>
+
+                {/* Affected Trade Sectors */}
+                <div>
+                    <h3 className="text-[11px] font-black text-white/40 uppercase tracking-widest pl-1 mb-3">At-Risk Global Sectors</h3>
+                    <div className="space-y-2">
+                        {selectedAlert.affectedSectors.map((sector, idx) => (
+                            <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                                <span className="font-semibold text-sm text-white/90">{sector.name}</span>
+                                <span className="text-xs font-bold text-red-400 bg-red-500/15 border border-red-500/10 px-2 py-1 rounded-md">{sector.risk}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Intelligence Feed */}
+                <div>
+                    <h3 className="text-[11px] font-black text-white/40 uppercase tracking-widest pl-1 mb-3">Live Intelligence Feed</h3>
+                    <div className="space-y-4 relative border-l-2 border-red-500/30 ml-2 pl-5 mt-2">
+                        {selectedAlert.alerts.map((alert, idx) => (
+                            <div key={idx} className="relative">
+                                {/* Timeline blip */}
+                                <div className="absolute -left-[25px] top-1.5 w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(255,0,0,0.8)]" />
+                                <span className="text-[10px] font-black text-red-400/80 uppercase mb-0.5 block">{alert.time}</span>
+                                <p className="text-sm text-white/90 font-medium leading-snug">{alert.msg}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ── STOCK ANALYSIS MODAL ── */}
       <AnimatePresence>
         {modalStock && <StockModal stock={modalStock} onClose={() => setModalStock(null)} />}
@@ -520,8 +698,8 @@ export default function GlobalTradePage() {
       {/* Globe */}
       <div
         className="w-full h-full cursor-grab active:cursor-grabbing"
-        onMouseEnter={() => { if (globeRef.current && !selectedCountry) globeRef.current.controls().autoRotate = false; }}
-        onMouseLeave={() => { if (globeRef.current && !selectedCountry) globeRef.current.controls().autoRotate = true; }}
+        onMouseEnter={() => { if (globeRef.current && !selectedCountry && !selectedAlert) globeRef.current.controls().autoRotate = false; }}
+        onMouseLeave={() => { if (globeRef.current && !selectedCountry && !selectedAlert) globeRef.current.controls().autoRotate = true; }}
         style={{ width: "calc(100% + 440px)", marginLeft: "-220px" }}
       >
         <Globe
@@ -536,13 +714,71 @@ export default function GlobalTradePage() {
           onPolygonHover={setHoverD}
           onPolygonClick={handleCountryClick}
           polygonsTransitionDuration={300}
+          
+          /* Tooltip for hovering countries */
+          polygonLabel={({ properties: d }: any) => `
+             <div style="background: rgba(0,0,0,0.8); padding: 4px 8px; border-radius: 6px; color: white; border: 1px solid rgba(255,255,255,0.2); font-family: sans-serif; font-size: 12px; pointer-events: none;">
+                <b>${d.ADMIN}</b> <span style="color: rgba(255,255,255,0.5); font-size: 10px;">${d.ISO_A3}</span>
+             </div>
+          `}
+          
+          /* Strategic Conflict & Trade Route Rendering */
+          arcsData={CONFLICT_ARCS}
+          arcColor={() => 'rgba(255, 60, 60, 0.9)'}
+          arcDashLength={0.3}
+          arcDashGap={0.2}
+          arcDashInitialGap={() => Math.random()}
+          arcDashAnimateTime={2000}
+          arcStroke={1.0}
+
+          /* HTML Elements: Clickable Conflict Swords */
+          htmlElementsData={conflicts}
+          htmlElement={(d: any) => {
+             const el = document.createElement('div');
+             el.style.pointerEvents = 'auto'; // allow clicking
+             
+             const inner = document.createElement('div');
+             inner.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" x2="19" y1="19" y2="13"/><line x1="16" x2="20" y1="16" y2="20"/><line x1="19" x2="21" y1="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"/><line x1="5" x2="9" y1="14" y2="18"/><line x1="7" x2="4" y1="17" y2="20"/><line x1="3" x2="5" y1="19" y2="21"/></svg>';
+             inner.style.color = '#ef4444'; // Solid Red
+             inner.style.cursor = 'pointer';
+             inner.style.transform = 'translate(-50%, -50%)';
+             inner.style.filter = 'drop-shadow(0px 0px 8px rgba(239, 68, 68, 0.9))';
+             inner.style.transition = 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+
+             // Handle click event securely on inner element
+             inner.onclick = () => handleAlertClick(d as AlertPoint);
+             
+             // Add hover effect safely without conflicting with react-globe.gl's transforms
+             inner.onmouseenter = () => { inner.style.transform = 'translate(-50%, -50%) scale(1.3)'; };
+             inner.onmouseleave = () => { inner.style.transform = 'translate(-50%, -50%) scale(1)'; };
+             
+             el.appendChild(inner);
+             return el;
+          }}
+
+          /* Chokepoints (Strait of Hormuz glow) */
+          ringsData={chokepoints}
+          ringColor={() => 'rgba(239, 68, 68, 0.8)'}
+          ringMaxRadius={3}
+          ringPropagationSpeed={1}
+          ringRepeatPeriod={800}
+
+          labelsData={chokepoints}
+          labelLat={(d: any) => d.lat}
+          labelLng={(d: any) => d.lng}
+          labelText={(d: any) => d.name}
+          labelSize={1.5}
+          labelDotRadius={0.4}
+          labelColor={() => 'rgba(255, 60, 60, 1)'}
+          labelResolution={2}
+          onLabelClick={handleAlertClick}
         />
       </div>
 
       {/* Monitored markets hint */}
-      {!selectedCountry && (
+      {!selectedCountry && !selectedAlert && (
         <div className="absolute bottom-8 left-8 z-40 bg-black/50 backdrop-blur-xl rounded-2xl border border-white/10 p-5 shadow-2xl">
-          <h3 className="text-xs font-black text-[#9EA2F8] uppercase tracking-widest mb-3">Monitored Markets</h3>
+          <h3 className="text-xs font-black text-[#9EA2F8] uppercase tracking-widest mb-3">Monitored Jurisdictions</h3>
           <div className="flex gap-2 flex-wrap max-w-[280px]">
             {["India", "USA", "Japan", "Australia", "China"].map((c) => (
               <span key={c} className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs font-medium text-white/90 hover:bg-white/10 hover:border-[#9EA2F8]/50 transition-all cursor-default">
