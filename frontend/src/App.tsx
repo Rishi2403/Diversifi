@@ -9,6 +9,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Header } from "@/components/Header";
 import LandingPage from "@/pages/LandingPage";
 import ChatPage from "@/pages/ChatPage";
+import GlobalTradePage from "@/pages/GlobalTradePage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
               </>
             }
           />
+          <Route path="/global-trade" element={<GlobalTradePage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

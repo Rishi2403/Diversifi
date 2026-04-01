@@ -122,6 +122,12 @@ export default function LandingPage() {
             )}
           </button>
           <Link
+            to="/global-trade"
+            className="px-6 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 text-[#141318] dark:text-white border border-text-tertiary/20 hover:bg-black/5 dark:hover:bg-white/5"
+          >
+            Global Trade
+          </Link>
+          <Link
             to="/chat"
             className="px-6 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 text-white"
             style={{
@@ -160,7 +166,13 @@ export default function LandingPage() {
           </p>
 
           {/* CTA Button */}
-          <div className="pt-4">
+          <div className="pt-4 flex items-center justify-center gap-4">
+            <Link
+              to="/global-trade"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg font-medium text-[#141318] dark:text-white border border-text-tertiary/20 transition-all duration-200 hover:opacity-85 active:scale-95"
+            >
+              Global Trade
+            </Link>
             <Link
               to="/chat"
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg font-medium text-white transition-all duration-200 hover:opacity-85 active:scale-95"
