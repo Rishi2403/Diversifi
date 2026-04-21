@@ -228,8 +228,41 @@ def send_clarifier():
 
 
 # -----------------------------
+# Portfolio Routes
+# -----------------------------
+
+@app.route("/portfolio/groww/holdings", methods=["GET"])
+def groww_holdings():
+    from portfolio_service import fetch_groww_holdings
+    return jsonify(fetch_groww_holdings())
+
+
+@app.route("/portfolio/groww/mf", methods=["GET"])
+def groww_mf():
+    from portfolio_service import fetch_groww_mf
+    return jsonify(fetch_groww_mf())
+
+
+@app.route("/portfolio/price/<symbol>", methods=["GET"])
+def stock_price(symbol):
+    from portfolio_service import fetch_live_price
+    return jsonify(fetch_live_price(symbol))
+
+
+@app.route("/portfolio/prices", methods=["POST"])
+def bulk_prices():
+    from portfolio_service import fetch_bulk_prices
+    data = request.get_json()
+    symbols = data.get("symbols", []) if data else []
+    if not symbols:
+        return jsonify({"success": False, "error": "No symbols provided"}), 400
+    return jsonify(fetch_bulk_prices(symbols))
+
+
+# -----------------------------
 # Entry Point
 # -----------------------------
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
+

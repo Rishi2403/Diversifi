@@ -1,6 +1,6 @@
 # trader.py
 import time
-from backend.algo_llm.symbols_stack import NIFTY_200
+from .symbols_stack import NIFTY_200
 from growwapi import GrowwAPI
 from .trading_state import TradingState
 from .execution_engine import ExecutionEngine
