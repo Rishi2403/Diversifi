@@ -11,6 +11,7 @@ import LandingPage from "@/pages/LandingPage";
 import ChatPage from "@/pages/ChatPage";
 import GlobalTradePage from "@/pages/GlobalTradePage";
 import NotFound from "@/pages/NotFound";
+import PortfolioPage from "@/pages/PortfolioPage";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
             }
           />
           <Route path="/global-trade" element={<GlobalTradePage />} />
+          <Route path="/portfolio" element={<PortfolioPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

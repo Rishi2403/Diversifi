@@ -46,7 +46,7 @@ export default function LandingPage() {
     { value: "8+", label: "AI Agents" },
     { value: "Real-Time", label: "Market Signals", featured: true },
     { value: "Multi-Source", label: "Data Fusion" },
-    { value: "Explainable", label: "Predictions" },
+    { value: "0–100", label: "Portfolio Health Score" },
   ];
 
   return (
@@ -121,6 +121,12 @@ export default function LandingPage() {
               <Moon className="w-5 h-5 text-text-secondary" />
             )}
           </button>
+          <Link
+            to="/portfolio"
+            className="px-6 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 text-[#141318] dark:text-white border border-text-tertiary/20 hover:bg-black/5 dark:hover:bg-white/5"
+          >
+            Portfolio
+          </Link>
           <Link
             to="/global-trade"
             className="px-6 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 text-[#141318] dark:text-white border border-text-tertiary/20 hover:bg-black/5 dark:hover:bg-white/5"
