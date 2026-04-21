@@ -1,15 +1,12 @@
 import { useState, useRef } from "react";
-import { RefreshCw, Upload, PenLine, CheckCircle, Loader2, AlertTriangle } from "lucide-react";
+import { Upload, PenLine, CheckCircle } from "lucide-react";
 import type { StockHolding, MFHolding } from "@/lib/portfolioEngine";
 
 interface Props {
   onStocksLoaded: (stocks: StockHolding[]) => void;
-  onMFLoaded: (mf: MFHolding[]) => void;
 }
 
-type Tab = "groww" | "csv" | "manual";
-
-const BACKEND = "http://localhost:8000";
+type Tab = "csv" | "manual";
 
 // Map common CSV column names to our schema
 function parseCSV(text: string): StockHolding[] {
@@ -35,36 +32,11 @@ function parseCSV(text: string): StockHolding[] {
 }
 
 export function PortfolioSyncPanel({ onStocksLoaded, onMFLoaded }: Props) {
-  const [tab, setTab] = useState<Tab>("groww");
-  const [growwStatus, setGrowwStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [growwError, setGrowwError] = useState("");
+  const [tab, setTab] = useState<Tab>("csv");
   const [csvStatus, setCsvStatus] = useState<"idle" | "success" | "error">("idle");
   const [csvCount, setCsvCount] = useState(0);
   const [dragging, setDragging] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-
-  const connectGroww = async () => {
-    setGrowwStatus("loading");
-    setGrowwError("");
-    try {
-      const res = await fetch(`${BACKEND}/portfolio/groww/holdings`);
-      const json = await res.json();
-      if (json.success && json.data?.length > 0) {
-        onStocksLoaded(json.data);
-        setGrowwStatus("success");
-      } else {
-        setGrowwError(json.error || "No holdings found in Groww account.");
-        setGrowwStatus("error");
-      }
-      // Also try MF
-      const mfRes = await fetch(`${BACKEND}/portfolio/groww/mf`);
-      const mfJson = await mfRes.json();
-      if (mfJson.success && mfJson.data?.length > 0) onMFLoaded(mfJson.data);
-    } catch {
-      setGrowwError("Cannot reach backend. Make sure Flask is running on port 8000.");
-      setGrowwStatus("error");
-    }
-  };
 
   const handleFile = (file: File) => {
     const reader = new FileReader();
@@ -83,7 +55,6 @@ export function PortfolioSyncPanel({ onStocksLoaded, onMFLoaded }: Props) {
   };
 
   const TABS: { id: Tab; label: string; icon: string }[] = [
-    { id: "groww", label: "Groww Sync", icon: "🟢" },
     { id: "csv", label: "CSV Import", icon: "📄" },
     { id: "manual", label: "Manual Entry", icon: "✍️" },
   ];
@@ -108,37 +79,6 @@ export function PortfolioSyncPanel({ onStocksLoaded, onMFLoaded }: Props) {
       </div>
 
       <div className="p-5">
-        {/* GROWW */}
-        {tab === "groww" && (
-          <div className="space-y-4">
-            <p className="text-xs text-white/50 leading-relaxed">
-              Connect your Groww account to automatically import all stock and mutual fund holdings.
-              Your API credentials are already configured in the backend.
-            </p>
-            {growwStatus === "success" && (
-              <div className="flex items-center gap-2 text-green-400 text-sm font-bold bg-green-500/10 border border-green-500/20 rounded-xl p-3">
-                <CheckCircle className="w-4 h-4" /> Holdings synced successfully from Groww!
-              </div>
-            )}
-            {growwStatus === "error" && (
-              <div className="flex items-start gap-2 text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-xl p-3">
-                <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" /> {growwError}
-              </div>
-            )}
-            <button
-              onClick={connectGroww}
-              disabled={growwStatus === "loading"}
-              className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all
-                bg-[#9EA2F8] text-[#1a0f3a] hover:opacity-90 disabled:opacity-60"
-            >
-              {growwStatus === "loading"
-                ? <><Loader2 className="w-4 h-4 animate-spin" /> Syncing from Groww…</>
-                : <><RefreshCw className="w-4 h-4" /> {growwStatus === "success" ? "Re-Sync Groww" : "Connect & Sync Groww"}</>
-              }
-            </button>
-          </div>
-        )}
-
         {/* CSV */}
         {tab === "csv" && (
           <div className="space-y-4">
