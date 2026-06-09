@@ -1,0 +1,26 @@
+# ── Model_Comparison — Python dependencies ────────────────────────────────────
+# Generated for: Python 3.10+
+# Install: pip install -r requirements.txt
+
+# ── Data handling ──────────────────────────────────────────────────────────────
+numpy>=1.24.0
+pandas>=2.0.0
+
+# ── Statistical models (ARIMA, SARIMA) ────────────────────────────────────────
+statsmodels>=0.14.0
+
+# ── Machine learning (LangGraph ensemble) ─────────────────────────────────────
+scikit-learn>=1.3.0
+
+# ── Deep learning (LSTM paper model) ──────────────────────────────────────────
+torch>=2.0.0          # CPU build — use torch+cu118/cu121 for GPU
+
+# ── Visualisation ─────────────────────────────────────────────────────────────
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# ── Report generation ─────────────────────────────────────────────────────────
+# (HTML report is self-contained; no additional libraries required)
+
+# ── Optional: faster ARIMA grid search ────────────────────────────────────────
+# pmdarima>=2.0.0     # drop-in auto_arima; not required for this project

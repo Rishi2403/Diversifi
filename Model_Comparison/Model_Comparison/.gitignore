@@ -1,0 +1,65 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+
+# ── Virtual environments ───────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+.env
+
+# ── Build / distribution ───────────────────────────────────────────────────────
+build/
+dist/
+*.egg-info/
+*.egg
+wheels/
+
+# ── Jupyter ───────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── Generated output ───────────────────────────────────────────────────────────
+comparison_report.html
+*.png
+*.jpg
+*.svg
+/figures/
+
+# ── Model artefacts / checkpoints ─────────────────────────────────────────────
+*.pt
+*.pth
+*.pkl
+*.pickle
+*.h5
+*.keras
+/models/
+/checkpoints/
+
+# ── Data files ────────────────────────────────────────────────────────────────
+*.csv
+*.parquet
+*.feather
+*.hdf5
+/data/
+
+# ── OS / editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ── Logs & profiling ──────────────────────────────────────────────────────────
+*.log
+*.prof
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
