@@ -22,10 +22,10 @@ const CustomTooltip = ({ active, payload }: any) => {
   if (!active || !payload?.length) return null;
   const d: SectorAllocation = payload[0].payload;
   return (
-    <div className="bg-[#1e1b2e] border border-white/15 rounded-xl p-3 text-xs shadow-2xl min-w-[180px]">
-      <p className="font-bold text-white mb-1">{d.sector}</p>
-      <p className="text-white/60">Portfolio: <span className="text-white font-semibold">{d.percentage}%</span></p>
-      <p className="text-white/60">Benchmark: <span className="text-white/80">{d.benchmarkPct}%</span></p>
+    <div className="bg-white dark:bg-[#1e1b2e] border border-gray-200 dark:border-white/15 rounded-xl p-3 text-xs shadow-2xl min-w-[180px]">
+      <p className="font-bold text-gray-900 dark:text-white mb-1">{d.sector}</p>
+      <p className="text-gray-600 dark:text-white/60">Portfolio: <span className="text-gray-900 dark:text-white font-semibold">{d.percentage}%</span></p>
+      <p className="text-gray-600 dark:text-white/60">Benchmark: <span className="text-gray-800 dark:text-white/80">{d.benchmarkPct}%</span></p>
       <p className={`font-semibold mt-1 ${d.delta > 0 ? "text-red-400" : "text-yellow-400"}`}>
         {d.delta > 0 ? "+" : ""}{d.delta}% vs benchmark
       </p>
@@ -65,8 +65,8 @@ export function SectorDonutChart({ allocations }: Props) {
         {data.map((s, i) => (
           <div key={s.sector} className="flex items-center gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
-            <span className="text-[11px] text-white/70">{s.sector}</span>
-            <span className="text-[11px] font-bold text-white">{s.percentage}%</span>
+            <span className="text-[11px] text-gray-600 dark:text-white/70">{s.sector}</span>
+            <span className="text-[11px] font-bold text-gray-900 dark:text-white">{s.percentage}%</span>
             <span
               className="text-[9px] font-bold px-1 rounded"
               style={{ color: STATUS_COLOR[s.status], background: STATUS_COLOR[s.status] + "20" }}

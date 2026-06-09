@@ -32,12 +32,21 @@ The platform uses a multi-agent workflow where user queries are classified and r
 - RAG-powered finance advice using ChromaDB vector store
 - Asynchronous processing with FastAPI backend
 - React frontend with modern UI
+- **🔐 Secure authentication with Clerk** - Protected routes and user management
+- **📊 AI-Powered Portfolio Simulation** - Advanced Monte Carlo simulation with:
+  - Year-wise investment planning (SIP/SWP/Lumpsum/Stock purchases)
+  - Industry-specific scenarios (20 industries)
+  - Geopolitical crisis modeling
+  - LLM-powered impact analysis per holding
+  - Comprehensive risk metrics and projections
 
 ## Tech Stack
 
 **Backend**: Flask, LangGraph, LangChain, Google Gemini 2.5 Flash, ChromaDB, SQLAlchemy, TextBlob, BeautifulSoup4, RapidFuzz
 
-**Frontend**: React, TypeScript, CSS3
+**Frontend**: React, TypeScript, Tailwind CSS, Framer Motion
+
+**Authentication**: Clerk (OAuth, Email/Password, Social Auth)
 
 **AI/NLP**: HuggingFace Embeddings (all-MiniLM-L6-v2), Sentiment Analysis
 
@@ -48,6 +57,7 @@ The platform uses a multi-agent workflow where user queries are classified and r
 - Python 3.8+
 - Node.js 16+
 - Google Gemini API key
+- Clerk account (for authentication) - Get one at [clerk.com](https://clerk.com)
 
 ### Backend Setup
 
@@ -98,6 +108,18 @@ cd ../frontend
 ```bash
 npm install
 ```
+
+3. **Configure Authentication**
+
+Create a `.env` file in the frontend directory:
+
+```env
+VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key_here
+```
+
+Get your Clerk publishable key from [Clerk Dashboard](https://dashboard.clerk.com).
+
+📖 **See [CLERK_AUTH_SETUP.md](CLERK_AUTH_SETUP.md) for detailed authentication setup instructions.**
 
 ## Usage
 

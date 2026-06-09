@@ -11,7 +11,7 @@ const SEVERITY_STYLE = {
 export function RecommendationsPanel({ recommendations }: Props) {
   if (recommendations.length === 0) {
     return (
-      <div className="text-center py-8 text-white/40 text-sm">
+      <div className="text-center py-8 text-gray-500 dark:text-white/40 text-sm">
         ✅ Portfolio looks well balanced — no major recommendations.
       </div>
     );
@@ -26,16 +26,16 @@ export function RecommendationsPanel({ recommendations }: Props) {
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-2">
                 <span className="text-xl">{r.emoji}</span>
-                <p className="text-sm font-bold text-white leading-tight">{r.title}</p>
+                <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight">{r.title}</p>
               </div>
               <span className={`flex-shrink-0 text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${s.badge}`}>
                 {r.severity}
               </span>
             </div>
-            <p className="text-xs text-white/60 leading-relaxed">{r.description}</p>
+            <p className="text-xs text-gray-600 dark:text-white/60 leading-relaxed">{r.description}</p>
             <div className="flex items-center gap-1.5 pt-1">
               <div className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
-              <p className="text-xs font-semibold text-white/80">{r.action}</p>
+              <p className="text-xs font-semibold text-gray-800 dark:text-white/80">{r.action}</p>
             </div>
           </div>
         );

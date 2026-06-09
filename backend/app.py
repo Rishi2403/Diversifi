@@ -1,13 +1,14 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_swagger_ui import get_swaggerui_blueprint
+from asgiref.wsgi import WsgiToAsgi
 import uuid
 import threading
 
 from trading_lang import build_graph, AgentState
 
-app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+flask_app = Flask(__name__)
+CORS(flask_app, resources={r"/*": {"origins": "*"}})
 
 graph = build_graph()
 TASKS = {}
@@ -27,11 +28,11 @@ swaggerui_blueprint = get_swaggerui_blueprint(
     }
 )
 
-app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+flask_app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 
 
-@app.route("/swagger.json")
+@flask_app.route("/swagger.json")
 def swagger_spec():
     return jsonify({
         "openapi": "3.0.0",
@@ -152,7 +153,7 @@ def start_background_task(task_id: str):
 # Routes
 # -----------------------------
 
-@app.route("/ask", methods=["POST"])
+@flask_app.route("/ask", methods=["POST"])
 def ask_agent():
     data = request.get_json()
     if not data or "question" not in data:
@@ -189,7 +190,7 @@ def ask_agent():
     })
 
 
-@app.route("/get/<task_id>", methods=["GET"])
+@flask_app.route("/get/<task_id>", methods=["GET"])
 def get_task_status(task_id):
     if task_id not in TASKS:
         return jsonify({"error": "Task not found"}), 404
@@ -203,7 +204,7 @@ def get_task_status(task_id):
     })
 
 
-@app.route("/clarify", methods=["POST"])
+@flask_app.route("/clarify", methods=["POST"])
 def send_clarifier():
     data = request.get_json()
     if not data or "task_id" not in data or "answer" not in data:
@@ -231,25 +232,25 @@ def send_clarifier():
 # Portfolio Routes
 # -----------------------------
 
-@app.route("/portfolio/groww/holdings", methods=["GET"])
+@flask_app.route("/portfolio/groww/holdings", methods=["GET"])
 def groww_holdings():
     from portfolio_service import fetch_groww_holdings
     return jsonify(fetch_groww_holdings())
 
 
-@app.route("/portfolio/groww/mf", methods=["GET"])
+@flask_app.route("/portfolio/groww/mf", methods=["GET"])
 def groww_mf():
     from portfolio_service import fetch_groww_mf
     return jsonify(fetch_groww_mf())
 
 
-@app.route("/portfolio/price/<symbol>", methods=["GET"])
+@flask_app.route("/portfolio/price/<symbol>", methods=["GET"])
 def stock_price(symbol):
     from portfolio_service import fetch_live_price
     return jsonify(fetch_live_price(symbol))
 
 
-@app.route("/portfolio/prices", methods=["POST"])
+@flask_app.route("/portfolio/prices", methods=["POST"])
 def bulk_prices():
     from portfolio_service import fetch_bulk_prices
     data = request.get_json()
@@ -263,6 +264,9 @@ def bulk_prices():
 # Entry Point
 # -----------------------------
 
+# Wrap Flask app with ASGI adapter for uvicorn
+app = WsgiToAsgi(flask_app)
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    flask_app.run(host="0.0.0.0", port=8000, debug=True)
 

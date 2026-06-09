@@ -1,0 +1,10 @@
+__pycache__
+.venv
+venv
+.env
+.dive
+dive
+.env.local
+vertex.json
+.claude
+notes.txt

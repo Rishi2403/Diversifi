@@ -16,7 +16,7 @@ const PRIORITY_DOT: Record<string, string> = {
 
 export function RebalancingActions({ suggestions }: Props) {
   if (suggestions.length === 0) {
-    return <div className="text-center py-8 text-white/40 text-sm">No rebalancing actions needed at this time.</div>;
+    return <div className="text-center py-8 text-gray-500 dark:text-white/40 text-sm">No rebalancing actions needed at this time.</div>;
   }
 
   return (
@@ -26,23 +26,23 @@ export function RebalancingActions({ suggestions }: Props) {
         const Icon = cfg.icon;
         return (
           <div key={i} className={`flex items-start gap-3 rounded-xl p-4 border ${cfg.bg}`}>
-            <div className={`mt-0.5 p-2 rounded-lg bg-white/5`}>
+            <div className={`mt-0.5 p-2 rounded-lg bg-gray-100 dark:bg-white/5`}>
               <Icon className={`w-4 h-4 ${cfg.color}`} />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                 <span className={`text-[10px] font-black uppercase tracking-wider ${cfg.color}`}>{cfg.label}</span>
                 <span className={`w-1.5 h-1.5 rounded-full ${PRIORITY_DOT[s.priority]}`} />
-                <span className="text-[10px] text-white/40 uppercase">{s.priority} priority</span>
+                <span className="text-[10px] text-gray-500 dark:text-white/40 uppercase">{s.priority} priority</span>
               </div>
-              <p className="text-sm font-bold text-white">{s.asset}</p>
-              <p className="text-xs text-white/55 mt-0.5">{s.reason}</p>
+              <p className="text-sm font-bold text-gray-900 dark:text-white">{s.asset}</p>
+              <p className="text-xs text-gray-600 dark:text-white/55 mt-0.5">{s.reason}</p>
               {s.currentPct !== undefined && s.targetPct !== undefined && (
                 <div className="flex items-center gap-2 mt-1.5">
-                  <span className="text-[11px] text-white/40">Current:</span>
-                  <span className="text-[11px] font-bold text-white">{s.currentPct}%</span>
-                  <span className="text-white/30">→</span>
-                  <span className="text-[11px] text-white/40">Target:</span>
+                  <span className="text-[11px] text-gray-500 dark:text-white/40">Current:</span>
+                  <span className="text-[11px] font-bold text-gray-900 dark:text-white">{s.currentPct}%</span>
+                  <span className="text-gray-400 dark:text-white/30">→</span>
+                  <span className="text-[11px] text-gray-500 dark:text-white/40">Target:</span>
                   <span className={`text-[11px] font-bold ${cfg.color}`}>{s.targetPct}%</span>
                 </div>
               )}

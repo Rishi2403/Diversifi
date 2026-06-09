@@ -1,0 +1,23 @@
+type,symbol,name,qty,avgBuyPrice,currentPrice,currentValue,category,investedAmount
+stock,RELIANCE,Reliance Industries Ltd,50,2450,2980,149000,,
+stock,TCS,Tata Consultancy Services,25,3200,3845,96125,,
+stock,HDFCBANK,HDFC Bank Ltd,100,1420,1530,153000,,
+stock,INFY,Infosys Ltd,80,1350,1580,126400,,
+stock,ICICIBANK,ICICI Bank Ltd,120,850,975,117000,,
+stock,BAJFINANCE,Bajaj Finance Ltd,15,6800,7250,108750,,
+stock,ITC,ITC Ltd,200,385,425,85000,,
+stock,SBIN,State Bank of India,150,520,585,87750,,
+stock,HINDUNILVR,Hindustan Unilever Ltd,40,2350,2580,103200,,
+stock,MARUTI,Maruti Suzuki India Ltd,10,9500,10250,102500,,
+mf,,HDFC Flexi Cap Fund Direct Growth,,,,125000,Flexi Cap,100000
+mf,,Parag Parikh Flexi Cap Fund Direct,,,,180000,Flexi Cap,150000
+mf,,Axis Bluechip Fund Direct Growth,,,,95000,Large Cap,80000
+mf,,ICICI Prudential Bluechip Fund Direct,,,,110000,Large Cap,90000
+mf,,Mirae Asset Large Cap Fund Direct,,,,88000,Large Cap,75000
+mf,,SBI Small Cap Fund Direct Growth,,,,145000,Small Cap,120000
+mf,,Axis Small Cap Fund Direct,,,,132000,Small Cap,110000
+mf,,Kotak Emerging Equity Fund Direct,,,,78000,Mid Cap,70000
+mf,,DSP Midcap Fund Direct Growth,,,,92000,Mid Cap,85000
+mf,,Nippon India Multi Cap Fund Direct,,,,105000,Multi Cap,95000
+mf,,Motilal Oswal Nasdaq 100 FOF Direct,,,,115000,International,100000
+mf,,PPFAS Flexi Cap Fund Direct,,,,98000,Flexi Cap,90000

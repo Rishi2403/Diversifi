@@ -30,7 +30,7 @@ export function HealthScoreCard({ score, label, sublabel, size = 160 }: Props) {
     <div className="flex flex-col items-center gap-2">
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         {/* Track */}
-        <circle cx={cx} cy={cx} r={radius} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={size * 0.075} />
+        <circle cx={cx} cy={cx} r={radius} fill="none" className="stroke-gray-200 dark:stroke-white/10" strokeWidth={size * 0.075} />
         {/* Progress */}
         <circle
           cx={cx} cy={cx} r={radius} fill="none"
@@ -42,18 +42,18 @@ export function HealthScoreCard({ score, label, sublabel, size = 160 }: Props) {
           style={{ transition: "stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1)" }}
         />
         {/* Score text */}
-        <text x={cx} y={cx - 6} textAnchor="middle" fill="white"
+        <text x={cx} y={cx - 6} textAnchor="middle" className="fill-gray-900 dark:fill-white"
           fontSize={size * 0.22} fontWeight="bold" fontFamily="Roboto Mono, monospace">
           {animated}
         </text>
-        <text x={cx} y={cx + size * 0.14} textAnchor="middle" fill="rgba(255,255,255,0.45)"
+        <text x={cx} y={cx + size * 0.14} textAnchor="middle" className="fill-gray-500 dark:fill-white/45"
           fontSize={size * 0.085} fontFamily="Roboto Mono, monospace">
           /100
         </text>
       </svg>
       <div className="text-center">
-        <p className="text-sm font-bold text-white/90">{label}</p>
-        {sublabel && <p className="text-xs text-white/45 mt-0.5">{sublabel}</p>}
+        <p className="text-sm font-bold text-gray-900 dark:text-white/90">{label}</p>
+        {sublabel && <p className="text-xs text-gray-500 dark:text-white/45 mt-0.5">{sublabel}</p>}
       </div>
     </div>
   );

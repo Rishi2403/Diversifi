@@ -6,40 +6,111 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ClerkProvider } from "@clerk/clerk-react";
 import { Header } from "@/components/Header";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import LandingPage from "@/pages/LandingPage";
 import ChatPage from "@/pages/ChatPage";
 import GlobalTradePage from "@/pages/GlobalTradePage";
 import NotFound from "@/pages/NotFound";
 import PortfolioPage from "@/pages/PortfolioPage";
+import SignInPage from "@/pages/SignInPage";
+import SignUpPage from "@/pages/SignUpPage";
+import ProfilePage from "@/pages/ProfilePage";
+import AdvancedSimulationPage from "@/pages/AdvancedSimulationPage";
 
 const queryClient = new QueryClient();
 
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+if (!PUBLISHABLE_KEY) {
+  throw new Error("Missing Clerk Publishable Key");
+}
+
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route
-            path="/chat"
-            element={
-              <>
-                <Header />
-                <ChatPage />
-              </>
-            }
-          />
-          <Route path="/global-trade" element={<GlobalTradePage />} />
-          <Route path="/portfolio" element={<PortfolioPage />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/sign-in" element={<SignInPage />} />
+            <Route path="/sign-up" element={<SignUpPage />} />
+            <Route
+              path="/chat"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header />
+                    <ChatPage />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/global-trade"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header />
+                    <GlobalTradePage />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/portfolio"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header />
+                    <PortfolioPage />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/portfolio-analyser"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header />
+                    <PortfolioPage />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header />
+                    <ProfilePage />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/portfolio-simulation"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header />
+                    <AdvancedSimulationPage />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ClerkProvider>
 );
 
 createRoot(document.getElementById("root")!).render(<App />);

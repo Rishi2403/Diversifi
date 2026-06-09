@@ -24,8 +24,8 @@ export function ConcentrationRiskPanel({ data, totalValue }: Props) {
           {alerts.map((a, i) => (
             <div key={i} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border ${
               a.level === "HIGH"
-                ? "bg-red-500/10 border-red-500/25 text-red-300"
-                : "bg-yellow-500/10 border-yellow-500/25 text-yellow-300"
+                ? "bg-red-500/10 border-red-500/25 text-red-400 dark:text-red-300"
+                : "bg-yellow-500/10 border-yellow-500/25 text-yellow-500 dark:text-yellow-300"
             }`}>
               <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
               {a.label}
@@ -36,12 +36,12 @@ export function ConcentrationRiskPanel({ data, totalValue }: Props) {
 
       {/* Top holdings table */}
       <div>
-        <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">Top Holdings Exposure</p>
+        <p className="text-[10px] font-black text-gray-500 dark:text-white/40 uppercase tracking-widest mb-2">Top Holdings Exposure</p>
         <div className="space-y-1.5">
           {data.topHoldings.map((h) => (
             <div key={h.name} className="flex items-center gap-3">
-              <span className="text-xs font-bold text-white/80 w-24 truncate">{h.name}</span>
-              <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+              <span className="text-xs font-bold text-gray-800 dark:text-white/80 w-24 truncate">{h.name}</span>
+              <div className="flex-1 h-1.5 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all"
                   style={{
@@ -50,7 +50,7 @@ export function ConcentrationRiskPanel({ data, totalValue }: Props) {
                   }}
                 />
               </div>
-              <span className={`text-xs font-bold w-10 text-right ${h.isRisk ? "text-red-400" : "text-white/70"}`}>
+              <span className={`text-xs font-bold w-10 text-right ${h.isRisk ? "text-red-400" : "text-gray-600 dark:text-white/70"}`}>
                 {h.pct}%
               </span>
               <RiskBadge isRisk={h.isRisk} />
@@ -61,12 +61,12 @@ export function ConcentrationRiskPanel({ data, totalValue }: Props) {
 
       {/* Sector concentration */}
       <div>
-        <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">Sector Concentration</p>
+        <p className="text-[10px] font-black text-gray-500 dark:text-white/40 uppercase tracking-widest mb-2">Sector Concentration</p>
         <div className="space-y-1.5">
           {data.sectorRisks.sort((a, b) => b.pct - a.pct).slice(0, 6).map((s) => (
             <div key={s.sector} className="flex items-center gap-3">
-              <span className="text-xs font-bold text-white/80 w-28 truncate">{s.sector}</span>
-              <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+              <span className="text-xs font-bold text-gray-800 dark:text-white/80 w-28 truncate">{s.sector}</span>
+              <div className="flex-1 h-1.5 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all"
                   style={{
@@ -75,7 +75,7 @@ export function ConcentrationRiskPanel({ data, totalValue }: Props) {
                   }}
                 />
               </div>
-              <span className={`text-xs font-bold w-10 text-right ${s.isRisk ? "text-red-400" : "text-white/70"}`}>
+              <span className={`text-xs font-bold w-10 text-right ${s.isRisk ? "text-red-400" : "text-gray-600 dark:text-white/70"}`}>
                 {s.pct}%
               </span>
               <RiskBadge isRisk={s.isRisk} />

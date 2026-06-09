@@ -1,0 +1,34 @@
+Portfolio CSV Format Guide
+==========================
+
+Your CSV file should have the following columns:
+
+Required Columns:
+-----------------
+1. type          - "stock" or "mutualfund" (or "mf")
+2. symbol        - Stock ticker symbol (for stocks only)
+3. name          - Stock name or Mutual Fund name
+4. qty           - Quantity of shares (for stocks)
+5. avgBuyPrice   - Average buy price (for stocks)
+6. currentPrice  - Current market price (for stocks)
+7. currentValue  - Current total value
+8. category      - Fund category (for mutual funds): Equity, Debt, Hybrid, Flexi Cap, Large Cap, Mid Cap, Small Cap, etc.
+9. investedAmount- Amount invested (for mutual funds)
+
+Sample Format:
+--------------
+type,symbol,name,qty,avgBuyPrice,currentPrice,currentValue,category,investedAmount
+stock,RELIANCE,Reliance Industries Ltd,50,2450,2980,149000,,
+stock,TCS,Tata Consultancy Services,25,3200,3845,96125,,
+mutualfund,,HDFC Flexi Cap Fund Direct Growth,,,,,125000,Flexi Cap,100000
+mutualfund,,SBI Small Cap Fund Direct Growth,,,,,145000,Small Cap,120000
+
+Notes:
+------
+- For stocks: Fill symbol, name, qty, avgBuyPrice, currentPrice, currentValue
+- For mutual funds: Fill name, currentValue, category, investedAmount
+- Leave empty cells blank (just commas with no value)
+- Do not use spaces around commas
+- Ensure proper CSV formatting (use quotes if values contain commas)
+
+Download sample CSV from: /sample-portfolio.csv

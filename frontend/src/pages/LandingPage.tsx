@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Moon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowUpRight } from "lucide-react";
+import { Header } from "@/components/Header";
+import { SignedIn, SignedOut } from "@clerk/clerk-react";
 
 interface StatCard {
   value: string;
@@ -9,39 +10,6 @@ interface StatCard {
 }
 
 export default function LandingPage() {
-  const [mounted, setMounted] = useState(false);
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const stored = localStorage.getItem("theme-mode");
-    if (stored) {
-      const dark = stored === "dark";
-      setIsDark(dark);
-      applyTheme(dark);
-    } else {
-      const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setIsDark(dark);
-      applyTheme(dark);
-    }
-  }, []);
-
-  const applyTheme = (dark: boolean) => {
-    const html = document.documentElement;
-    if (dark) {
-      html.classList.add("dark");
-    } else {
-      html.classList.remove("dark");
-    }
-  };
-
-  const toggleTheme = () => {
-    const newDark = !isDark;
-    setIsDark(newDark);
-    applyTheme(newDark);
-    localStorage.setItem("theme-mode", newDark ? "dark" : "light");
-  };
-
   const stats: StatCard[] = [
     { value: "8+", label: "AI Agents" },
     { value: "Real-Time", label: "Market Signals", featured: true },
@@ -82,68 +50,7 @@ export default function LandingPage() {
       </div>
 
       {/* Navbar */}
-      <nav className="relative z-40 px-6 md:px-12 py-6 flex items-center justify-between backdrop-blur-sm">
-        <div className="flex items-center gap-12">
-          <div className="text-2xl font-bold" style={{ color: "#9EA2F8" }}>
-            ◯
-          </div>
-
-          {/* Menu Items - Hidden on mobile */}
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium">
-            {[
-              "Platform",
-              "Agents",
-              "Research",
-              "Insights",
-              "Documentation",
-            ].map((item) => (
-              <a
-                key={item}
-                href="#"
-                className="text-text-secondary dark:text-text-secondary hover:text-text-primary dark:hover:text-text-primary transition-colors duration-200"
-              >
-                {item}
-              </a>
-            ))}
-          </div>
-        </div>
-
-        {/* Right side - Theme toggle and Launch App button */}
-        <div className="flex items-center gap-4">
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/10 transition-colors duration-200"
-            aria-label="Toggle theme"
-          >
-            {isDark ? (
-              <Sun className="w-5 h-5" style={{ color: "#9EA2F8" }} />
-            ) : (
-              <Moon className="w-5 h-5 text-text-secondary" />
-            )}
-          </button>
-          <Link
-            to="/portfolio"
-            className="px-6 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 text-[#141318] dark:text-white border border-text-tertiary/20 hover:bg-black/5 dark:hover:bg-white/5"
-          >
-            Portfolio
-          </Link>
-          <Link
-            to="/global-trade"
-            className="px-6 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 text-[#141318] dark:text-white border border-text-tertiary/20 hover:bg-black/5 dark:hover:bg-white/5"
-          >
-            Global Trade
-          </Link>
-          <Link
-            to="/chat"
-            className="px-6 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 text-white"
-            style={{
-              backgroundColor: "#141318",
-            }}
-          >
-            Launch App
-          </Link>
-        </div>
-      </nav>
+      <Header />
 
       {/* Hero Section */}
       <div className="relative z-10 min-h-[calc(100vh-80px)] flex flex-col items-center justify-center px-6 md:px-12">
@@ -179,19 +86,29 @@ export default function LandingPage() {
             >
               Global Trade
             </Link>
-            <Link
-              to="/chat"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg font-medium text-white transition-all duration-200 hover:opacity-85 active:scale-95"
-              style={{ backgroundColor: "#141318" }}
-            >
-              Launch App ↗
-            </Link>
+            <SignedOut>
+              <Link
+                to="/sign-in"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg font-medium text-white transition-all duration-200 hover:opacity-85 active:scale-95"
+                style={{ backgroundColor: "#141318" }}
+              >
+                Sign In ↗
+              </Link>
+            </SignedOut>
+            <SignedIn>
+              <Link
+                to="/chat"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg font-medium text-white transition-all duration-200 hover:opacity-85 active:scale-95"
+                style={{ backgroundColor: "#141318" }}
+              >
+                Launch App ↗
+              </Link>
+            </SignedIn>
           </div>
         </div>
 
         {/* Floating Stats Cards - Positioned at bottom of hero */}
-        {mounted && (
-          <div className="absolute -bottom-32 md:-bottom-24 left-0 right-0 z-20">
+        <div className="absolute -bottom-32 md:-bottom-24 left-0 right-0 z-20">
             <div className="px-6 md:px-12">
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 max-w-7xl mx-auto">
                 {stats.map((stat, idx) => (
@@ -259,7 +176,6 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-        )}
       </div>
 
       {/* Bottom Spacing for Cards */}

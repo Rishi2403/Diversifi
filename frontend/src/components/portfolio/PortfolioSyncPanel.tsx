@@ -60,9 +60,9 @@ export function PortfolioSyncPanel({ onStocksLoaded, onMFLoaded }: Props) {
   ];
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+    <div className="bg-white/5 border text-gray-800 dark:border-white/10 rounded-2xl overflow-hidden">
       {/* Tab bar */}
-      <div className="flex border-b border-white/10">
+      <div className="flex border-b text-gray-800 dark:border-white/10">
         {TABS.map((t) => (
           <button
             key={t.id}
@@ -70,7 +70,7 @@ export function PortfolioSyncPanel({ onStocksLoaded, onMFLoaded }: Props) {
             className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-all ${
               tab === t.id
                 ? "bg-[#9EA2F8]/15 text-[#9EA2F8] border-b-2 border-[#9EA2F8]"
-                : "text-white/40 hover:text-white/70"
+                : "text-gray-400 dark:text-white/40 hover:text-[#9EA2F8]"
             }`}
           >
             <span>{t.icon}</span>{t.label}
@@ -82,8 +82,8 @@ export function PortfolioSyncPanel({ onStocksLoaded, onMFLoaded }: Props) {
         {/* CSV */}
         {tab === "csv" && (
           <div className="space-y-4">
-            <p className="text-xs text-white/50 leading-relaxed">
-              Export your portfolio as CSV from <strong className="text-white/70">Groww → Portfolio → Download</strong> or
+            <p className="text-xs text-gray-500 dark:text-white/50 leading-relaxed">
+              Export your portfolio as CSV from <strong className="text-gray-700 dark:text-white/70">Groww → Portfolio → Download</strong> or
               any other platform (Zerodha, INDMoney, Upstox) and upload here.
             </p>
             <div
@@ -92,12 +92,12 @@ export function PortfolioSyncPanel({ onStocksLoaded, onMFLoaded }: Props) {
               onDrop={(e) => { e.preventDefault(); setDragging(false); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}
               onClick={() => fileRef.current?.click()}
               className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
-                dragging ? "border-[#9EA2F8] bg-[#9EA2F8]/10" : "border-white/20 hover:border-white/40"
+                dragging ? "border-[#9EA2F8] bg-[#9EA2F8]/10" : "text-gray-800 dark:border-white/20 hover:border-[#9EA2F8]"
               }`}
             >
-              <Upload className="w-8 h-8 mx-auto mb-2 text-white/30" />
-              <p className="text-sm font-medium text-white/60">Drop CSV file here or <span className="text-[#9EA2F8]">click to browse</span></p>
-              <p className="text-xs text-white/30 mt-1">Supports Groww, Zerodha, INDMoney, Upstox CSV formats</p>
+              <Upload className="w-8 h-8 mx-auto mb-2 text-gray-300 dark:text-white/30" />
+              <p className="text-sm font-medium text-gray-600 dark:text-white/60">Drop CSV file here or <span className="text-[#9EA2F8]">click to browse</span></p>
+              <p className="text-xs text-gray-400 dark:text-white/30 mt-1">Supports Groww, Zerodha, INDMoney, Upstox CSV formats</p>
               <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
             </div>
             {csvStatus === "success" && (
@@ -117,8 +117,8 @@ export function PortfolioSyncPanel({ onStocksLoaded, onMFLoaded }: Props) {
         {tab === "manual" && (
           <div className="text-center py-6 space-y-2">
             <PenLine className="w-8 h-8 mx-auto text-white/30" />
-            <p className="text-sm text-white/60 font-medium">Use the form below to enter holdings manually.</p>
-            <p className="text-xs text-white/35">All fields are pre-filled with a demo portfolio so you can see the analyzer immediately.</p>
+            <p className="text-sm text-gray-600 dark:text-white/60 font-medium">Use the form below to enter holdings manually.</p>
+            <p className="text-xs text-gray-500 dark:text-white/35">All fields are pre-filled with a demo portfolio so you can see the analyzer immediately.</p>
           </div>
         )}
       </div>

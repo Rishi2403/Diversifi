@@ -12,12 +12,12 @@ interface Props {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-[#1e1b2e] border border-white/15 rounded-xl p-3 text-xs shadow-2xl min-w-[160px]">
-      <p className="font-bold text-white mb-2">{label}</p>
+    <div className="bg-white dark:bg-[#1e1b2e] border border-gray-200 dark:border-white/15 rounded-xl p-3 text-xs shadow-2xl min-w-[160px]">
+      <p className="font-bold text-gray-900 dark:text-white mb-2">{label}</p>
       {payload.map((p: any) => (
         <div key={p.name} className="flex justify-between gap-4">
           <span style={{ color: p.fill }} className="font-medium">{p.name}</span>
-          <span className="text-white font-bold">{p.value}%</span>
+          <span className="text-gray-900 dark:text-white font-bold">{p.value}%</span>
         </div>
       ))}
     </div>
@@ -42,26 +42,27 @@ export function BenchmarkComparisonChart({ allocations, benchmarkLabel }: Props)
   return (
     <ResponsiveContainer width="100%" height={280}>
       <BarChart data={data} margin={{ top: 5, right: 10, left: -15, bottom: 5 }} barGap={2}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+        <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-white/10" />
         <XAxis
-          dataKey="name" tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 10 }}
+          dataKey="name"
+          tick={{ className: "fill-gray-500 dark:fill-white/50", fontSize: 10 }}
           axisLine={false} tickLine={false}
         />
         <YAxis
-          tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 10 }}
+          tick={{ className: "fill-gray-500 dark:fill-white/50", fontSize: 10 }}
           axisLine={false} tickLine={false}
           tickFormatter={(v) => `${v}%`}
         />
-        <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+        <Tooltip content={<CustomTooltip />} cursor={{ className: "fill-gray-100 dark:fill-white/5" }} />
         <Legend
-          formatter={(v) => <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 11 }}>{v}</span>}
+          formatter={(v) => <span className="text-gray-600 dark:text-white/60 text-[11px]">{v}</span>}
         />
         <Bar dataKey="Portfolio" radius={[4, 4, 0, 0]} maxBarSize={28}>
           {data.map((entry, i) => (
             <Cell key={i} fill={portfolioColor(entry)} fillOpacity={0.85} />
           ))}
         </Bar>
-        <Bar dataKey="Benchmark" fill="rgba(255,255,255,0.2)" radius={[4, 4, 0, 0]} maxBarSize={28} />
+        <Bar dataKey="Benchmark" className="fill-gray-300 dark:fill-white/20" radius={[4, 4, 0, 0]} maxBarSize={28} />
       </BarChart>
     </ResponsiveContainer>
   );
