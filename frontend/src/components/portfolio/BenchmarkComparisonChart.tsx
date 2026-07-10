@@ -36,7 +36,7 @@ export function BenchmarkComparisonChart({ allocations, benchmarkLabel }: Props)
   const portfolioColor = (entry: any) => {
     if (entry.status === "overweight") return "#f87171";
     if (entry.status === "underweight" || entry.status === "missing") return "#facc15";
-    return "#9EA2F8";
+    return "#00D09C";
   };
 
   return (

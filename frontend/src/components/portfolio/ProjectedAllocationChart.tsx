@@ -1,7 +1,7 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import type { SectorAllocation } from "@/lib/portfolioEngine";
 
-const COLORS = ["#9EA2F8","#4ade80","#f87171","#facc15","#60a5fa","#f97316","#a78bfa","#34d399","#fb7185","#38bdf8","#e879f9","#a3e635"];
+const COLORS = ["#00D09C","#4ade80","#f87171","#facc15","#60a5fa","#f97316","#a78bfa","#34d399","#fb7185","#38bdf8","#e879f9","#a3e635"];
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (!active || !payload?.length) return null;

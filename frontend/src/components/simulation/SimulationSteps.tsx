@@ -96,7 +96,7 @@ export function InvestmentPlanStep({
           onChange={(e) => setTimeHorizon(Math.max(1, Math.min(30, parseInt(e.target.value) || 1)))}
           min="1"
           max="30"
-          className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+          className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
         />
         <p className="text-xs text-gray-500 dark:text-white/40 mt-2">
           Configure investment plans for each year of your simulation (1-30 years)
@@ -136,7 +136,7 @@ export function InvestmentPlanStep({
                     updatePlan(plan.year, "sipAmount", parseInt(e.target.value) || 0)
                   }
                   placeholder="0"
-                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                 />
               </div>
               <div>
@@ -150,7 +150,7 @@ export function InvestmentPlanStep({
                     updatePlan(plan.year, "swpAmount", parseInt(e.target.value) || 0)
                   }
                   placeholder="0"
-                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                 />
               </div>
               <div>
@@ -164,7 +164,7 @@ export function InvestmentPlanStep({
                     updatePlan(plan.year, "lumpsum", parseInt(e.target.value) || 0)
                   }
                   placeholder="0"
-                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                 />
               </div>
             </div>
@@ -177,7 +177,7 @@ export function InvestmentPlanStep({
                 </label>
                 <button
                   onClick={() => addStockPurchase(plan.year)}
-                  className="text-xs text-[#9EA2F8] hover:text-[#9EA2F8]/80 flex items-center gap-1"
+                  className="text-xs text-[#00D09C] hover:text-[#00D09C]/80 flex items-center gap-1"
                 >
                   <Plus className="w-3 h-3" /> Add
                 </button>
@@ -192,7 +192,7 @@ export function InvestmentPlanStep({
                         onChange={(e) =>
                           updateStockPurchase(plan.year, i, "symbol", e.target.value)
                         }
-                        className="flex-1 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                        className="flex-1 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                       >
                         <option value="">Select stock...</option>
                         {stocks.map((s) => (
@@ -213,7 +213,7 @@ export function InvestmentPlanStep({
                           )
                         }
                         placeholder="Amount ₹"
-                        className="w-32 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                        className="w-32 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                       />
                       <button
                         onClick={() => removeStockPurchase(plan.year, i)}
@@ -343,9 +343,9 @@ export function ScenarioBuilderStep({
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-br from-[#9EA2F8]/10 to-purple-500/10 border border-[#9EA2F8]/30 rounded-2xl p-6">
+      <div className="bg-gradient-to-br from-[#00D09C]/10 to-emerald-500/10 border border-[#00D09C]/30 rounded-2xl p-6">
         <div className="flex items-start gap-3">
-          <Info className="w-5 h-5 text-[#9EA2F8] flex-shrink-0" />
+          <Info className="w-5 h-5 text-[#00D09C] flex-shrink-0" />
           <div>
             <h4 className="text-sm font-black text-gray-900 dark:text-white mb-1">
               AI-Powered Scenario Analysis
@@ -367,7 +367,7 @@ export function ScenarioBuilderStep({
           </h3>
           <button
             onClick={addIndustryScenario}
-            className="flex items-center gap-1 text-xs text-[#9EA2F8] hover:text-[#9EA2F8]/80"
+            className="flex items-center gap-1 text-xs text-[#00D09C] hover:text-[#00D09C]/80"
           >
             <Plus className="w-4 h-4" /> Add Scenario
           </button>
@@ -394,7 +394,7 @@ export function ScenarioBuilderStep({
                       onChange={(e) =>
                         updateIndustryScenario(scenario.id, "type", e.target.value)
                       }
-                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                     >
                       <option value="CRASH">Crash</option>
                       <option value="BOOM">Boom</option>
@@ -414,7 +414,7 @@ export function ScenarioBuilderStep({
                           e.target.value as Industry
                         )
                       }
-                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                     >
                       {INDUSTRIES.map((ind) => (
                         <option key={ind} value={ind}>
@@ -439,7 +439,7 @@ export function ScenarioBuilderStep({
                         )
                       }
                       step="5"
-                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                     />
                   </div>
 
@@ -459,7 +459,7 @@ export function ScenarioBuilderStep({
                       }
                       min="0"
                       max={timeHorizon - 1}
-                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                     />
                   </div>
 
@@ -478,7 +478,7 @@ export function ScenarioBuilderStep({
                         )
                       }
                       min="1"
-                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                     />
                   </div>
                 </div>
@@ -501,7 +501,7 @@ export function ScenarioBuilderStep({
                       step="5"
                       min="0"
                       max="100"
-                      className="w-20 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                      className="w-20 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                     />
                     <span className="text-xs text-gray-600 dark:text-white/60">%</span>
                   </div>
@@ -526,7 +526,7 @@ export function ScenarioBuilderStep({
           </h3>
           <button
             onClick={addGeoScenario}
-            className="flex items-center gap-1 text-xs text-[#9EA2F8] hover:text-[#9EA2F8]/80"
+            className="flex items-center gap-1 text-xs text-[#00D09C] hover:text-[#00D09C]/80"
           >
             <Plus className="w-4 h-4" /> Add Scenario
           </button>
@@ -555,7 +555,7 @@ export function ScenarioBuilderStep({
                         updateGeoScenario(scenario.id, "name", e.target.value)
                       }
                       placeholder="e.g., Trade War, Regional Conflict"
-                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                     />
                   </div>
 
@@ -573,7 +573,7 @@ export function ScenarioBuilderStep({
                         );
                         updateGeoScenario(scenario.id, "countries", selected);
                       }}
-                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                       size={4}
                     >
                       {COUNTRIES.map((country) => (
@@ -602,7 +602,7 @@ export function ScenarioBuilderStep({
                         )
                       }
                       step="5"
-                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                     />
                   </div>
 
@@ -621,7 +621,7 @@ export function ScenarioBuilderStep({
                         )
                       }
                       step="5"
-                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                     />
                   </div>
 
@@ -641,7 +641,7 @@ export function ScenarioBuilderStep({
                       }
                       min="0"
                       max={timeHorizon - 1}
-                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                     />
                   </div>
 
@@ -660,7 +660,7 @@ export function ScenarioBuilderStep({
                         )
                       }
                       min="1"
-                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                     />
                   </div>
                 </div>
@@ -687,7 +687,7 @@ export function ScenarioBuilderStep({
           </h3>
           <button
             onClick={addInflationScenario}
-            className="flex items-center gap-1 text-xs text-[#9EA2F8] hover:text-[#9EA2F8]/80"
+            className="flex items-center gap-1 text-xs text-[#00D09C] hover:text-[#00D09C]/80"
           >
             <Plus className="w-4 h-4" /> Add Scenario
           </button>
@@ -718,7 +718,7 @@ export function ScenarioBuilderStep({
                           e.target.value as Country
                         )
                       }
-                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                     >
                       {COUNTRIES.map((country) => (
                         <option key={country} value={country}>
@@ -743,7 +743,7 @@ export function ScenarioBuilderStep({
                         )
                       }
                       step="0.5"
-                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                     />
                   </div>
 
@@ -763,7 +763,7 @@ export function ScenarioBuilderStep({
                       }
                       min="0"
                       max={timeHorizon - 1}
-                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                     />
                   </div>
 
@@ -783,7 +783,7 @@ export function ScenarioBuilderStep({
                           )
                         }
                         min="1"
-                        className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                        className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                       />
                     </div>
                     <button

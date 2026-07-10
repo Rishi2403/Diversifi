@@ -4,68 +4,62 @@ import { ArrowLeft } from "lucide-react";
 
 export default function SignUpPage() {
   return (
-    <div className="min-h-screen bg-[#1a0f3a] text-white font-mono relative overflow-hidden">
-      {/* Background gradient */}
+    <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse at 50% 50%, rgba(158,162,248,0.12) 0%, transparent 60%)",
+            "radial-gradient(ellipse at 50% 50%, rgba(0,208,156,0.06) 0%, transparent 60%)",
         }}
       />
 
-      {/* Back to home button */}
       <Link
         to="/"
-        className="absolute top-6 left-6 z-50 flex items-center gap-2 text-white/60 hover:text-white transition-colors text-sm"
+        className="absolute top-6 left-6 z-50 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to Home
       </Link>
 
-      {/* Content */}
       <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-12">
         <div className="w-full max-w-md">
-          {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-black text-white mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Get Started
             </h1>
-            <p className="text-white/50 text-sm">
+            <p className="text-muted-foreground text-sm">
               Create your account to unlock AI-powered financial insights
             </p>
           </div>
 
-          {/* Clerk Sign Up Component */}
           <div className="flex justify-center">
             <SignUp
               appearance={{
                 elements: {
                   rootBox: "w-full",
-                  card: "bg-white/5 border border-white/10 shadow-2xl",
-                  headerTitle: "text-white",
-                  headerSubtitle: "text-white/50",
+                  card: "bg-card border border-border shadow-xl",
+                  headerTitle: "text-foreground",
+                  headerSubtitle: "text-muted-foreground",
                   socialButtonsBlockButton:
-                    "bg-white/10 border border-white/20 text-white hover:bg-white/15",
+                    "bg-muted border border-border text-foreground hover:bg-muted/80",
                   formButtonPrimary:
-                    "bg-[#9EA2F8] hover:bg-[#9EA2F8]/90 text-[#1a0f3a] font-bold",
-                  identityPreviewText: "text-white",
-                  identityPreviewEditButton: "text-[#9EA2F8]",
-                  formFieldLabel: "text-white/70",
+                    "bg-[#00D09C] hover:bg-[#00D09C]/90 text-white font-semibold",
+                  identityPreviewText: "text-foreground",
+                  identityPreviewEditButton: "text-[#00D09C]",
+                  formFieldLabel: "text-muted-foreground",
                   formFieldInput:
-                    "bg-white/5 border-white/20 text-white placeholder:text-white/30",
-                  dividerLine: "bg-white/20",
-                  dividerText: "text-white/40",
-                  formHeaderTitle: "text-white",
-                  formHeaderSubtitle: "text-white/50",
-                  otpCodeFieldInput:
-                    "bg-white/5 border-white/20 text-white",
+                    "bg-muted border-border text-foreground placeholder:text-muted-foreground",
+                  dividerLine: "bg-border",
+                  dividerText: "text-muted-foreground",
+                  formHeaderTitle: "text-foreground",
+                  formHeaderSubtitle: "text-muted-foreground",
+                  otpCodeFieldInput: "bg-muted border-border text-foreground",
                   footer: "bg-transparent",
                   footerAction: "bg-transparent",
-                  footerActionText: "text-[#9EA2F8]",
-                  footerActionLink: "text-[#9EA2F8] hover:text-[#9EA2F8]/80",
-                  footerPages: "bg-[#1a0f3a]",
-                  footerPagesLink: "text-[#9EA2F8]",
+                  footerActionText: "text-muted-foreground",
+                  footerActionLink: "text-[#00D09C] hover:text-[#00D09C]/80",
+                  footerPages: "bg-card",
+                  footerPagesLink: "text-[#00D09C]",
                 },
               }}
               routing="path"

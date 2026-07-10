@@ -67,7 +67,7 @@ function StockTable({ stocks, onChange }: { stocks: StockHolding[]; onChange: (s
           {(["symbol", "qty", "avgBuyPrice", "currentPrice"] as const).map((f) => (
             <input key={f} value={(s as any)[f]} onChange={(e) => update(i, f, e.target.value)}
               className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white
-                focus:outline-none focus:border-[#9EA2F8]/50 transition-colors"
+                focus:outline-none focus:border-[#00D09C]/50 transition-colors"
               placeholder={f === "symbol" ? "RELIANCE" : "0"}
             />
           ))}
@@ -77,7 +77,7 @@ function StockTable({ stocks, onChange }: { stocks: StockHolding[]; onChange: (s
           </div>
         </div>
       ))}
-      <button onClick={addRow} className="text-xs text-[#9EA2F8] hover:text-[#9EA2F8]/70 transition-colors mt-1">+ Add Stock</button>
+      <button onClick={addRow} className="text-xs text-[#00D09C] hover:text-[#00D09C]/70 transition-colors mt-1">+ Add Stock</button>
     </div>
   );
 }
@@ -100,20 +100,20 @@ function MFTable({ funds, onChange }: { funds: MFHolding[]; onChange: (f: MFHold
       {funds.map((f, i) => (
         <div key={i} className="grid grid-cols-4 gap-2 items-center group">
           <input value={f.fundName} onChange={(e) => update(i, "fundName", e.target.value)}
-            className="col-span-2 w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]/50 transition-colors"
+            className="col-span-2 w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]/50 transition-colors"
             placeholder="Mirae Asset Large Cap" />
           <select value={f.category} onChange={(e) => update(i, "category", e.target.value)}
-            className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]/50 transition-colors">
-            {MF_CATEGORIES.map((c) => <option key={c} value={c} className="bg-white dark:bg-[#1a0f3a]">{c}</option>)}
+            className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]/50 transition-colors">
+            {MF_CATEGORIES.map((c) => <option key={c} value={c} className="bg-white dark:bg-card">{c}</option>)}
           </select>
           <div className="flex items-center gap-1">
             <input value={f.currentValue || ""} onChange={(e) => update(i, "currentValue", e.target.value)}
-              className="flex-1 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]/50 transition-colors" placeholder="0" />
+              className="flex-1 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]/50 transition-colors" placeholder="0" />
             <button onClick={() => removeRow(i)} className="opacity-0 group-hover:opacity-100 text-red-400/70 hover:text-red-400 text-xs px-1 transition-all">✕</button>
           </div>
         </div>
       ))}
-      <button onClick={addRow} className="text-xs text-[#9EA2F8] hover:text-[#9EA2F8]/70 transition-colors mt-1">+ Add Fund</button>
+      <button onClick={addRow} className="text-xs text-[#00D09C] hover:text-[#00D09C]/70 transition-colors mt-1">+ Add Fund</button>
     </div>
   );
 }
@@ -154,9 +154,9 @@ export default function PortfolioPage() {
     + input.mutualFunds.reduce((a, m) => a + m.currentValue, 0) + input.cashBalance;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a0f3a] text-gray-900 dark:text-white font-mono">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Background */}
-      <div className="fixed inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 20% 20%, rgba(158,162,248,0.08) 0%, transparent 60%)" }} />
+      <div className="fixed inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 20% 20%, rgba(0,208,156,0.04) 0%, transparent 60%)" }} />
 
       {/* Header */}
       <header className="top-0 z-50 backdrop-blur-xl px-8 md:px-12 py-6 ">
@@ -176,7 +176,7 @@ export default function PortfolioPage() {
             <span className="text-xs text-gray-500 dark:text-white/40">Total: <span className="text-gray-900 dark:text-white font-bold">{formatINR(totalValue)}</span></span>
             <Link
               to="/portfolio-simulation"
-              className="flex items-center gap-1.5 text-xs text-gray-900 dark:text-white bg-[#9EA2F8]/20 border border-[#9EA2F8] hover:bg-[#9EA2F8]/30 px-3 py-1.5 rounded-lg transition-all"
+              className="flex items-center gap-1.5 text-xs text-gray-900 dark:text-white bg-[#00D09C]/20 border border-[#00D09C] hover:bg-[#00D09C]/30 px-3 py-1.5 rounded-lg transition-all"
             >
               <Play className="w-3.5 h-3.5" /> Simulate
             </Link>
@@ -197,9 +197,9 @@ export default function PortfolioPage() {
                 <div key={i} className="flex items-center gap-0 flex-1">
                   <button onClick={() => setStep(i)} className="flex items-center gap-2 group">
                     <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black transition-all ${
-                      i < step ? "bg-[#9EA2F8] text-white dark:text-[#1a0f3a]" : i === step ? "bg-[#9EA2F8]/30 text-[#9EA2F8] border border-[#9EA2F8]" : "bg-gray-100 dark:bg-white/10 text-gray-400 dark:text-white/30"
+                      i < step ? "bg-[#00D09C] text-white dark:text-background" : i === step ? "bg-[#00D09C]/30 text-[#00D09C] border border-[#00D09C]" : "bg-gray-100 dark:bg-white/10 text-gray-400 dark:text-white/30"
                     }`}>{i < step ? "✓" : i + 1}</div>
-                    <span className={`text-xs font-medium hidden sm:block ${i === step ? "text-[#9EA2F8]" : "text-gray-400 dark:text-white/30"}`}>{s}</span>
+                    <span className={`text-xs font-medium hidden sm:block ${i === step ? "text-[#00D09C]" : "text-gray-400 dark:text-white/30"}`}>{s}</span>
                   </button>
                   {i < STEPS.length - 1 && <div className="flex-1 h-px bg-gray-200 dark:bg-white/10 mx-2" />}
                 </div>
@@ -231,7 +231,7 @@ export default function PortfolioPage() {
                         <div className="flex rounded-xl overflow-hidden border border-gray-200 dark:border-white/10">
                           {(["Conservative", "Moderate", "Aggressive"] as const).map((r) => (
                             <button key={r} onClick={() => set("riskProfile", r)}
-                              className={`flex-1 py-2.5 text-xs font-bold transition-all ${input.riskProfile === r ? "bg-[#9EA2F8] text-white dark:text-[#1a0f3a]" : "text-gray-400 dark:text-white/40 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5"}`}>
+                              className={`flex-1 py-2.5 text-xs font-bold transition-all ${input.riskProfile === r ? "bg-[#00D09C] text-white dark:text-background" : "text-gray-400 dark:text-white/40 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5"}`}>
                               {r}
                             </button>
                           ))}
@@ -242,7 +242,7 @@ export default function PortfolioPage() {
                         <div className="flex rounded-xl overflow-hidden border border-gray-200 dark:border-white/10">
                           {(["nifty50", "nifty500"] as const).map((b) => (
                             <button key={b} onClick={() => set("benchmark", b)}
-                              className={`flex-1 py-2.5 text-xs font-bold transition-all ${input.benchmark === b ? "bg-[#9EA2F8] text-white dark:text-[#1a0f3a]" : "text-gray-400 dark:text-white/40 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5"}`}>
+                              className={`flex-1 py-2.5 text-xs font-bold transition-all ${input.benchmark === b ? "bg-[#00D09C] text-white dark:text-background" : "text-gray-400 dark:text-white/40 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5"}`}>
                               {b === "nifty50" ? "Nifty 50" : "Nifty 500"}
                             </button>
                           ))}
@@ -251,19 +251,19 @@ export default function PortfolioPage() {
                       <div>
                         <label className="block text-xs font-bold text-gray-500 dark:text-white/50 uppercase tracking-widest mb-2">Investment Goal</label>
                         <select value={input.investmentGoal} onChange={(e) => set("investmentGoal", e.target.value)}
-                          className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]/50">
-                          {GOALS.map((g) => <option key={g.value} value={g.value} className="bg-white dark:bg-[#1a0f3a]">{g.label}</option>)}
+                          className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]/50">
+                          {GOALS.map((g) => <option key={g.value} value={g.value} className="bg-white dark:bg-card">{g.label}</option>)}
                         </select>
                       </div>
                       <div>
                         <label className="block text-xs font-bold text-gray-500 dark:text-white/50 uppercase tracking-widest mb-2">Age (optional)</label>
                         <input type="number" value={input.age || ""} onChange={(e) => set("age", parseInt(e.target.value) || undefined)}
-                          placeholder="28" className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]/50" />
+                          placeholder="28" className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]/50" />
                       </div>
                       <div className="sm:col-span-2">
                         <label className="block text-xs font-bold text-gray-500 dark:text-white/50 uppercase tracking-widest mb-2">Monthly SIP / Investment ₹ (optional)</label>
                         <input type="number" value={input.monthlyInvestment || ""} onChange={(e) => set("monthlyInvestment", parseInt(e.target.value) || undefined)}
-                          placeholder="15000" className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]/50" />
+                          placeholder="15000" className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]/50" />
                       </div>
                     </div>
                   </div>
@@ -287,10 +287,10 @@ export default function PortfolioPage() {
                     <div className="bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-5">
                       <label className="block text-xs font-bold text-gray-500 dark:text-white/50 uppercase tracking-widest mb-2">Cash / Liquid Balance ₹</label>
                       <input type="number" value={input.cashBalance || ""} onChange={(e) => set("cashBalance", parseFloat(e.target.value) || 0)}
-                        placeholder="25000" className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]/50" />
+                        placeholder="25000" className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]/50" />
                     </div>
                     {/* Summary */}
-                    <div className="bg-[#9EA2F8]/10 border border-[#9EA2F8]/25 rounded-2xl p-4">
+                    <div className="bg-[#00D09C]/10 border border-[#00D09C]/25 rounded-2xl p-4">
                       <p className="text-xs text-gray-600 dark:text-white/50 mb-2">Portfolio Summary</p>
                       <div className="grid grid-cols-3 gap-4 text-center">
                         {[
@@ -300,7 +300,7 @@ export default function PortfolioPage() {
                         ].map((item) => (
                           <div key={item.label}>
                             <p className="text-xs text-gray-500 dark:text-white/40">{item.label}</p>
-                            <p className="text-sm font-bold text-[#9EA2F8]">{item.val}</p>
+                            <p className="text-sm font-bold text-[#00D09C]">{item.val}</p>
                           </div>
                         ))}
                       </div>
@@ -327,7 +327,7 @@ export default function PortfolioPage() {
                 </button>
               ) : (
                 <button onClick={runAnalysis} disabled={analyzing || totalValue === 0}
-                  className="flex items-center gap-2 text-sm font-bold bg-[#9EA2F8] text-white dark:text-[#1a0f3a] hover:opacity-90 disabled:opacity-50 px-8 py-2.5 rounded-xl transition-all shadow-[0_0_20px_rgba(158,162,248,0.3)]">
+                  className="flex items-center gap-2 text-sm font-bold bg-[#00D09C] text-white dark:text-background hover:opacity-90 disabled:opacity-50 px-8 py-2.5 rounded-xl transition-all shadow-[0_0_20px_rgba(0,208,156,0.25)]">
                   {analyzing ? <><Loader2 className="w-4 h-4 animate-spin" /> Analyzing…</> : <><Play className="w-4 h-4" /> Run Analysis</>}
                 </button>
               )}
@@ -380,7 +380,7 @@ export default function PortfolioPage() {
                       <span className="font-bold text-gray-900 dark:text-white">{val}/{max}</span>
                     </div>
                     <div className="h-1.5 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full bg-[#9EA2F8] transition-all" style={{ width: `${(val / max) * 100}%` }} />
+                      <div className="h-full rounded-full bg-[#00D09C] transition-all" style={{ width: `${(val / max) * 100}%` }} />
                     </div>
                   </div>
                 ))}

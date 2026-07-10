@@ -69,8 +69,8 @@ export function PortfolioSyncPanel({ onStocksLoaded, onMFLoaded }: Props) {
             onClick={() => setTab(t.id)}
             className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-all ${
               tab === t.id
-                ? "bg-[#9EA2F8]/15 text-[#9EA2F8] border-b-2 border-[#9EA2F8]"
-                : "text-gray-400 dark:text-white/40 hover:text-[#9EA2F8]"
+                ? "bg-[#00D09C]/15 text-[#00D09C] border-b-2 border-[#00D09C]"
+                : "text-gray-400 dark:text-white/40 hover:text-[#00D09C]"
             }`}
           >
             <span>{t.icon}</span>{t.label}
@@ -92,11 +92,11 @@ export function PortfolioSyncPanel({ onStocksLoaded, onMFLoaded }: Props) {
               onDrop={(e) => { e.preventDefault(); setDragging(false); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}
               onClick={() => fileRef.current?.click()}
               className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
-                dragging ? "border-[#9EA2F8] bg-[#9EA2F8]/10" : "text-gray-800 dark:border-white/20 hover:border-[#9EA2F8]"
+                dragging ? "border-[#00D09C] bg-[#00D09C]/10" : "text-gray-800 dark:border-white/20 hover:border-[#00D09C]"
               }`}
             >
               <Upload className="w-8 h-8 mx-auto mb-2 text-gray-300 dark:text-white/30" />
-              <p className="text-sm font-medium text-gray-600 dark:text-white/60">Drop CSV file here or <span className="text-[#9EA2F8]">click to browse</span></p>
+              <p className="text-sm font-medium text-gray-600 dark:text-white/60">Drop CSV file here or <span className="text-[#00D09C]">click to browse</span></p>
               <p className="text-xs text-gray-400 dark:text-white/30 mt-1">Supports Groww, Zerodha, INDMoney, Upstox CSV formats</p>
               <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
             </div>

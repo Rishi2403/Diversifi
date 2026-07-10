@@ -9,7 +9,7 @@ import warnings
 from helper_func import analyze_sentiment
 from news_service import NewsService
 warnings.simplefilter(action='ignore', category=FutureWarning)
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_anthropic import ChatAnthropic
 from dotenv import find_dotenv, load_dotenv
 from langgraph.graph import StateGraph, END
 from typing import Optional, TypedDict, List
@@ -17,14 +17,19 @@ import os
 
 # Load env
 load_dotenv(find_dotenv())
-google_api_key = os.getenv("GOOGLE_API_KEY")
-
-
 try:
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-2.5-flash",
+    _api_key = os.getenv("ANTHROPIC_API_KEY", "")
+    _resource = os.getenv("ANTHROPIC_FOUNDRY_RESOURCE", "")
+    _anthropic_url = (
+        f"https://{_resource}.services.ai.azure.com/anthropic" if _resource else "https://api.anthropic.com"
+    )
+    _anthropic_headers = {"Authorization": f"Bearer {_api_key}"} if _resource else {}
+    llm = ChatAnthropic(
+        model="claude-sonnet-4-6",
         temperature=0,
-        api_key=google_api_key,
+        anthropic_api_key=_api_key,
+        anthropic_api_url=_anthropic_url,
+        default_headers=_anthropic_headers,
     )
 except Exception as e:
     llm = None
@@ -47,7 +52,7 @@ class AgentState(TypedDict):
 
 def safe_llm_invoke(prompt: str) -> str:
     if llm is None:
-        raise RuntimeError("LLM is not configured. Set GOOGLE_API_KEY in your environment to use real LLM.")
+        raise RuntimeError("LLM is not configured. Set ANTHROPIC_API_KEY in your environment to use real LLM.")
     resp = llm.invoke(prompt)
     return resp.content.strip()
 

@@ -242,10 +242,10 @@ const StockCard = ({ stock, onOpenModal }: { stock: any; onOpenModal: (stock: an
   return (
     <button
       onClick={() => onOpenModal(stock)}
-      className="w-full text-left rounded-xl p-4 flex items-center justify-between transition-all group border bg-white/5 border-white/10 hover:bg-white/10 hover:border-[#9EA2F8]/50"
+      className="w-full text-left rounded-xl p-4 flex items-center justify-between transition-all group border bg-white/5 border-white/10 hover:bg-white/10 hover:border-[#00D09C]/50"
     >
       <div>
-        <p className="font-bold text-sm text-white group-hover:text-[#9EA2F8] transition-colors">{stock.ticker}</p>
+        <p className="font-bold text-sm text-white group-hover:text-[#00D09C] transition-colors">{stock.ticker}</p>
         <p className="text-[10px] text-white/40 uppercase">{stock.name}</p>
       </div>
       <div className="flex items-center gap-5">
@@ -256,7 +256,7 @@ const StockCard = ({ stock, onOpenModal }: { stock: any; onOpenModal: (stock: an
             {isUp ? "+" : ""}{stock.changePct.toFixed(2)}%
           </p>
         </div>
-        <div className="p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity bg-[#9EA2F8]/15 text-[#9EA2F8]">
+        <div className="p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity bg-[#00D09C]/15 text-[#00D09C]">
           <Maximize2 className="w-4 h-4" />
         </div>
       </div>
@@ -325,7 +325,7 @@ const StockModal = ({ stock, onClose }: { stock: any; onClose: () => void }) => 
                 key={t}
                 onClick={() => setTf(t)}
                 className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
-                  tf === t ? "bg-[#9EA2F8] text-black shadow-md" : "text-white/50 hover:text-white"
+                  tf === t ? "bg-[#00D09C] text-black shadow-md" : "text-white/50 hover:text-white"
                 }`}
               >
                 {t}
@@ -443,9 +443,9 @@ export default function GlobalTradePage() {
   const conflicts = STRATEGIC_ALERTS.filter(a => a.type === 'conflict');
 
   return (
-    <div className="relative w-full h-screen bg-[#1a0f3a] overflow-hidden text-white font-sans">
+    <div className="relative w-full h-screen bg-[#131415] overflow-hidden text-white font-sans">
       {/* Radial vignette */}
-      <div className="absolute inset-0 pointer-events-none z-[1]" style={{ background: "radial-gradient(ellipse at center, transparent 30%, #1a0f3a 100%)" }} />
+      <div className="absolute inset-0 pointer-events-none z-[1]" style={{ background: "radial-gradient(ellipse at center, transparent 30%, #131415 100%)" }} />
 
       {/* Back button */}
       <div className="absolute top-6 left-6 z-50">
@@ -458,16 +458,16 @@ export default function GlobalTradePage() {
       {/* Title */}
       <div className="absolute top-8 left-1/2 -translate-x-1/2 z-50 text-center pointer-events-none flex flex-col items-center">
         <h1 className="leading-tight text-[48px] md:text-[60px] font-bold tracking-tight text-white drop-shadow-xl">
-          Global <span style={{ color: "#9EA2F8" }}>Trade</span>
+          Global <span style={{ color: "#00D09C" }}>Trade</span>
         </h1>
-        <div className="inline-flex items-center gap-2 mt-3 px-4 py-1.5 rounded-full border border-[#9EA2F8]/30 bg-black/40 backdrop-blur-sm">
+        <div className="inline-flex items-center gap-2 mt-3 px-4 py-1.5 rounded-full border border-[#00D09C]/30 bg-black/40 backdrop-blur-sm">
           <div className="w-2 h-2 rounded-full animate-pulse bg-red-500" />
           <p className="text-white/80 text-sm font-medium">Live Escalations & Markets</p>
         </div>
       </div>
 
       {/* ── RIGHT SIDEBAR ─ Editorial Breaking News ── */}
-      <div className="absolute top-0 right-0 h-full w-[440px] bg-[#141318]/88 backdrop-blur-2xl border-l border-white/10 z-40 flex flex-col pt-32 pb-6 px-6 shadow-2xl">
+      <div className="absolute top-0 right-0 h-full w-[440px] bg-[#131415]/88 backdrop-blur-2xl border-l border-white/10 z-40 flex flex-col pt-32 pb-6 px-6 shadow-2xl">
         <div className="flex items-center gap-3 mb-8 px-1">
           <div className="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.7)] animate-pulse" />
           <h2 className="text-3xl font-extrabold tracking-tight text-white">Daily Briefing</h2>
@@ -476,7 +476,7 @@ export default function GlobalTradePage() {
         <div className="flex-1 overflow-y-auto px-1 space-y-6" style={{ scrollbarWidth: "none" }}>
           {globalNews.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-40 space-y-4">
-              <Loader2 className="w-8 h-8 animate-spin text-[#9EA2F8]" />
+              <Loader2 className="w-8 h-8 animate-spin text-[#00D09C]" />
               <span className="text-white/50 font-medium">Scanning global feeds...</span>
             </div>
           ) : (
@@ -509,12 +509,12 @@ export default function GlobalTradePage() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -500, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="absolute top-28 left-6 bottom-8 w-[450px] bg-[#141318]/92 backdrop-blur-2xl border border-white/10 rounded-3xl z-40 flex flex-col p-6 shadow-2xl"
+            className="absolute top-28 left-6 bottom-8 w-[450px] bg-[#131415]/92 backdrop-blur-2xl border border-white/10 rounded-3xl z-40 flex flex-col p-6 shadow-2xl"
           >
             {/* Panel header */}
             <div className="flex justify-between items-start mb-6 pb-4 border-b border-white/10">
               <div>
-                <h2 className="text-4xl font-extrabold tracking-tight" style={{ color: "#9EA2F8" }}>{selectedCountry.properties.ADMIN}</h2>
+                <h2 className="text-4xl font-extrabold tracking-tight" style={{ color: "#00D09C" }}>{selectedCountry.properties.ADMIN}</h2>
                 <span className="mt-2 inline-block px-2.5 py-1 bg-white/5 text-white/60 text-[10px] uppercase font-bold tracking-wider rounded-md border border-white/10">
                   Market Overview
                 </span>
@@ -534,7 +534,7 @@ export default function GlobalTradePage() {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-all ${
-                    activeTab === tab ? "bg-[#9EA2F8] text-black shadow-lg" : "text-white/50 hover:text-white hover:bg-white/5"
+                    activeTab === tab ? "bg-[#00D09C] text-black shadow-lg" : "text-white/50 hover:text-white hover:bg-white/5"
                   }`}
                 >
                   {tab === "news" ? <><Newspaper className="w-4 h-4" /> Policy & News</> : <><BarChart3 className="w-4 h-4" /> Market Impact</>}
@@ -550,19 +550,19 @@ export default function GlobalTradePage() {
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                   {loadingNews ? (
                     <div className="flex flex-col items-center justify-center h-48 gap-4 text-white/50">
-                      <Loader2 className="w-8 h-8 animate-spin text-[#9EA2F8]" />
+                      <Loader2 className="w-8 h-8 animate-spin text-[#00D09C]" />
                       <p className="text-sm font-medium">Fetching intelligence...</p>
                     </div>
                   ) : countryNews.length > 0 ? (
                     <div className="space-y-4">
                       {countryNews.map((news, idx) => (
                         <a key={idx} href={news.url} target="_blank" rel="noopener noreferrer" className="block group">
-                          <div className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-[#9EA2F8]/50 transition-all shadow-md">
-                            <h3 className="font-semibold text-sm mb-2 group-hover:text-[#9EA2F8] transition-colors leading-snug">{news.title}</h3>
+                          <div className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-[#00D09C]/50 transition-all shadow-md">
+                            <h3 className="font-semibold text-sm mb-2 group-hover:text-[#00D09C] transition-colors leading-snug">{news.title}</h3>
                             <p className="text-xs text-white/55 mb-4 line-clamp-3 leading-relaxed">{news.description}</p>
                             <div className="flex items-center justify-between text-[11px] text-white/35 font-bold uppercase tracking-wider">
                               <span>{news.source.name}</span>
-                              <div className="flex items-center gap-1 group-hover:text-[#9EA2F8] transition-colors">
+                              <div className="flex items-center gap-1 group-hover:text-[#00D09C] transition-colors">
                                 <span>Read</span>
                                 <ExternalLink className="w-3 h-3" />
                               </div>
@@ -586,7 +586,7 @@ export default function GlobalTradePage() {
                   {/* Sector tags */}
                   <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
                     <h3 className="text-sm font-bold text-white/75 mb-4 flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-[#9EA2F8]" /> Key Sector Performance
+                      <TrendingUp className="w-4 h-4 text-[#00D09C]" /> Key Sector Performance
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {getMockSectors(selectedCountry.properties.ISO_A3).map((s) => {
@@ -627,7 +627,7 @@ export default function GlobalTradePage() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -500, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="absolute top-28 left-6 bottom-8 w-[450px] bg-[#141318]/92 backdrop-blur-2xl border border-red-500/30 rounded-3xl z-40 flex flex-col p-6 shadow-[0_0_25px_rgba(255,0,0,0.1)]"
+            className="absolute top-28 left-6 bottom-8 w-[450px] bg-[#131415]/92 backdrop-blur-2xl border border-red-500/30 rounded-3xl z-40 flex flex-col p-6 shadow-[0_0_25px_rgba(255,0,0,0.1)]"
           >
             {/* Panel header */}
             <div className="flex justify-between items-start mb-6 pb-4 border-b border-red-500/20 relative">
@@ -778,10 +778,10 @@ export default function GlobalTradePage() {
       {/* Monitored markets hint */}
       {!selectedCountry && !selectedAlert && (
         <div className="absolute bottom-8 left-8 z-40 bg-black/50 backdrop-blur-xl rounded-2xl border border-white/10 p-5 shadow-2xl">
-          <h3 className="text-xs font-black text-[#9EA2F8] uppercase tracking-widest mb-3">Monitored Jurisdictions</h3>
+          <h3 className="text-xs font-black text-[#00D09C] uppercase tracking-widest mb-3">Monitored Jurisdictions</h3>
           <div className="flex gap-2 flex-wrap max-w-[280px]">
             {["India", "USA", "Japan", "Australia", "China"].map((c) => (
-              <span key={c} className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs font-medium text-white/90 hover:bg-white/10 hover:border-[#9EA2F8]/50 transition-all cursor-default">
+              <span key={c} className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs font-medium text-white/90 hover:bg-white/10 hover:border-[#00D09C]/50 transition-all cursor-default">
                 {c}
               </span>
             ))}

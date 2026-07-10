@@ -46,7 +46,7 @@ export function ConcentrationRiskPanel({ data, totalValue }: Props) {
                   className="h-full rounded-full transition-all"
                   style={{
                     width: `${Math.min(h.pct, 100)}%`,
-                    background: h.isRisk ? "#f87171" : "#9EA2F8",
+                    background: h.isRisk ? "#f87171" : "#00D09C",
                   }}
                 />
               </div>

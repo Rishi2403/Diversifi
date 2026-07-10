@@ -215,7 +215,7 @@ export default function AdvancedSimulationPage() {
   const STEPS = ["Portfolio", "Investment Plan", "Scenarios", "Review"];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a0f3a] text-gray-900 dark:text-white font-mono">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Background */}
       <div
         className="fixed inset-0 pointer-events-none"
@@ -268,9 +268,9 @@ export default function AdvancedSimulationPage() {
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black transition-all ${
                           i < step
-                            ? "bg-[#9EA2F8] text-[#1a0f3a]"
+                            ? "bg-[#00D09C] text-white"
                             : i === step
-                            ? "bg-[#9EA2F8]/30 text-[#9EA2F8] border border-[#9EA2F8]"
+                            ? "bg-[#00D09C]/30 text-[#00D09C] border border-[#00D09C]"
                             : "bg-gray-200 dark:bg-white/10 text-gray-500 dark:text-white/30"
                         }`}
                       >
@@ -279,7 +279,7 @@ export default function AdvancedSimulationPage() {
                       <span
                         className={`text-xs font-medium hidden sm:block ${
                           i === step
-                            ? "text-[#9EA2F8]"
+                            ? "text-[#00D09C]"
                             : "text-gray-500 dark:text-white/30"
                         }`}
                       >
@@ -370,7 +370,7 @@ export default function AdvancedSimulationPage() {
                 <button
                   onClick={() => setStep((s) => s + 1)}
                   disabled={simulating}
-                  className="flex items-center gap-2 text-sm bg-[#9EA2F8] text-[#1a0f3a] hover:opacity-90 px-6 py-2 rounded-xl font-bold transition-all disabled:opacity-50"
+                  className="flex items-center gap-2 text-sm bg-[#00D09C] text-white hover:opacity-90 px-6 py-2 rounded-xl font-bold transition-all disabled:opacity-50"
                 >
                   Next <ChevronRight className="w-4 h-4" />
                 </button>
@@ -378,7 +378,7 @@ export default function AdvancedSimulationPage() {
                 <button
                   onClick={runSimulation}
                   disabled={simulating || totalValue === 0}
-                  className="flex items-center gap-2 text-sm font-bold bg-[#9EA2F8] text-[#1a0f3a] hover:opacity-90 disabled:opacity-50 px-8 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(158,162,248,0.3)]"
+                  className="flex items-center gap-2 text-sm font-bold bg-[#00D09C] text-white hover:opacity-90 disabled:opacity-50 px-8 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(158,162,248,0.3)]"
                 >
                   {simulating ? (
                     <>
@@ -472,9 +472,9 @@ function PortfolioInputStep({
   return (
     <div className="space-y-6">
       {/* CSV Upload */}
-      <div className="bg-gradient-to-br from-[#9EA2F8]/10 to-purple-500/10 border border-[#9EA2F8]/30 rounded-2xl p-6">
+      <div className="bg-gradient-to-br from-[#00D09C]/10 to-emerald-500/10 border border-[#00D09C]/30 rounded-2xl p-6">
         <div className="flex items-start gap-4">
-          <FileSpreadsheet className="w-8 h-8 text-[#9EA2F8] flex-shrink-0" />
+          <FileSpreadsheet className="w-8 h-8 text-[#00D09C] flex-shrink-0" />
           <div className="flex-1">
             <h3 className="text-sm font-black text-gray-900 dark:text-white mb-2">
               Quick Import
@@ -484,7 +484,7 @@ function PortfolioInputStep({
               currentPrice, currentValue, category, investedAmount
             </p>
             <div className="flex items-center gap-3">
-              <label className="inline-flex items-center gap-2 px-4 py-2 bg-[#9EA2F8] text-[#1a0f3a] rounded-lg cursor-pointer hover:opacity-90 transition text-sm font-bold">
+              <label className="inline-flex items-center gap-2 px-4 py-2 bg-[#00D09C] text-white rounded-lg cursor-pointer hover:opacity-90 transition text-sm font-bold">
                 <Upload className="w-4 h-4" />
                 Upload CSV
                 <input
@@ -497,7 +497,7 @@ function PortfolioInputStep({
               {/* <a
                 href="/sample-portfolio.csv"
                 download="sample-portfolio.csv"
-                className="text-xs text-[#9EA2F8] hover:text-[#9EA2F8]/80 underline transition"
+                className="text-xs text-[#00D09C] hover:text-[#00D09C]/80 underline transition"
               >
                 Download Sample CSV
               </a> */}
@@ -512,7 +512,7 @@ function PortfolioInputStep({
           <h3 className="text-sm font-black text-gray-900 dark:text-white">Stocks</h3>
           <button
             onClick={addStock}
-            className="flex items-center gap-1 text-xs text-[#9EA2F8] hover:text-[#9EA2F8]/80 transition"
+            className="flex items-center gap-1 text-xs text-[#00D09C] hover:text-[#00D09C]/80 transition"
           >
             <Plus className="w-4 h-4" /> Add Stock
           </button>
@@ -538,14 +538,14 @@ function PortfolioInputStep({
                   value={stock.symbol}
                   onChange={(e) => updateStock(i, "symbol", e.target.value.toUpperCase())}
                   placeholder="RELIANCE"
-                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                 />
                 <input
                   type="number"
                   value={stock.qty || ""}
                   onChange={(e) => updateStock(i, "qty", parseFloat(e.target.value) || 0)}
                   placeholder="0"
-                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                 />
                 <input
                   type="number"
@@ -554,7 +554,7 @@ function PortfolioInputStep({
                     updateStock(i, "avgBuyPrice", parseFloat(e.target.value) || 0)
                   }
                   placeholder="0"
-                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                 />
                 <input
                   type="number"
@@ -563,7 +563,7 @@ function PortfolioInputStep({
                     updateStock(i, "currentPrice", parseFloat(e.target.value) || 0)
                   }
                   placeholder="0"
-                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                 />
                 <span className="text-xs text-gray-700 dark:text-white/70 font-medium">
                   {formatINR(stock.currentValue)}
@@ -588,7 +588,7 @@ function PortfolioInputStep({
           </h3>
           <button
             onClick={addMF}
-            className="flex items-center gap-1 text-xs text-[#9EA2F8] hover:text-[#9EA2F8]/80 transition"
+            className="flex items-center gap-1 text-xs text-[#00D09C] hover:text-[#00D09C]/80 transition"
           >
             <Plus className="w-4 h-4" /> Add Fund
           </button>
@@ -611,12 +611,12 @@ function PortfolioInputStep({
                   value={mf.fundName}
                   onChange={(e) => updateMF(i, "fundName", e.target.value)}
                   placeholder="Fund Name"
-                  className="col-span-2 w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                  className="col-span-2 w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                 />
                 <select
                   value={mf.category}
                   onChange={(e) => updateMF(i, "category", e.target.value)}
-                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                 >
                   <option value="Equity">Equity</option>
                   <option value="Debt">Debt</option>
@@ -630,7 +630,7 @@ function PortfolioInputStep({
                       updateMF(i, "currentValue", parseFloat(e.target.value) || 0)
                     }
                     placeholder="0"
-                    className="flex-1 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+                    className="flex-1 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                   />
                   <button
                     onClick={() => removeMF(i)}
@@ -655,7 +655,7 @@ function PortfolioInputStep({
           value={cashBalance || ""}
           onChange={(e) => setCashBalance(parseFloat(e.target.value) || 0)}
           placeholder="0"
-          className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+          className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
         />
       </div>
     </div>
@@ -720,7 +720,7 @@ function ReviewStep({
               value={baseExpectedReturn}
               onChange={(e) => setBaseExpectedReturn(parseFloat(e.target.value) || 0)}
               step="0.5"
-              className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+              className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
             />
           </div>
           <div>
@@ -732,7 +732,7 @@ function ReviewStep({
               value={baseVolatility}
               onChange={(e) => setBaseVolatility(parseFloat(e.target.value) || 0)}
               step="1"
-              className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#9EA2F8]"
+              className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
             />
           </div>
         </div>
@@ -810,9 +810,9 @@ function ReviewStep({
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-[#9EA2F8]/10 to-purple-500/10 border border-[#9EA2F8]/30 rounded-2xl p-6">
+      <div className="bg-gradient-to-br from-[#00D09C]/10 to-emerald-500/10 border border-[#00D09C]/30 rounded-2xl p-6">
         <div className="flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-[#9EA2F8] flex-shrink-0" />
+          <AlertCircle className="w-5 h-5 text-[#00D09C] flex-shrink-0" />
           <div>
             <h4 className="text-sm font-black text-gray-900 dark:text-white mb-1">
               Ready to Simulate
@@ -908,7 +908,7 @@ function ResultsStep({
       {/* Holding Impacts */}
       <div className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-6">
         <h3 className="text-sm font-black text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-          <CheckCircle className="w-4 h-4 text-[#9EA2F8]" />
+          <CheckCircle className="w-4 h-4 text-[#00D09C]" />
           AI Impact Analysis - Affected Holdings
         </h3>
 
@@ -935,7 +935,7 @@ function ResultsStep({
                         {formatINR(holding.baseValue)}
                       </p>
                     </div>
-                    <span className="text-xs bg-[#9EA2F8]/20 text-[#9EA2F8] px-2 py-1 rounded">
+                    <span className="text-xs bg-[#00D09C]/20 text-[#00D09C] px-2 py-1 rounded">
                       {holding.affectedBy.length} scenario(s)
                     </span>
                   </div>
@@ -958,7 +958,7 @@ function ResultsStep({
                         </div>
                         <div className="flex-1">
                           <p className="font-medium text-gray-900 dark:text-white">
-                            {impact.scenarioName}
+                            {impact.scenarioName || impact.scenarioId}
                           </p>
                           <p className="text-gray-600 dark:text-white/60 mt-0.5">
                             {impact.reasoning}

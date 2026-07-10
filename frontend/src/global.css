@@ -6,115 +6,107 @@
 
 @layer base {
   :root {
-    /* === Light Mode Colors === */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    
-    /* Brand colors - from design */
-    --primary: 237 100% 68%;
+    /* Light Mode — Groww-inspired */
+    --background: 210 20% 96%;
+    --foreground: 225 7% 10%;
+
+    --primary: 162 100% 41%;
     --primary-foreground: 0 0% 100%;
-    
-    --white: 0 0% 97%;
-    --soft-gray: 0 0% 30%;
-    --black: 0 0% 8%;
-    --secondary: 45 100% 95%;
-    
-    /* Surface colors */
+
+    --white: 0 0% 100%;
+    --soft-gray: 225 5% 45%;
+    --black: 225 7% 10%;
+    --secondary: 162 30% 92%;
+
     --surface-primary: 0 0% 100%;
-    --surface-secondary: 45 100% 95%;
-    --surface-tertiary: 0 0% 97%;
-    
-    /* Card and container */
+    --surface-secondary: 210 20% 96%;
+    --surface-tertiary: 210 15% 93%;
+
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 8%;
-    
-    /* Borders */
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    
-    /* Text colors */
-    --text-primary: 0 0% 8%;
-    --text-secondary: 0 0% 30%;
-    --text-tertiary: 0 0% 60%;
-    
-    /* Muted */
-    --muted: 0 0% 95%;
-    --muted-foreground: 0 0% 50%;
-    
-    /* Popover */
+    --card-foreground: 225 7% 10%;
+
+    --border: 225 5% 88%;
+    --input: 225 5% 88%;
+
+    --text-primary: 225 7% 10%;
+    --text-secondary: 225 5% 45%;
+    --text-tertiary: 225 5% 65%;
+
+    --muted: 210 15% 93%;
+    --muted-foreground: 225 5% 50%;
+
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 8%;
-    
-    /* Ring */
-    --ring: 237 100% 68%;
-    
-    /* Radius */
-    --radius: 0.75rem;
-    
-    /* Sidebar */
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 0 0% 20%;
-    --sidebar-primary: 237 100% 68%;
+    --popover-foreground: 225 7% 10%;
+
+    --ring: 162 100% 41%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 225 7% 10%;
+    --sidebar-primary: 162 100% 41%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 45 100% 95%;
-    --sidebar-accent-foreground: 0 0% 8%;
-    --sidebar-border: 0 0% 90%;
-    --sidebar-ring: 237 100% 68%;
-    
-    /* Gradients */
-    --gradient-primary-to-secondary: linear-gradient(135deg, #9EA2F8 0%, #FBFAEE 100%);
-    --gradient-radial: radial-gradient(circle at 20% 50%, #9EA2F8 0%, #FBFAEE 100%);
+    --sidebar-accent: 162 30% 92%;
+    --sidebar-accent-foreground: 225 7% 10%;
+    --sidebar-border: 225 5% 88%;
+    --sidebar-ring: 162 100% 41%;
+
+    --gradient-primary-to-secondary: linear-gradient(135deg, #00D09C 0%, #E8FFF7 100%);
+    --gradient-radial: radial-gradient(circle at 20% 50%, rgba(0,208,156,0.08) 0%, #F0F2F5 100%);
+
+    --destructive: 355 100% 60%;
+    --destructive-foreground: 0 0% 100%;
   }
 
   .dark {
-    /* === Dark Mode Colors === */
-    --background: 262 40% 12%;
-    --foreground: 0 0% 97%;
-    
-    /* Brand colors - inverted for dark mode */
-    --primary: 237 100% 65%;
-    --primary-foreground: 0 0% 8%;
-    
-    --white: 0 0% 15%;
-    --soft-gray: 0 0% 70%;
-    --black: 0 0% 92%;
-    --secondary: 45 100% 20%;
-    
-    /* Surface colors */
-    --surface-primary: 262 30% 18%;
-    --surface-secondary: 262 35% 25%;
-    --surface-tertiary: 262 25% 22%;
-    
-    --card: 0 0% 12%;
-    --card-foreground: 0 0% 97%;
-    
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    
-    /* Text colors */
-    --text-primary: 0 0% 97%;
-    --text-secondary: 0 0% 70%;
-    --text-tertiary: 0 0% 50%;
-    
-    --muted: 0 0% 20%;
-    --muted-foreground: 0 0% 60%;
-    
-    --popover: 0 0% 12%;
-    --popover-foreground: 0 0% 97%;
-    
-    --ring: 237 100% 65%;
-    
-    --sidebar-background: 0 0% 10%;
-    --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 237 100% 65%;
-    --sidebar-primary-foreground: 0 0% 8%;
-    --sidebar-accent: 45 20% 30%;
-    --sidebar-accent-foreground: 0 0% 97%;
-    --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 237 100% 65%;
+    /* Dark Mode — Groww dark inspired */
+    --background: 225 7% 9%;
+    --foreground: 0 0% 95%;
 
-    --gradient-primary-to-secondary: linear-gradient(135deg, #9EA2F8 0%, #FBFAEE 100%);
-    --gradient-radial: radial-gradient(circle at 20% 50%, #6366f1 0%, #1a0f3a 100%);
+    --primary: 162 100% 41%;
+    --primary-foreground: 225 7% 9%;
+
+    --white: 225 5% 15%;
+    --soft-gray: 0 0% 65%;
+    --black: 0 0% 92%;
+    --secondary: 162 20% 15%;
+
+    --surface-primary: 225 6% 12%;
+    --surface-secondary: 225 5% 15%;
+    --surface-tertiary: 225 5% 18%;
+
+    --card: 225 6% 12%;
+    --card-foreground: 0 0% 95%;
+
+    --border: 225 5% 18%;
+    --input: 225 5% 18%;
+
+    --text-primary: 0 0% 95%;
+    --text-secondary: 0 0% 65%;
+    --text-tertiary: 0 0% 45%;
+
+    --muted: 225 5% 18%;
+    --muted-foreground: 0 0% 55%;
+
+    --popover: 225 6% 12%;
+    --popover-foreground: 0 0% 95%;
+
+    --ring: 162 100% 41%;
+
+    --sidebar-background: 225 7% 9%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 162 100% 41%;
+    --sidebar-primary-foreground: 225 7% 9%;
+    --sidebar-accent: 162 20% 15%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 225 5% 18%;
+    --sidebar-ring: 162 100% 41%;
+
+    --gradient-primary-to-secondary: linear-gradient(135deg, #00D09C 0%, #131415 100%);
+    --gradient-radial: radial-gradient(circle at 20% 50%, rgba(0,208,156,0.05) 0%, #131415 100%);
+
+    --destructive: 355 100% 60%;
+    --destructive-foreground: 0 0% 100%;
   }
 }
 
@@ -129,7 +121,7 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: "Roboto Mono", monospace;
+    font-family: "Inter", sans-serif;
   }
 
   :where(p, span, li, h1, h2, h3, h4, h5, h6, a, button, label, td, th) {
@@ -179,7 +171,7 @@
   }
 
   .glass-effect {
-    @apply bg-white/10 dark:bg-slate-900/10 backdrop-blur-md border border-white/20 dark:border-slate-700/30;
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
   }
 
   .card-elevated {
@@ -191,11 +183,28 @@
   }
 
   .input-base {
-    @apply px-4 py-2 rounded-lg border border-input text-foreground placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-0;
+    @apply px-4 py-2 rounded-lg border border-input text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-0;
     background-color: hsl(var(--surface-primary));
   }
 
   .pill-badge {
-    @apply inline-flex items-center px-4 py-2 rounded-full text-sm font-medium border border-border bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm;
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border border-border bg-muted;
+  }
+
+  .positive {
+    color: #00D09C;
+  }
+
+  .negative {
+    color: #FF4D4D;
+  }
+}
+
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
   }
 }

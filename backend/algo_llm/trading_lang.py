@@ -4,7 +4,7 @@ from mf_scrapper import scrape_mf
 from helper_func import analyze_sentiment, normalize_fund_name
 from news_service import NewsService
 warnings.simplefilter(action='ignore', category=FutureWarning)
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_anthropic import ChatAnthropic
 from dotenv import find_dotenv, load_dotenv
 from langgraph.graph import StateGraph, END
 from typing import Dict, Optional, TypedDict, List
@@ -16,7 +16,6 @@ from langgraph.prebuilt import create_react_agent
 from rapidfuzz import fuzz
 
 load_dotenv(find_dotenv())
-google_api_key = os.getenv("GOOGLE_API_KEY")
 
 CHROMA_DB = "./finance_db"
 embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
@@ -138,11 +137,19 @@ class AgentState(TypedDict):
     should_scrape: bool
     trade_signal: Optional[Dict]
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash-lite",
+_api_key = os.getenv("ANTHROPIC_API_KEY", "")
+_resource = os.getenv("ANTHROPIC_FOUNDRY_RESOURCE", "")
+_anthropic_url = (
+    f"https://{_resource}.services.ai.azure.com/anthropic" if _resource else "https://api.anthropic.com"
+)
+_anthropic_headers = {"Authorization": f"Bearer {_api_key}"} if _resource else {}
+
+llm = ChatAnthropic(
+    model="claude-sonnet-4-6",
     temperature=0,
-    project=os.getenv("GCP_PROJECT_ID"),
-    location=os.getenv("GCP_LOCATION"),
+    anthropic_api_key=_api_key,
+    anthropic_api_url=_anthropic_url,
+    default_headers=_anthropic_headers,
 )
 
 tools = [get_finance_info]

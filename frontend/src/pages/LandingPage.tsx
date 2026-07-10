@@ -1,229 +1,171 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight } from "lucide-react";
+import { TrendingUp, TrendingDown, BarChart2, Shield, Zap } from "lucide-react";
 import { Header } from "@/components/Header";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 
-interface StatCard {
-  value: string;
-  label: string;
-  featured?: boolean;
-}
+const TICKERS = [
+  { name: "NIFTY 50", value: "23,415.05", change: "+127.35", pct: "+0.55%", up: true },
+  { name: "SENSEX", value: "77,209.90", change: "+387.45", pct: "+0.50%", up: true },
+  { name: "BANK NIFTY", value: "50,127.80", change: "-215.60", pct: "-0.43%", up: false },
+  { name: "NIFTY IT", value: "38,204.15", change: "+520.75", pct: "+1.38%", up: true },
+  { name: "NIFTY MIDCAP", value: "52,891.40", change: "+243.20", pct: "+0.46%", up: true },
+  { name: "INDIA VIX", value: "13.85", change: "-0.42", pct: "-2.94%", up: false },
+  { name: "NIFTY PHARMA", value: "21,340.60", change: "+180.30", pct: "+0.85%", up: true },
+  { name: "USD/INR", value: "83.42", change: "+0.15", pct: "+0.18%", up: false },
+];
 
 export default function LandingPage() {
-  const stats: StatCard[] = [
-    { value: "8+", label: "AI Agents" },
-    { value: "Real-Time", label: "Market Signals", featured: true },
-    { value: "Multi-Source", label: "Data Fusion" },
-    { value: "0–100", label: "Portfolio Health Score" },
-  ];
-
   return (
-    <main className="min-h-screen w-full bg-white dark:bg-[#1a0f3a] overflow-hidden">
-      {/* Background Gradient */}
-      <div
-        className="fixed inset-0 z-0 pointer-events-none"
-        style={{
-          background: "var(--gradient-radial)",
-        }}
-      />
-
-      {/* Subtle grid overlay */}
-      <div className="fixed inset-0 z-0 pointer-events-none opacity-5">
-        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern
-              id="grid"
-              width="40"
-              height="40"
-              patternUnits="userSpaceOnUse"
+    <main className="min-h-screen w-full bg-background overflow-hidden">
+      {/* Market Ticker Strip */}
+      <div className="border-b border-border bg-card overflow-hidden h-9 flex items-center">
+        <div
+          className="flex whitespace-nowrap"
+          style={{ animation: "ticker 40s linear infinite" }}
+        >
+          {[...TICKERS, ...TICKERS, ...TICKERS].map((t, i) => (
+            <div
+              key={i}
+              className="inline-flex items-center gap-2 px-5 shrink-0 border-r border-border h-9"
             >
-              <path
-                d="M 40 0 L 0 0 0 40"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="0.5"
-              />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
+              <span className="text-xs font-semibold text-foreground">{t.name}</span>
+              <span className="text-xs font-bold text-foreground">{t.value}</span>
+              <span
+                className="text-xs font-medium flex items-center gap-0.5"
+                style={{ color: t.up ? "#00D09C" : "#FF4D4D" }}
+              >
+                {t.up ? (
+                  <TrendingUp className="w-3 h-3" />
+                ) : (
+                  <TrendingDown className="w-3 h-3" />
+                )}
+                {t.change} ({t.pct})
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Navbar */}
       <Header />
 
       {/* Hero Section */}
-      <div className="relative z-10 min-h-[calc(100vh-80px)] flex flex-col items-center justify-center px-6 md:px-12">
-        <div className="max-w-4xl text-center space-y-8">
-          {/* Stay up to date pill */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-text-tertiary/30 bg-white/40 dark:bg-white/5 backdrop-blur-sm">
-            <div
-              className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: "#9EA2F8" }}
-            />
-            <span className="text-sm font-medium text-text-secondary dark:text-text-secondary">
-              AI Driven Research Prototype
-            </span>
+      <div className="relative px-6 md:px-12 py-16 md:py-24 max-w-7xl mx-auto">
+        <div className="max-w-2xl space-y-6">
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold"
+            style={{
+              borderColor: "rgba(0,208,156,0.35)",
+              backgroundColor: "rgba(0,208,156,0.07)",
+              color: "#00D09C",
+            }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00D09C] animate-pulse" />
+            AI-Powered Research • Indian Markets
           </div>
 
-          {/* Main Headline */}
-          <h1 className="leading-tight text-[60px] text-text-primary dark:text-white">
-            <span className="block">Intelligent Stock Market</span>
-            <span className="block">Analysis Pipeline</span>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-tight">
+            Smart Portfolio
+            <br />
+            <span style={{ color: "#00D09C" }}>Analysis & Insights</span>
           </h1>
 
-          {/* Subtitle */}
-          <p className="text-lg md:text-xl text-text-secondary dark:text-text-secondary max-w-2xl mx-auto">
-            An AI-powered system using RAG, multi-agent intelligence, and
-            real-time market data.
+          <p className="text-base md:text-lg text-muted-foreground max-w-xl leading-relaxed">
+            AI-driven portfolio health scoring, sector analysis, rebalancing
+            recommendations, and Monte Carlo simulations — built for Indian markets.
           </p>
 
-          {/* CTA Button */}
-          <div className="pt-4 flex items-center justify-center gap-4">
-            <Link
-              to="/global-trade"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg font-medium text-[#141318] dark:text-white border border-text-tertiary/20 transition-all duration-200 hover:opacity-85 active:scale-95"
-            >
-              Global Trade
-            </Link>
+          <div className="flex items-center gap-3 pt-2">
             <SignedOut>
               <Link
                 to="/sign-in"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg font-medium text-white transition-all duration-200 hover:opacity-85 active:scale-95"
-                style={{ backgroundColor: "#141318" }}
+                className="px-6 py-2.5 rounded-md font-semibold text-sm text-white hover:opacity-90 transition-all"
+                style={{ backgroundColor: "#00D09C" }}
               >
-                Sign In ↗
+                Get Started Free
               </Link>
             </SignedOut>
             <SignedIn>
               <Link
-                to="/chat"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg font-medium text-white transition-all duration-200 hover:opacity-85 active:scale-95"
-                style={{ backgroundColor: "#141318" }}
+                to="/portfolio-analyser"
+                className="px-6 py-2.5 rounded-md font-semibold text-sm text-white hover:opacity-90 transition-all"
+                style={{ backgroundColor: "#00D09C" }}
               >
-                Launch App ↗
+                Open Dashboard
               </Link>
             </SignedIn>
+            <Link
+              to="/global-trade"
+              className="px-6 py-2.5 rounded-md font-semibold text-sm border border-border text-foreground hover:bg-muted transition-all"
+            >
+              Global Markets
+            </Link>
           </div>
         </div>
 
-        {/* Floating Stats Cards - Positioned at bottom of hero */}
-        <div className="absolute -bottom-32 md:-bottom-24 left-0 right-0 z-20">
-            <div className="px-6 md:px-12">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 max-w-7xl mx-auto">
-                {stats.map((stat, idx) => (
-                  <div
-                    key={idx}
-                    className="relative group"
-                    style={{
-                      perspective: "1000px",
-                    }}
-                  >
-                    <div
-                      className={`rounded-2xl p-6 md:p-8 border transition-all duration-300 ${
-                        stat.featured
-                          ? "lg:col-span-1 border-text-tertiary/20 dark:border-text-tertiary/20"
-                          : "border-text-tertiary/10 dark:border-text-tertiary/10"
-                      } dark:bg-white/5`}
-                      style={{
-                        backgroundColor: stat.featured
-                          ? "rgba(20, 19, 24, 0.9)"
-                          : "rgba(255, 255, 255, 0.7)",
-                        backdropFilter: "blur(12px)",
-                        color: stat.featured ? "#F5F5F9" : "#141318",
-                      }}
-                    >
-                      <div className="space-y-6">
-                        {/* Value */}
-                        <div className="space-y-1">
-                          <p className="text-2xl md:text-3xl font-bold tracking-tight">
-                            {stat.value}
-                          </p>
-                          <p
-                            className="text-xs md:text-sm font-medium opacity-70"
-                            style={{
-                              color: stat.featured
-                                ? "rgba(245, 245, 249, 0.7)"
-                                : "rgba(20, 19, 24, 0.6)",
-                            }}
-                          >
-                            {stat.label}
-                          </p>
-                        </div>
-
-                        {/* Arrow Icon - Bottom Right */}
-                        <div className="flex justify-end">
-                          <div
-                            className="p-2 rounded-lg"
-                            style={{
-                              backgroundColor: stat.featured
-                                ? "rgba(245, 245, 249, 0.1)"
-                                : "rgba(20, 19, 24, 0.05)",
-                            }}
-                          >
-                            <ArrowUpRight
-                              className="w-4 h-4"
-                              style={{
-                                color: stat.featured ? "#F5F5F9" : "#141318",
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+        {/* Stats row */}
+        <div className="mt-14 grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { label: "AI Agents", value: "8+", sub: "Collaborative intelligence" },
+            { label: "Data Sources", value: "12+", sub: "Real-time market signals" },
+            { label: "Health Score", value: "0–100", sub: "Portfolio scoring system" },
+            { label: "Simulations", value: "5,000", sub: "Monte Carlo runs" },
+          ].map((s, i) => (
+            <div key={i} className="bg-card border border-border rounded-xl p-5">
+              <p className="text-2xl font-bold text-foreground">{s.value}</p>
+              <p className="text-sm font-semibold text-foreground mt-1">{s.label}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{s.sub}</p>
             </div>
-          </div>
+          ))}
+        </div>
       </div>
 
-      {/* Bottom Spacing for Cards */}
-      <div className="h-40 md:h-32" />
-
-      {/* Additional Sections */}
-      <section className="relative z-10 px-6 md:px-12 py-20 md:py-32">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center space-y-6 mb-16">
-            <h2 className="text-text-primary dark:text-white">
-              Why This System Matters
+      {/* Features Section */}
+      <section className="px-6 md:px-12 py-16 border-t border-border">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+              Why DiversiFi?
             </h2>
-            <p className="text-lg text-text-secondary dark:text-text-secondary max-w-2xl mx-auto">
-              Designed to analyze complex market behavior using coordinated AI
-              agents
+            <p className="text-muted-foreground mt-2 text-sm">
+              Built for serious investors who want data-driven clarity
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
               {
-                title: "Multi-Agent Intelligence",
+                Icon: BarChart2,
+                title: "Portfolio Health Score",
                 description:
-                  "Independent AI agents collaborate to analyze sentiment, trends, and technical indicators",
+                  "0–100 score measuring diversification, concentration risk, MF overlap, and benchmark alignment against Nifty 50 / 500.",
               },
               {
-                title: "Retrieval-Augmented Generation (RAG)",
+                Icon: Zap,
+                title: "Multi-Agent AI",
                 description:
-                  "Live market data and news are retrieved and grounded into AI-generated insights",
+                  "8+ specialized AI agents analyse sentiment, trends, and technicals to deliver comprehensive, explainable insights.",
               },
               {
-                title: "Explainable Predictions",
+                Icon: Shield,
+                title: "Risk Analytics",
                 description:
-                  "Each recommendation is supported by transparent reasoning and agent-level analysis",
+                  "Monte Carlo simulations with 5,000 runs model portfolio outcomes across bull, bear, and black-swan scenarios.",
               },
-            ].map((feature, idx) => (
+            ].map(({ Icon, title, description }, i) => (
               <div
-                key={idx}
-                className="p-8 rounded-2xl border border-border backdrop-blur-sm dark:bg-white/5"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.5)",
-                }}
+                key={i}
+                className="bg-card border border-border rounded-xl p-6 hover:border-[#00D09C]/40 transition-colors"
               >
-                <h3 className="text-xl font-bold mb-3 text-text-primary dark:text-white">
-                  {feature.title}
-                </h3>
-                <p className="text-text-secondary dark:text-black">
-                  {feature.description}
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center mb-4"
+                  style={{ backgroundColor: "rgba(0,208,156,0.1)" }}
+                >
+                  <Icon className="w-5 h-5" style={{ color: "#00D09C" }} />
+                </div>
+                <h3 className="text-base font-bold text-foreground mb-2">{title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {description}
                 </p>
               </div>
             ))}
@@ -232,19 +174,18 @@ export default function LandingPage() {
       </section>
 
       {/* Team Section */}
-      <section className="relative z-10 px-6 md:px-12 py-20 md:py-32 border-t border-border">
+      <section className="px-6 md:px-12 py-16 border-t border-border">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-text-primary dark:text-white">
+          <div className="mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">
               Meet Our Team
             </h2>
-            <p className="text-lg text-text-secondary dark:text-text-secondary max-w-2xl mx-auto">
-              Pioneering AI-driven stock market analysis with expertise in
-              machine learning, finance, and software engineering
+            <p className="text-muted-foreground mt-2 text-sm">
+              Experts in AI, finance, and software engineering
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {[
               {
                 name: "Satyaki Dey",
@@ -259,9 +200,9 @@ export default function LandingPage() {
               },
               {
                 name: "Rishi Bhattasali",
-                role: "ML Engineer & Backend Developer",
+                role: "ML & Backend",
                 expertise:
-                  " ML Ops, Backend Architecture, API Design, Distributed Systems",
+                  "ML Ops, Backend Architecture, API Design, Distributed Systems",
               },
               {
                 name: "Shristy Dutta",
@@ -274,25 +215,23 @@ export default function LandingPage() {
                 role: "Frontend Engineer",
                 expertise: "UI/UX, Responsive Design, Component Architecture",
               },
-            ].map((member, idx) => (
+            ].map((m, i) => (
               <div
-                key={idx}
-                className="rounded-2xl p-6 border border-border transition-all duration-300 hover:border-primary/50 group dark:bg-white/5"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.5)",
-                }}
+                key={i}
+                className="bg-card border border-border rounded-xl p-5 hover:border-[#00D09C]/30 transition-colors"
               >
-                {/* <div className="w-16 h-16 rounded-full mb-4 bg-gradient-primary-to-secondary flex items-center justify-center text-white font-bold text-lg">
-                  {member.name.charAt(0)}
-                </div> */}
-                <h3 className="text-lg font-bold mb-1 text-text-primary dark:text-white mt-6">
-                  {member.name}
-                </h3>
-                <p className="text-sm font-medium text-primary dark:text-primary mb-2">
-                  {member.role}
+                <div
+                  className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white mb-4"
+                  style={{ backgroundColor: "#00D09C" }}
+                >
+                  {m.name.charAt(0)}
+                </div>
+                <p className="font-semibold text-sm text-foreground">{m.name}</p>
+                <p className="text-xs font-medium mt-0.5" style={{ color: "#00D09C" }}>
+                  {m.role}
                 </p>
-                <p className="text-sm text-text-secondary dark:text-black mb-4">
-                  {member.expertise}
+                <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                  {m.expertise}
                 </p>
               </div>
             ))}
@@ -301,39 +240,43 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-border px-6 md:px-12 py-12 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-            <p className="text-sm text-text-secondary dark:text-text-secondary">
-              © 2025 Automated Stock Market Prediction Pipeline
-            </p>
-            <div className="flex items-center gap-6">
-              <a
-                href="#"
-                className="text-sm text-text-secondary hover:text-text-primary dark:hover:text-text-primary transition-colors"
-              >
-                Privacy
-              </a>
-              <a
-                href="#"
-                className="text-sm text-text-secondary hover:text-text-primary dark:hover:text-text-primary transition-colors"
-              >
-                Terms
-              </a>
-              <a
-                href="#"
-                className="text-sm text-text-secondary hover:text-text-primary dark:hover:text-text-primary transition-colors"
-              >
-                Contact
-              </a>
+      <footer className="border-t border-border px-6 md:px-12 py-8">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-2">
+            <div
+              className="w-6 h-6 rounded flex items-center justify-center"
+              style={{ backgroundColor: "#00D09C" }}
+            >
+              <TrendingUp className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
             </div>
+            <span className="font-bold text-sm text-foreground">DiversiFi</span>
+            <span className="text-muted-foreground text-xs">© 2025</span>
           </div>
-          <p className="text-sm text-text-secondary dark:text-text-secondary mt-12">
-            Disclaimer: This system is developed for academic and research
-            purposes only. It does not provide <br />
-            financial or investment advice.
-          </p>
+          <div className="flex items-center gap-6">
+            <a
+              href="#"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Privacy
+            </a>
+            <a
+              href="#"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Terms
+            </a>
+            <a
+              href="#"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Contact
+            </a>
+          </div>
         </div>
+        <p className="text-xs text-muted-foreground mt-4 max-w-7xl mx-auto">
+          Disclaimer: For academic and research purposes only. Not financial or
+          investment advice.
+        </p>
       </footer>
     </main>
   );

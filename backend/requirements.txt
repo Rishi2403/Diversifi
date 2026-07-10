@@ -18,7 +18,8 @@ langchain_mcp_adapters
 mcp
 langchain-community
 langchain-core
-langchain_google_genai
+langchain_anthropic
+anthropic
 requests
 bs4
 langchain
@@ -28,9 +29,9 @@ chromadb
 langchain-chroma
 rapidfuzz
 langchain_huggingface
-langchain_google_vertexai
 flask
 flask_cors
 flask_swagger_ui
 growwapi
 openai
+asgiref

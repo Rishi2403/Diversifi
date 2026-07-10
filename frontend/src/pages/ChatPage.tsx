@@ -1,8 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import {
   ArrowUpRight,
-  Moon,
-  Sun,
   Send,
   CheckCircle2,
   X,
@@ -10,6 +8,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { ChatMarkdown } from "@/components/ChatMarkdown";
 
 // --- Interfaces ---
 interface Message {
@@ -47,7 +46,7 @@ function StepModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className={`w-full max-w-lg bg-white dark:bg-[#1a0f3a] rounded-2xl shadow-2xl border overflow-hidden transform transition-all scale-100 ${isError ? "border-red-500/30" : "border-white/10"}`}
+        className={`w-full max-w-lg bg-white dark:bg-background rounded-2xl shadow-2xl border overflow-hidden transform transition-all scale-100 ${isError ? "border-red-500/30" : "border-white/10"}`}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-white/5">
@@ -61,7 +60,7 @@ function StepModal({
                 <Info className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               )}
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-foreground">
               {step.name} {isError ? "Error Log" : "Output"}
             </h3>
           </div>
@@ -120,7 +119,6 @@ function StepModal({
 
 export default function ChatPage() {
   // --- UI State ---
-  const [isDark, setIsDark] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "init",
@@ -145,30 +143,9 @@ export default function ChatPage() {
   const isPollingRef = useRef(false);
   const pollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // --- Theme Logic ---
   useEffect(() => {
-    const stored = localStorage.getItem("theme-mode");
-    if (stored) {
-      setIsDark(stored === "dark");
-      applyTheme(stored === "dark");
-    } else {
-      const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setIsDark(dark);
-      applyTheme(dark);
-    }
     return () => stopPolling();
   }, []);
-
-  const applyTheme = (dark: boolean) => {
-    document.documentElement.classList.toggle("dark", dark);
-  };
-
-  const toggleTheme = () => {
-    const newDark = !isDark;
-    setIsDark(newDark);
-    applyTheme(newDark);
-    localStorage.setItem("theme-mode", newDark ? "dark" : "light");
-  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -373,37 +350,11 @@ export default function ChatPage() {
 
   // --- RENDER ---
   return (
-    <main className="min-h-screen w-full bg-white dark:bg-[#1a0f3a] overflow-hidden transition-colors duration-300">
+    <main className="min-h-screen w-full bg-background overflow-hidden">
       {/* Modal */}
       {selectedStep && (
         <StepModal step={selectedStep} onClose={() => setSelectedStep(null)} />
       )}
-
-      {/* Background Gradient */}
-      <div
-        className="fixed inset-0 z-0 pointer-events-none"
-        style={{ background: "var(--gradient-radial)" }}
-      />
-      <div className="fixed inset-0 z-0 pointer-events-none opacity-5">
-        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern
-              id="grid"
-              width="40"
-              height="40"
-              patternUnits="userSpaceOnUse"
-            >
-              <path
-                d="M 40 0 L 0 0 0 40"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="0.5"
-              />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
-      </div>
 
       {/* Stats Cards */}
       <div className="relative z-10 px-6 md:px-12 py-8">
@@ -424,34 +375,17 @@ export default function ChatPage() {
             ].map((metric, idx) => (
               <div
                 key={idx}
-                className={`rounded-2xl p-4 md:p-6 border transition-all duration-300 dark:bg-white/5 ${
+                className={`rounded-xl p-4 md:p-5 border transition-all ${
                   metric.featured
-                    ? "border-text-tertiary/20"
-                    : "border-text-tertiary/10"
+                    ? "border-[#00D09C]/40 text-white"
+                    : "border-border bg-card text-foreground"
                 }`}
-                style={{
-                  backgroundColor: metric.featured
-                    ? "rgba(20, 19, 24, 0.9)"
-                    : "rgba(255, 255, 255, 0.7)",
-                  backdropFilter: "blur(12px)",
-                  color: metric.featured ? "#F5F5F9" : "#141318",
-                }}
+                style={metric.featured ? { backgroundColor: "#00D09C" } : undefined}
               >
-                <div className="space-y-3">
-                  <p className="text-xl md:text-2xl font-bold tracking-tight">
-                    {metric.value}
-                  </p>
-                  <p
-                    className="text-xs md:text-sm font-medium opacity-70"
-                    style={{
-                      color: metric.featured
-                        ? "rgba(245, 245, 249, 0.7)"
-                        : "rgba(20, 19, 24, 0.6)",
-                    }}
-                  >
-                    {metric.label}
-                  </p>
-                </div>
+                <p className="text-2xl font-bold tracking-tight">{metric.value}</p>
+                <p className={`text-xs font-medium mt-1 ${metric.featured ? "text-white/80" : "text-muted-foreground"}`}>
+                  {metric.label}
+                </p>
               </div>
             ));
           })()}
@@ -463,8 +397,7 @@ export default function ChatPage() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Chat Panel */}
           <div
-            className="lg:col-span-2 rounded-2xl border border-text-tertiary/10 overflow-hidden dark:bg-white/5"
-            style={{ backgroundColor: "rgba(255, 255, 255, 0.7)" }}
+            className="lg:col-span-2 rounded-xl border border-border overflow-hidden bg-card"
           >
             <div className="h-96 md:h-[500px] overflow-y-auto p-6 space-y-4">
               {messages.map((msg) => (
@@ -473,67 +406,24 @@ export default function ChatPage() {
                   className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-xl px-4 py-2 rounded-lg text-sm overflow-hidden ${msg.role === "user" ? "text-white" : "text-gray-900"}`}
-                    style={{
-                      backgroundColor:
-                        msg.role === "user"
-                          ? "#141318"
-                          : "rgba(255,255,255,0.5)",
-                    }}
+                    className={`max-w-xl px-4 py-3 rounded-xl ${
+                      msg.role === "user"
+                        ? "text-white"
+                        : "bg-muted text-foreground"
+                    }`}
+                    style={msg.role === "user" ? { backgroundColor: "#00D09C" } : undefined}
                   >
-                    <div
-                      className={`prose prose-sm max-w-none ${msg.role === "user" ? "prose-invert" : ""}`}
-                    >
-                      <ReactMarkdown
-                        components={{
-                          // Custom styling for chat bubble markdown to keep it compact
-                          p: ({ children }) => (
-                            <p className="mb-1 last:mb-0">{children}</p>
-                          ),
-                          ul: ({ children }) => (
-                            <ul className="list-disc pl-4 mb-2 last:mb-0">
-                              {children}
-                            </ul>
-                          ),
-                          ol: ({ children }) => (
-                            <ol className="list-decimal pl-4 mb-2 last:mb-0">
-                              {children}
-                            </ol>
-                          ),
-                          li: ({ children }) => (
-                            <li className="mb-0.5">{children}</li>
-                          ),
-                          a: ({ children, href }) => (
-                            <a
-                              href={href}
-                              className="text-blue-500 hover:underline"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              {children}
-                            </a>
-                          ),
-                          code: ({ children }) => (
-                            <code className="bg-black/10 dark:bg-white/10 px-1 rounded font-mono text-xs">
-                              {children}
-                            </code>
-                          ),
-                        }}
-                      >
-                        {msg.content}
-                      </ReactMarkdown>
-                    </div>
+                    <ChatMarkdown
+                      content={msg.content}
+                      invert={msg.role === "user"}
+                    />
                   </div>
                 </div>
               ))}
               {isProcessing && (
                 <div className="flex justify-start">
                   <div
-                    className="px-4 py-2 rounded-lg text-sm flex items-center gap-2"
-                    style={{
-                      backgroundColor: "rgba(255,255,255,0.5)",
-                      color: "#4D4D4D",
-                    }}
+                    className="px-4 py-2 rounded-lg text-sm flex items-center gap-2 bg-muted text-muted-foreground"
                   >
                     <div className="w-2 h-2 rounded-full bg-current animate-pulse" />
                     Processing...
@@ -544,7 +434,7 @@ export default function ChatPage() {
             </div>
 
             {/* Input */}
-            <div className="border-t border-text-tertiary/10 p-4">
+            <div className="border-t border-border p-4">
               <form onSubmit={handleSendMessage} className="flex gap-2">
                 <input
                   type="text"
@@ -555,18 +445,14 @@ export default function ChatPage() {
                       ? "Please provide the required clarification..."
                       : "Ask about a stock, market trend, or sentiment…"
                   }
-                  className="flex-1 px-4 py-2 rounded-lg text-sm border border-text-tertiary/20 focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all"
-                  style={{
-                    backgroundColor: "rgba(255,255,255,0.5)",
-                    color: "#141318",
-                  }}
+                  className="flex-1 px-4 py-2 rounded-lg text-sm border border-border bg-muted text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#00D09C]/40 focus:ring-offset-0 transition-all"
                   disabled={isProcessing}
                 />
                 <button
                   type="submit"
                   disabled={isProcessing || !input.trim()}
                   className="p-2 rounded-lg transition-all disabled:opacity-50"
-                  style={{ backgroundColor: "#141318", color: "#F5F5F9" }}
+                  style={{ backgroundColor: "#00D09C", color: "#fff" }}
                 >
                   <Send className="w-4 h-4" />
                 </button>
@@ -576,11 +462,10 @@ export default function ChatPage() {
 
           {/* Reasoning Panel */}
           <div
-            className="rounded-2xl border border-text-tertiary/10 p-6 overflow-hidden dark:bg-white/5"
-            style={{ backgroundColor: "rgba(255, 255, 255, 0.7)" }}
+            className="rounded-xl border border-border p-6 overflow-hidden bg-card"
           >
             <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-sm md:text-base text-text-primary dark:text-white">
+              <h3 className="font-bold text-sm md:text-base text-foreground">
                 System Reasoning
               </h3>
             </div>
@@ -618,7 +503,7 @@ export default function ChatPage() {
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <p
-                      className={`text-sm font-medium ${step.status === "pending" ? "opacity-50" : step.status === "error" ? "text-red-600 dark:text-red-400" : "text-gray-900 dark:text-white"}`}
+                      className={`text-sm font-medium ${step.status === "pending" ? "opacity-50" : step.status === "error" ? "text-red-600 dark:text-red-400" : "text-foreground"}`}
                     >
                       {step.name}
                     </p>

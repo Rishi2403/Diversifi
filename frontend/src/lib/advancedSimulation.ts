@@ -1,5 +1,6 @@
 // ─── Advanced Portfolio Simulation Engine with LLM Integration ───────────────
 
+import { AnthropicFoundry } from "@anthropic-ai/foundry-sdk";
 import { StockHolding, MFHolding } from "./portfolioEngine";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -164,10 +165,11 @@ export interface AdvancedSimulationResult {
 export async function analyzeHoldingImpacts(
   input: AdvancedSimulationInput
 ): Promise<HoldingImpact[]> {
-  const GEMINI_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
+  const FOUNDRY_API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
+  const FOUNDRY_RESOURCE = import.meta.env.VITE_ANTHROPIC_FOUNDRY_RESOURCE;
 
-  if (!GEMINI_API_KEY) {
-    console.error("Google API key not found");
+  if (!FOUNDRY_API_KEY || !FOUNDRY_RESOURCE) {
+    console.error("Anthropic Foundry credentials not found");
     return fallbackImpactAnalysis(input);
   }
 
@@ -213,7 +215,7 @@ export async function analyzeHoldingImpacts(
     console.log(`📊 Analyzing ${i + 1}/${holdings.length}: ${holding.name}`);
 
     try {
-      const impact = await analyzeHoldingWithLLM(holding, allScenarios, GEMINI_API_KEY);
+      const impact = await analyzeHoldingWithLLM(holding, allScenarios, FOUNDRY_API_KEY, FOUNDRY_RESOURCE);
       holdingImpacts.push(impact);
 
       // Small delay to avoid rate limiting (500ms between calls)
@@ -240,7 +242,8 @@ async function analyzeHoldingWithLLM(
     value: number;
   },
   scenarios: any[],
-  apiKey: string
+  apiKey: string,
+  resource: string
 ): Promise<HoldingImpact> {
   const prompt = `You are a financial analyst analyzing how market scenarios affect specific holdings.
 
@@ -250,8 +253,8 @@ Holding Details:
 - Type: ${holding.type}
 - Current Value: ₹${holding.value}
 
-Scenarios to analyze:
-${scenarios.map((s, idx) => `${idx + 1}. ${s.name} (Base impact: ${(s.impact * 100).toFixed(0)}%)`).join("\n")}
+Scenarios to analyze (use the exact id values shown below):
+${scenarios.map((s) => `- id: "${s.id}" | name: "${s.name}" | base impact: ${(s.impact * 100).toFixed(0)}%`).join("\n")}
 
 For each scenario, determine:
 1. Will this holding be affected? (yes/no)
@@ -264,46 +267,37 @@ Consider:
 - Industry-specific scenarios affect relevant sectors
 - Geopolitical scenarios affect companies with exposure to those regions
 
-Return ONLY a JSON array with this structure:
+Return ONLY a JSON array — one entry per scenario, using the EXACT id string from above:
 [
   {
-    "scenarioId": "scenario-id",
-    "affected": true/false,
+    "scenarioId": "<exact id from above>",
+    "affected": true,
     "impactPercent": -30,
     "reasoning": "Brief explanation"
-  },
-  ...
+  }
 ]
 
 Be realistic and conservative in impact estimates.`;
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 2048,
-          },
-        }),
-      }
-    );
+    const client = new AnthropicFoundry({
+      apiKey,
+      resource,
+      dangerouslyAllowBrowser: true,
+    });
 
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
-    }
+    const message = await client.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: 2048,
+      temperature: 0.3,
+      messages: [{ role: "user", content: prompt }],
+    });
 
-    const data = await response.json();
-
-    if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
+    if (!message.content[0] || message.content[0].type !== "text") {
       throw new Error("Invalid API response structure");
     }
 
-    const text = data.candidates[0].content.parts[0].text;
+    const text = message.content[0].text;
 
     // Extract JSON from markdown code blocks if present
     let jsonText = text;
@@ -332,7 +326,7 @@ Be realistic and conservative in impact estimates.`;
           const scenario = scenarios.find((s) => s.id === a.scenarioId);
           return {
             scenarioId: a.scenarioId,
-            scenarioName: scenario?.name || "Unknown",
+            scenarioName: scenario?.name || scenarios.find((s) => s.name?.toLowerCase() === String(a.scenarioId).toLowerCase())?.name || a.scenarioId || "Scenario",
             impactPercent: a.impactPercent || 0,
             reasoning: a.reasoning || "No reasoning provided",
           };

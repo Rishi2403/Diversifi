@@ -1,7 +1,7 @@
 import os
 import sys
 from typing import Annotated, Literal
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_anthropic import ChatAnthropic
 from langchain_core.tools import tool
 from langgraph.prebuilt import create_react_agent
 from langchain_core.prompts import ChatPromptTemplate
@@ -11,11 +11,17 @@ from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
 
-google_api_key = os.getenv("GOOGLE_API_KEY")
+_api_key = os.getenv("ANTHROPIC_API_KEY", "")
+_resource = os.getenv("ANTHROPIC_FOUNDRY_RESOURCE", "")
 
-if not google_api_key:
-    print("Error: GOOGLE_API_KEY not found.")
+if not _api_key:
+    print("Error: ANTHROPIC_API_KEY not found.")
     sys.exit(1)
+
+_anthropic_url = (
+    f"https://{_resource}.services.ai.azure.com/anthropic" if _resource else "https://api.anthropic.com"
+)
+_anthropic_headers = {"Authorization": f"Bearer {_api_key}"} if _resource else {}
 
 news_service = NewsService()
 
@@ -33,10 +39,12 @@ def fetch_stock_news_tool(symbol: str, limit: int = 3):
 
 
 
-llm = ChatGoogleGenerativeAI(
-    api_key=google_api_key,
-    model="gemini-2.5-flash",    
-    temperature=0
+llm = ChatAnthropic(
+    model="claude-sonnet-4-6",
+    temperature=0,
+    anthropic_api_key=_api_key,
+    anthropic_api_url=_anthropic_url,
+    default_headers=_anthropic_headers,
 )
 
 tools = [fetch_stock_news_tool]
