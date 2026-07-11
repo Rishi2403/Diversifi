@@ -5,20 +5,26 @@ from asgiref.wsgi import WsgiToAsgi
 import uuid
 import threading
 
+
 from trading_lang import build_graph, AgentState
+
 
 flask_app = Flask(__name__)
 CORS(flask_app, resources={r"/*": {"origins": "*"}})
 
+
 graph = build_graph()
 TASKS = {}
+
 
 # =============================
 # Swagger Configuration
 # =============================
 
+
 SWAGGER_URL = "/docs"
 API_URL = "/swagger.json"
+
 
 swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
@@ -28,7 +34,11 @@ swaggerui_blueprint = get_swaggerui_blueprint(
     }
 )
 
+
 flask_app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+
+
+
 
 
 
@@ -119,9 +129,13 @@ def swagger_spec():
 
 
 
+
+
+
 # -----------------------------
 # Helpers
 # -----------------------------
+
 
 def run_graph(task_id: str):
     state = TASKS[task_id]["state"]
@@ -129,6 +143,7 @@ def run_graph(task_id: str):
         final_state = graph.invoke(state)
         final_state["status"] = "COMPLETED"
         TASKS[task_id]["state"] = final_state
+
 
     except Exception as e:
         if str(e) == "WAITING_FOR_CLARIFICATION":
@@ -143,15 +158,20 @@ def run_graph(task_id: str):
             TASKS[task_id]["state"] = state
 
 
+
+
 def start_background_task(task_id: str):
     thread = threading.Thread(target=run_graph, args=(task_id,))
     thread.daemon = True
     thread.start()
 
 
+
+
 # -----------------------------
 # Routes
 # -----------------------------
+
 
 @flask_app.route("/ask", methods=["POST"])
 def ask_agent():
@@ -159,7 +179,9 @@ def ask_agent():
     if not data or "question" not in data:
         return jsonify({"success": False, "error": "Missing question"}), 400
 
+
     task_id = str(uuid.uuid4())
+
 
     initial_state: AgentState = {
         "question": data["question"],
@@ -181,8 +203,10 @@ def ask_agent():
         "should_scrape": False
     }
 
+
     TASKS[task_id] = {"state": initial_state}
     start_background_task(task_id)
+
 
     return jsonify({
         "task_id": task_id,
@@ -190,10 +214,13 @@ def ask_agent():
     })
 
 
+
+
 @flask_app.route("/get/<task_id>", methods=["GET"])
 def get_task_status(task_id):
     if task_id not in TASKS:
         return jsonify({"error": "Task not found"}), 404
+
 
     state = TASKS[task_id]["state"]
     return jsonify({
@@ -204,38 +231,50 @@ def get_task_status(task_id):
     })
 
 
+
+
 @flask_app.route("/clarify", methods=["POST"])
 def send_clarifier():
     data = request.get_json()
     if not data or "task_id" not in data or "answer" not in data:
         return jsonify({"success": False, "error": "Invalid request"}), 400
 
+
     task_id = data["task_id"]
     answer = data["answer"]
+
 
     task = TASKS.get(task_id)
     if not task:
         return jsonify({"error": "Task not found"}), 404
+
 
     state = task["state"]
     state["question"] = state["question"] + " | " + answer
     state["clarification_used"] = True
     state["status"] = "RUNNING"
 
+
     TASKS[task_id]["state"] = state
     start_background_task(task_id)
 
+
     return jsonify({"success": True})
+
+
 
 
 # -----------------------------
 # Portfolio Routes
 # -----------------------------
 
+
 @flask_app.route("/portfolio/groww/holdings", methods=["GET"])
 def groww_holdings():
     from portfolio_service import fetch_groww_holdings
     return jsonify(fetch_groww_holdings())
+
+
 
 
 @flask_app.route("/portfolio/groww/mf", methods=["GET"])
@@ -244,10 +283,14 @@ def groww_mf():
     return jsonify(fetch_groww_mf())
 
 
+
+
 @flask_app.route("/portfolio/price/<symbol>", methods=["GET"])
 def stock_price(symbol):
     from portfolio_service import fetch_live_price
     return jsonify(fetch_live_price(symbol))
+
+
 
 
 @flask_app.route("/portfolio/prices", methods=["POST"])
@@ -260,12 +303,37 @@ def bulk_prices():
     return jsonify(fetch_bulk_prices(symbols))
 
 
+
+
+# -----------------------------
+# Global Markets Routes
+# -----------------------------
+
+
+@flask_app.route("/global/market-data", methods=["GET"])
+def global_market_data():
+    from global_market_service import fetch_global_market_data
+    return jsonify(fetch_global_market_data())
+
+
+
+
+@flask_app.route("/global/fii-dii", methods=["GET"])
+def fii_dii_data():
+    from global_market_service import fetch_fii_dii
+    return jsonify(fetch_fii_dii())
+
+
+
+
 # -----------------------------
 # Entry Point
 # -----------------------------
 
+
 # Wrap Flask app with ASGI adapter for uvicorn
 app = WsgiToAsgi(flask_app)
+
 
 if __name__ == "__main__":
     flask_app.run(host="0.0.0.0", port=8000, debug=True)
