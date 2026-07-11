@@ -10,6 +10,7 @@ import {
 import ReactMarkdown from "react-markdown";
 import { ChatMarkdown } from "@/components/ChatMarkdown";
 
+
 // --- Interfaces ---
 interface Message {
   id: string;
@@ -17,11 +18,13 @@ interface Message {
   content: string;
 }
 
+
 interface ReasoningStep {
   name: string;
   status: "pending" | "active" | "complete" | "error";
   message?: string;
 }
+
 
 interface BackendEvent {
   type: "result" | "clarifier" | "error";
@@ -29,7 +32,9 @@ interface BackendEvent {
   message: string;
 }
 
-const API_BASE = "http://localhost:8000";
+
+const API_BASE = "";
+
 
 // --- Modal Component ---
 function StepModal({
@@ -41,7 +46,9 @@ function StepModal({
 }) {
   if (!step) return null;
 
+
   const isError = step.status === "error";
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -71,6 +78,7 @@ function StepModal({
             <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
+
 
         {/* Content */}
         <div className="p-6 max-h-[60vh] overflow-y-auto">
@@ -103,6 +111,7 @@ function StepModal({
           </div>
         </div>
 
+
         {/* Footer */}
         <div className="p-6 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/5 flex justify-end">
           <button
@@ -116,6 +125,7 @@ function StepModal({
     </div>
   );
 }
+
 
 export default function ChatPage() {
   // --- UI State ---
@@ -131,35 +141,44 @@ export default function ChatPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+
   // --- Modal State ---
   const [selectedStep, setSelectedStep] = useState<ReasoningStep | null>(null);
+
 
   // --- Backend Logic State ---
   const [taskId, setTaskId] = useState<string | null>(null);
   const [waitingClarification, setWaitingClarification] = useState(false);
   const [reasoningSteps, setReasoningSteps] = useState<ReasoningStep[]>([]);
 
+
   const processedCountRef = useRef(0);
   const isPollingRef = useRef(false);
   const pollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
 
   useEffect(() => {
     return () => stopPolling();
   }, []);
 
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
 
   useEffect(() => {
     scrollToBottom();
   }, [messages, reasoningSteps]);
 
+
   // --- Backend Interaction Logic ---
+
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
+
 
     const userText = input;
     setMessages((prev) => [
@@ -169,6 +188,7 @@ export default function ChatPage() {
     setInput("");
     setIsProcessing(true);
 
+
     if (waitingClarification && taskId) {
       try {
         await fetch(`${API_BASE}/clarify`, {
@@ -176,6 +196,7 @@ export default function ChatPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ task_id: taskId, answer: userText }),
         });
+
 
         setWaitingClarification(false);
         startPolling(taskId);
@@ -187,6 +208,7 @@ export default function ChatPage() {
       processedCountRef.current = 0;
       setReasoningSteps([{ name: "Initializing Agent...", status: "active" }]);
 
+
       try {
         const res = await fetch(`${API_BASE}/ask`, {
           method: "POST",
@@ -194,7 +216,9 @@ export default function ChatPage() {
           body: JSON.stringify({ question: userText }),
         });
 
+
         if (!res.ok) throw new Error("Backend connection failed");
+
 
         const data = await res.json();
         if (data.task_id) {
@@ -219,19 +243,24 @@ export default function ChatPage() {
     }
   };
 
+
   const startPolling = (id: string) => {
     stopPolling();
     isPollingRef.current = true;
 
+
     const poll = async () => {
       if (!isPollingRef.current) return;
+
 
       try {
         const res = await fetch(`${API_BASE}/get/${id}`);
         if (!res.ok) throw new Error("Poll failed");
 
+
         const data = await res.json();
         const allEvents = data.events || [];
+
 
         // 1. Update UI
         if (Array.isArray(allEvents)) {
@@ -243,8 +272,10 @@ export default function ChatPage() {
             }),
           );
 
+
           const hasClarifier = allEvents.some((e) => e.title === "Clarifier");
           const hasError = allEvents.some((e) => e.type === "error");
+
 
           if (data.status === "RUNNING" && !hasClarifier && !hasError) {
             mappedSteps.push({ name: "Processing...", status: "active" });
@@ -252,9 +283,11 @@ export default function ChatPage() {
           setReasoningSteps(mappedSteps);
         }
 
+
         // 2. Logic Control
         const newEvents = allEvents.slice(processedCountRef.current);
         processedCountRef.current = allEvents.length;
+
 
         // Check for Error
         const errorEvent = newEvents.find(
@@ -274,6 +307,7 @@ export default function ChatPage() {
           stopPolling();
           return;
         }
+
 
         // Check for Clarifier
         const newClarifier = newEvents.find(
@@ -298,22 +332,26 @@ export default function ChatPage() {
             ];
           });
 
+
           setIsProcessing(false);
           setWaitingClarification(true);
           stopPolling();
           return;
         }
 
+
         // Check for Completion
         if (data.status === "COMPLETED") {
           stopPolling();
           setIsProcessing(false);
+
 
           if (data.answer) {
             const cleanedAnswer = data.answer
               .split("\n")
               .filter((line) => !/^\|\s*:?-{2,}/.test(line.trim()))
               .join("\n");
+
 
             setMessages((prev) => {
               const lastMsg = prev[prev.length - 1];
@@ -340,13 +378,16 @@ export default function ChatPage() {
       }
     };
 
+
     poll();
   };
+
 
   const stopPolling = () => {
     isPollingRef.current = false;
     if (pollTimeoutRef.current) clearTimeout(pollTimeoutRef.current);
   };
+
 
   // --- RENDER ---
   return (
@@ -356,12 +397,14 @@ export default function ChatPage() {
         <StepModal step={selectedStep} onClose={() => setSelectedStep(null)} />
       )}
 
+
       {/* Stats Cards */}
       <div className="relative z-10 px-6 md:px-12 py-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 max-w-7xl mx-auto">
           {(() => {
             const randomDataSources = 3;
             const randomConfidence = 100;
+
 
             return [
               { value: "8", label: "Active Agents" },
@@ -391,6 +434,7 @@ export default function ChatPage() {
           })()}
         </div>
       </div>
+
 
       {/* Main Chat Area */}
       <div className="relative z-10 px-6 md:px-12 py-8">
@@ -433,6 +477,7 @@ export default function ChatPage() {
               <div ref={messagesEndRef} />
             </div>
 
+
             {/* Input */}
             <div className="border-t border-border p-4">
               <form onSubmit={handleSendMessage} className="flex gap-2">
@@ -460,6 +505,7 @@ export default function ChatPage() {
             </div>
           </div>
 
+
           {/* Reasoning Panel */}
           <div
             className="rounded-xl border border-border p-6 overflow-hidden bg-card"
@@ -470,12 +516,14 @@ export default function ChatPage() {
               </h3>
             </div>
 
+
             <div className="space-y-4">
               {reasoningSteps.length === 0 && !isProcessing && (
                 <p className="text-sm opacity-50 italic">
                   Waiting for query...
                 </p>
               )}
+
 
               {reasoningSteps.map((step, idx) => (
                 <div
@@ -500,6 +548,7 @@ export default function ChatPage() {
                     )}
                   </div>
 
+
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <p
@@ -507,6 +556,7 @@ export default function ChatPage() {
                     >
                       {step.name}
                     </p>
+
 
                     {/* Markdown Preview Box */}
                     {step.message && (
@@ -522,6 +572,7 @@ export default function ChatPage() {
                       </div>
                     )}
                   </div>
+
 
                   {(step.status === "complete" || step.status === "error") && (
                     <ArrowUpRight className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity absolute top-3 right-3" />

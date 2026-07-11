@@ -3,6 +3,7 @@ import { TrendingUp, TrendingDown, BarChart2, Shield, Zap } from "lucide-react";
 import { Header } from "@/components/Header";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 
+
 const TICKERS = [
   { name: "NIFTY 50", value: "23,415.05", change: "+127.35", pct: "+0.55%", up: true },
   { name: "SENSEX", value: "77,209.90", change: "+387.45", pct: "+0.50%", up: true },
@@ -13,6 +14,7 @@ const TICKERS = [
   { name: "NIFTY PHARMA", value: "21,340.60", change: "+180.30", pct: "+0.85%", up: true },
   { name: "USD/INR", value: "83.42", change: "+0.15", pct: "+0.18%", up: false },
 ];
+
 
 export default function LandingPage() {
   return (
@@ -46,8 +48,10 @@ export default function LandingPage() {
         </div>
       </div>
 
+
       {/* Navbar */}
       <Header />
+
 
       {/* Hero Section */}
       <div className="relative px-6 md:px-12 py-16 md:py-24 max-w-7xl mx-auto">
@@ -64,16 +68,30 @@ export default function LandingPage() {
             AI-Powered Research • Indian Markets
           </div>
 
+
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-tight">
             Smart Portfolio
             <br />
             <span style={{ color: "#00D09C" }}>Analysis & Insights</span>
           </h1>
 
+
           <p className="text-base md:text-lg text-muted-foreground max-w-xl leading-relaxed">
             AI-driven portfolio health scoring, sector analysis, rebalancing
             recommendations, and Monte Carlo simulations — built for Indian markets.
           </p>
+
+
+          <a
+            href="/comparison_report.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-[#00D09C]/60 transition-all w-fit"
+          >
+            <BarChart2 className="w-3.5 h-3.5" />
+            View Model Comparison Report
+          </a>
+
 
           <div className="flex items-center gap-3 pt-2">
             <SignedOut>
@@ -103,6 +121,7 @@ export default function LandingPage() {
           </div>
         </div>
 
+
         {/* Stats row */}
         <div className="mt-14 grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
@@ -120,6 +139,7 @@ export default function LandingPage() {
         </div>
       </div>
 
+
       {/* Features Section */}
       <section className="px-6 md:px-12 py-16 border-t border-border">
         <div className="max-w-7xl mx-auto">
@@ -131,6 +151,7 @@ export default function LandingPage() {
               Built for serious investors who want data-driven clarity
             </p>
           </div>
+
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
@@ -173,6 +194,7 @@ export default function LandingPage() {
         </div>
       </section>
 
+
       {/* Team Section */}
       <section className="px-6 md:px-12 py-16 border-t border-border">
         <div className="max-w-7xl mx-auto">
@@ -184,6 +206,7 @@ export default function LandingPage() {
               Experts in AI, finance, and software engineering
             </p>
           </div>
+
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {[
@@ -238,6 +261,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
 
       {/* Footer */}
       <footer className="border-t border-border px-6 md:px-12 py-8">
