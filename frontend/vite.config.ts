@@ -21,6 +21,7 @@ export default defineConfig({
       "/get": "http://localhost:8000",
       "/clarify": "http://localhost:8000",
       "/portfolio": "http://localhost:8000",
+      "/api": "http://localhost:8000",
     },
   },
 });

@@ -35,3 +35,4 @@ flask_swagger_ui
 growwapi
 openai
 asgiref
+yfinance
