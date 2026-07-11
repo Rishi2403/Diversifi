@@ -4,6 +4,9 @@ from flask_swagger_ui import get_swaggerui_blueprint
 from asgiref.wsgi import WsgiToAsgi
 import uuid
 import threading
+import time
+import datetime
+import concurrent.futures
 
 
 from trading_lang import build_graph, AgentState
@@ -15,6 +18,7 @@ CORS(flask_app, resources={r"/*": {"origins": "*"}})
 
 graph = build_graph()
 TASKS = {}
+_market_cache: dict = {}
 
 
 # =============================
@@ -324,6 +328,77 @@ def fii_dii_data():
     return jsonify(fetch_fii_dii())
 
 
+
+
+# -----------------------------
+# Markets Route
+# -----------------------------
+
+_INDICES = [
+    {"symbol": "^NSEI",     "name": "Nifty 50",      "region": "India",     "flag": "🇮🇳"},
+    {"symbol": "^BSESN",    "name": "Sensex",         "region": "India",     "flag": "🇮🇳"},
+    {"symbol": "^GSPC",     "name": "S&P 500",        "region": "USA",       "flag": "🇺🇸"},
+    {"symbol": "^IXIC",     "name": "NASDAQ",         "region": "USA",       "flag": "🇺🇸"},
+    {"symbol": "^DJI",      "name": "Dow Jones",      "region": "USA",       "flag": "🇺🇸"},
+    {"symbol": "^FTSE",     "name": "FTSE 100",       "region": "UK",        "flag": "🇬🇧"},
+    {"symbol": "^GDAXI",    "name": "DAX",            "region": "Germany",   "flag": "🇩🇪"},
+    {"symbol": "^N225",     "name": "Nikkei 225",     "region": "Japan",     "flag": "🇯🇵"},
+    {"symbol": "^HSI",      "name": "Hang Seng",      "region": "Hong Kong", "flag": "🇭🇰"},
+    {"symbol": "000001.SS", "name": "Shanghai Comp.", "region": "China",     "flag": "🇨🇳"},
+]
+
+_COMMODITIES = [
+    {"symbol": "GC=F", "name": "Gold",          "unit": "USD/oz"},
+    {"symbol": "SI=F", "name": "Silver",         "unit": "USD/oz"},
+    {"symbol": "CL=F", "name": "WTI Crude Oil", "unit": "USD/bbl"},
+    {"symbol": "BZ=F", "name": "Brent Crude",   "unit": "USD/bbl"},
+    {"symbol": "NG=F", "name": "Natural Gas",   "unit": "USD/MMBtu"},
+]
+
+
+def _fetch_one(item: dict) -> dict:
+    import yfinance as yf
+    sym = item["symbol"]
+    try:
+        t = yf.Ticker(sym)
+        fi = t.fast_info
+        price = fi.last_price
+        prev  = fi.previous_close
+        if not price or not prev:
+            hist = t.history(period="5d", interval="1d")
+            if not hist.empty:
+                price = float(hist["Close"].iloc[-1])
+                prev  = float(hist["Close"].iloc[-2]) if len(hist) >= 2 else price
+        price = price or 0.0
+        prev  = prev  or price
+        change     = price - prev
+        change_pct = (change / prev * 100) if prev else 0.0
+        return {**item, "price": round(price, 2), "change": round(change, 2), "changePct": round(change_pct, 2)}
+    except Exception as e:
+        return {**item, "price": 0.0, "change": 0.0, "changePct": 0.0, "error": str(e)}
+
+
+@flask_app.route("/api/markets", methods=["GET"])
+def market_data():
+    global _market_cache
+    now = time.time()
+    if _market_cache.get("data") and (now - _market_cache.get("ts", 0)) < 300:
+        return jsonify(_market_cache["data"])
+
+    all_items = _INDICES + _COMMODITIES
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as ex:
+        results = list(ex.map(_fetch_one, all_items))
+
+    n = len(_INDICES)
+    payload = {
+        "success":    True,
+        "indices":    results[:n],
+        "commodities": results[n:],
+        "timestamp":  datetime.datetime.utcnow().isoformat() + "Z",
+    }
+    _market_cache["data"] = payload
+    _market_cache["ts"]   = now
+    return jsonify(payload)
 
 
 # -----------------------------
