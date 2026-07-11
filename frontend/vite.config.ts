@@ -3,6 +3,8 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 
+
+
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
@@ -21,6 +23,7 @@ export default defineConfig({
       "/get": "http://localhost:8000",
       "/clarify": "http://localhost:8000",
       "/portfolio": "http://localhost:8000",
+      "/global": "http://localhost:8000",
     },
   },
 });
