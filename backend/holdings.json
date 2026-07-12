@@ -1,0 +1,14 @@
+{
+  "satyaki.dey.ks@gmail.com": {
+    "isDataPresent": true,
+    "dataFile": "sat-ks.json"
+  },
+  "priyanshuduttakey@gmail.com": {
+    "isDataPresent": false,
+    "dataFile": "pry-ks.json"
+  },
+  "sdey2836@gmail.com": {
+    "isDataPresent": false,
+    "dataFile": "sat.json"
+  }
+}

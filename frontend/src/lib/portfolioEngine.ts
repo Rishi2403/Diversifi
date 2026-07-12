@@ -7,6 +7,7 @@ export interface StockHolding {
   avgBuyPrice: number;
   currentPrice: number;
   currentValue: number;
+  buyDate?: string;
 }
 
 export interface MFHolding {
@@ -14,6 +15,7 @@ export interface MFHolding {
   category: string;
   investedAmount: number;
   currentValue: number;
+  buyDate?: string;
 }
 
 export interface PortfolioInput {
@@ -47,8 +49,12 @@ export interface ConcentrationRisk {
 export interface MFOverlap {
   fund1: string;
   fund2: string;
+  category1: string;
+  category2: string;
   sharedStocks: string[];
   overlapScore: number;
+  overlapType: "category" | "holdings" | "both";
+  reason: string;
 }
 
 export interface Recommendation {
@@ -161,6 +167,30 @@ const NIFTY500_WEIGHTS: Record<string, number> = {
   "Metals": 4.6, "Realty": 2.1, "Others": 1.4,
 };
 
+// ─── SEBI Category Overlap Matrix ────────────────────────────────────────────
+// Score = expected % portfolio duplication between two funds of these categories.
+// Driven primarily by market-cap universe overlap (SEBI mandates), not sector similarity.
+// E.g. Large Cap must invest ≥80% in top-100 stocks — any two such funds share the same universe.
+// Flexi Cap is ~55% large-cap by practice, so it overlaps Large Cap but not Small Cap.
+const CATEGORY_BASE_OVERLAP: Record<string, Record<string, number>> = {
+  "Large Cap":       { "Large Cap": 85, "Index": 75, "Flexi Cap": 55, "ELSS": 50, "Multi Cap": 40, "Large & Mid Cap": 45, "Value": 40, "Hybrid": 35, "Mid Cap": 8,  "Small Cap": 3  },
+  "Mid Cap":         { "Mid Cap": 80, "Large & Mid Cap": 40, "Multi Cap": 35, "Flexi Cap": 30, "Small Cap": 15, "ELSS": 25, "Value": 25, "Hybrid": 20, "Large Cap": 8,  "Index": 10 },
+  "Small Cap":       { "Small Cap": 65, "Multi Cap": 28, "Flexi Cap": 20, "Mid Cap": 15, "Large & Mid Cap": 12, "ELSS": 18, "Value": 20, "Hybrid": 10, "Large Cap": 3,  "Index": 5  },
+  "Flexi Cap":       { "Flexi Cap": 55, "Large Cap": 55, "ELSS": 55, "Multi Cap": 50, "Index": 50, "Large & Mid Cap": 48, "Value": 45, "Hybrid": 40, "Mid Cap": 30, "Small Cap": 20 },
+  "Multi Cap":       { "Multi Cap": 60, "Large & Mid Cap": 55, "Flexi Cap": 50, "ELSS": 48, "Large Cap": 40, "Value": 40, "Index": 38, "Hybrid": 35, "Mid Cap": 35, "Small Cap": 28 },
+  "ELSS":            { "ELSS": 70, "Flexi Cap": 55, "Large Cap": 50, "Multi Cap": 48, "Index": 48, "Large & Mid Cap": 45, "Value": 45, "Hybrid": 38, "Mid Cap": 25, "Small Cap": 18 },
+  "Index":           { "Index": 90, "Large Cap": 75, "Flexi Cap": 50, "ELSS": 48, "Large & Mid Cap": 42, "Multi Cap": 38, "Value": 38, "Hybrid": 30, "Mid Cap": 10, "Small Cap": 5  },
+  "Large & Mid Cap": { "Large & Mid Cap": 72, "Multi Cap": 55, "Flexi Cap": 48, "Large Cap": 45, "ELSS": 45, "Index": 42, "Mid Cap": 40, "Value": 40, "Hybrid": 32, "Small Cap": 12 },
+  "Value":           { "Value": 65, "Flexi Cap": 45, "ELSS": 45, "Large Cap": 40, "Multi Cap": 40, "Large & Mid Cap": 40, "Index": 38, "Mid Cap": 25, "Hybrid": 35, "Small Cap": 20 },
+  "Hybrid":          { "Hybrid": 60, "Flexi Cap": 40, "ELSS": 38, "Large Cap": 35, "Multi Cap": 35, "Large & Mid Cap": 32, "Value": 35, "Index": 30, "Mid Cap": 20, "Small Cap": 10 },
+  "Sectoral":        {},
+};
+
+function categorySimilarityScore(cat1: string, cat2: string): number {
+  if (cat1 === cat2) return CATEGORY_BASE_OVERLAP[cat1]?.[cat1] ?? 65;
+  return CATEGORY_BASE_OVERLAP[cat1]?.[cat2] ?? CATEGORY_BASE_OVERLAP[cat2]?.[cat1] ?? 0;
+}
+
 const MF_TOP_HOLDINGS: Record<string, string[]> = {
   "Mirae Asset Large Cap": ["HDFCBANK", "ICICIBANK", "RELIANCE", "INFY", "TCS"],
   "Axis Bluechip": ["HDFCBANK", "ICICIBANK", "RELIANCE", "INFY", "BAJFINANCE"],
@@ -212,8 +242,11 @@ function calcSectorAllocations(
 
 function calcConcentration(stocks: StockHolding[], totalValue: number): ConcentrationRisk {
   const sorted = [...stocks].sort((a, b) => b.currentValue - a.currentValue);
+  // Measure per-stock concentration against stock-only total — MF value diluting stock risk is misleading
+  const stockTotal = stocks.reduce((a, s) => a + s.currentValue, 0);
+  const stockBase = stockTotal > 0 ? stockTotal : totalValue;
   const topHoldings = sorted.slice(0, 10).map((s) => {
-    const pct = totalValue > 0 ? (s.currentValue / totalValue) * 100 : 0;
+    const pct = stockBase > 0 ? (s.currentValue / stockBase) * 100 : 0;
     return { name: s.symbol, pct: +pct.toFixed(2), isRisk: pct > 15 };
   });
   const sectorMap: Record<string, number> = {};
@@ -221,12 +254,13 @@ function calcConcentration(stocks: StockHolding[], totalValue: number): Concentr
     const sec = getSector(s.symbol);
     sectorMap[sec] = (sectorMap[sec] ?? 0) + s.currentValue;
   }
+  // Sector risk measured vs total portfolio (correct — sector dominance is portfolio-level risk)
   const sectorRisks = Object.entries(sectorMap).map(([sector, val]) => {
     const pct = totalValue > 0 ? (val / totalValue) * 100 : 0;
     return { sector, pct: +pct.toFixed(2), isRisk: pct > 25 };
   });
   const top3Sum = sorted.slice(0, 3).reduce((acc, s) => acc + s.currentValue, 0);
-  const top3Pct = totalValue > 0 ? (top3Sum / totalValue) * 100 : 0;
+  const top3Pct = stockBase > 0 ? (top3Sum / stockBase) * 100 : 0;
   return {
     topHoldings,
     sectorRisks,
@@ -236,24 +270,66 @@ function calcConcentration(stocks: StockHolding[], totalValue: number): Concentr
   };
 }
 
+function findMFHoldings(fundName: string): string[] {
+  if (MF_TOP_HOLDINGS[fundName]) return MF_TOP_HOLDINGS[fundName];
+  const norm = fundName.toLowerCase();
+  for (const [key, holdings] of Object.entries(MF_TOP_HOLDINGS)) {
+    if (norm.includes(key.toLowerCase()) || key.toLowerCase().includes(norm)) {
+      return holdings;
+    }
+  }
+  return [];
+}
+
 function detectMFOverlap(funds: MFHolding[]): MFOverlap[] {
   const overlaps: MFOverlap[] = [];
-  const names = funds.map((f) => f.fundName);
-  for (let i = 0; i < names.length; i++) {
-    for (let j = i + 1; j < names.length; j++) {
-      const h1 = MF_TOP_HOLDINGS[names[i]] ?? [];
-      const h2 = MF_TOP_HOLDINGS[names[j]] ?? [];
-      const shared = h1.filter((s) => h2.includes(s));
-      if (shared.length >= 2) {
+
+  for (let i = 0; i < funds.length; i++) {
+    for (let j = i + 1; j < funds.length; j++) {
+      const f1 = funds[i];
+      const f2 = funds[j];
+
+      // 1. Category-based structural overlap (SEBI mandate → sector profile similarity)
+      const sameCategory = f1.category === f2.category;
+      const catScore = categorySimilarityScore(f1.category, f2.category);
+
+      // 2. Holdings-based overlap (augments — not all funds have hardcoded holdings)
+      const h1 = findMFHoldings(f1.fundName);
+      const h2 = findMFHoldings(f2.fundName);
+      const shared = h1.length > 0 && h2.length > 0 ? h1.filter((s) => h2.includes(s)) : [];
+      const holdingsScore = shared.length > 0
+        ? Math.round((shared.length / Math.max(h1.length, h2.length)) * 100)
+        : 0;
+
+      const finalScore = Math.max(catScore, holdingsScore);
+      const hasHoldingsData = shared.length > 0;
+      const overlapType: MFOverlap["overlapType"] = hasHoldingsData && catScore >= 45
+        ? "both" : hasHoldingsData ? "holdings" : "category";
+
+      // Flag if: same category OR sector profile similarity ≥ 45%
+      if (sameCategory || catScore >= 45) {
+        let reason: string;
+        if (sameCategory) {
+          reason = `Both are ${f1.category} funds — SEBI mandates near-identical investment universe`;
+        } else {
+          reason = `${catScore}% sector overlap: ${f1.category} and ${f2.category} funds have similar mandates`;
+        }
+
         overlaps.push({
-          fund1: names[i], fund2: names[j],
+          fund1: f1.fundName,
+          fund2: f2.fundName,
+          category1: f1.category,
+          category2: f2.category,
           sharedStocks: shared,
-          overlapScore: Math.round((shared.length / Math.max(h1.length, h2.length)) * 100),
+          overlapScore: finalScore,
+          overlapType,
+          reason,
         });
       }
     }
   }
-  return overlaps;
+
+  return overlaps.sort((a, b) => b.overlapScore - a.overlapScore);
 }
 
 function calcDiversificationScore(
@@ -277,7 +353,7 @@ function calcDiversificationScore(
   const sectConc = concentrationRisk.sectorRisks.filter((r) => r.isRisk).length === 0;
   const concentrationSafe = stockConc && sectConc && !concentrationRisk.top3Risk ? 30 : stockConc || sectConc ? 15 : 5;
 
-  const mfOverlapSafe = mfOverlaps.length === 0 ? 15 : mfOverlaps.length === 1 ? 10 : 5;
+  const mfOverlapSafe = mfOverlaps.length === 0 ? 15 : mfOverlaps.length === 1 ? 11 : mfOverlaps.length <= 3 ? 7 : mfOverlaps.length <= 5 ? 4 : 1;
 
   // Risk alignment
   const aggrSectors = sectorAllocations.filter((s) =>
@@ -289,7 +365,9 @@ function calcDiversificationScore(
 
   const benchmarkAlign = sectorAllocations.filter((s) => Math.abs(s.delta) <= 10).length >= 5 ? 10 : 5;
 
-  const score = Math.min(100, sectorSpread + assetClassSpread + concentrationSafe + mfOverlapSafe + riskAlignment + benchmarkAlign);
+  // Max possible raw = 25+20+30+15+10+10 = 110. Normalize to 0-100 so score is a true percentage.
+  const rawScore = sectorSpread + assetClassSpread + concentrationSafe + mfOverlapSafe + riskAlignment + benchmarkAlign;
+  const score = Math.round((rawScore / 110) * 100);
   return {
     score,
     breakdown: { sectorSpread, assetClassSpread, concentrationSafe, mfOverlapSafe, riskAlignment, benchmarkAlign },
@@ -450,10 +528,14 @@ export function analyzePortfolio(input: PortfolioInput): PortfolioAnalysis {
     sectorAllocations, assetClassBreakdown, concentrationRisk, mfOverlaps, input.stocks, input
   );
 
-  const benchAlignScore = sectorAllocations.filter((s) => Math.abs(s.delta) <= 10).length / Math.max(sectorAllocations.length, 1);
-  const concPenalty = (concentrationRisk.topHoldings.filter((h) => h.isRisk).length * 5) + (concentrationRisk.top3Risk ? 10 : 0);
+  // Health score: weighted blend of diversification + benchmark alignment - concentration penalties
+  // Max before penalties: divScore(0-100)*0.55 + benchAlignPct*30 + overlapBonus(15) = 55+30+15 = 100
+  const alignedSectors = sectorAllocations.filter((s) => Math.abs(s.delta) <= 10).length;
+  const benchAlignPct = alignedSectors / Math.max(sectorAllocations.length, 1);
+  const concPenalty = (concentrationRisk.topHoldings.filter((h) => h.isRisk).length * 5) + (concentrationRisk.top3Risk ? 15 : 0);
+  const overlapBonus = mfOverlaps.length === 0 ? 15 : mfOverlaps.length === 1 ? 8 : mfOverlaps.length <= 3 ? 3 : 0;
   const healthScore = Math.max(0, Math.min(100, Math.round(
-    divScore * 0.4 + benchAlignScore * 30 - concPenalty + (mfOverlaps.length === 0 ? 10 : 0)
+    divScore * 0.55 + benchAlignPct * 30 + overlapBonus - concPenalty
   )));
 
   const recommendations = buildRecommendations(sectorAllocations, concentrationRisk, mfOverlaps, input, totalValue);
@@ -469,22 +551,22 @@ export function analyzePortfolio(input: PortfolioInput): PortfolioAnalysis {
 
 export const DEMO_PORTFOLIO: PortfolioInput = {
   stocks: [
-    { symbol: "RELIANCE", name: "Reliance Industries", qty: 10, avgBuyPrice: 2500, currentPrice: 2980, currentValue: 29800 },
-    { symbol: "LT", name: "Larsen & Toubro", qty: 15, avgBuyPrice: 3200, currentPrice: 3600, currentValue: 54000 },
-    { symbol: "BHEL", name: "Bharat Heavy Electricals", qty: 80, avgBuyPrice: 200, currentPrice: 245, currentValue: 19600 },
-    { symbol: "CGPOWER", name: "CG Power", qty: 50, avgBuyPrice: 400, currentPrice: 620, currentValue: 31000 },
-    { symbol: "HDFCBANK", name: "HDFC Bank", qty: 20, avgBuyPrice: 1500, currentPrice: 1620, currentValue: 32400 },
-    { symbol: "ICICIBANK", name: "ICICI Bank", qty: 15, avgBuyPrice: 900, currentPrice: 1150, currentValue: 17250 },
-    { symbol: "TCS", name: "Tata Consultancy Services", qty: 5, avgBuyPrice: 3800, currentPrice: 3845, currentValue: 19225 },
-    { symbol: "SUNPHARMA", name: "Sun Pharma", qty: 20, avgBuyPrice: 1100, currentPrice: 1250, currentValue: 25000 },
-    { symbol: "SIEMENS", name: "Siemens India", qty: 10, avgBuyPrice: 5200, currentPrice: 6100, currentValue: 61000 },
-    { symbol: "ABB", name: "ABB India", qty: 8, avgBuyPrice: 4500, currentPrice: 5800, currentValue: 46400 },
+    { symbol: "RELIANCE", name: "Reliance Industries", qty: 10, avgBuyPrice: 2500, currentPrice: 2980, currentValue: 29800, buyDate: "2022-08-15" },
+    { symbol: "LT", name: "Larsen & Toubro", qty: 15, avgBuyPrice: 3200, currentPrice: 3600, currentValue: 54000, buyDate: "2022-03-10" },
+    { symbol: "BHEL", name: "Bharat Heavy Electricals", qty: 80, avgBuyPrice: 200, currentPrice: 245, currentValue: 19600, buyDate: "2023-01-20" },
+    { symbol: "CGPOWER", name: "CG Power", qty: 50, avgBuyPrice: 400, currentPrice: 620, currentValue: 31000, buyDate: "2022-11-05" },
+    { symbol: "HDFCBANK", name: "HDFC Bank", qty: 20, avgBuyPrice: 1500, currentPrice: 1620, currentValue: 32400, buyDate: "2022-06-12" },
+    { symbol: "ICICIBANK", name: "ICICI Bank", qty: 15, avgBuyPrice: 900, currentPrice: 1150, currentValue: 17250, buyDate: "2021-12-01" },
+    { symbol: "TCS", name: "Tata Consultancy Services", qty: 5, avgBuyPrice: 3800, currentPrice: 3845, currentValue: 19225, buyDate: "2023-04-18" },
+    { symbol: "SUNPHARMA", name: "Sun Pharma", qty: 20, avgBuyPrice: 1100, currentPrice: 1250, currentValue: 25000, buyDate: "2022-09-30" },
+    { symbol: "SIEMENS", name: "Siemens India", qty: 10, avgBuyPrice: 5200, currentPrice: 6100, currentValue: 61000, buyDate: "2022-02-14" },
+    { symbol: "ABB", name: "ABB India", qty: 8, avgBuyPrice: 4500, currentPrice: 5800, currentValue: 46400, buyDate: "2021-10-07" },
   ],
   mutualFunds: [
-    { fundName: "Mirae Asset Large Cap", category: "Large Cap", investedAmount: 50000, currentValue: 62000 },
-    { fundName: "Axis Bluechip", category: "Large Cap", investedAmount: 40000, currentValue: 48000 },
-    { fundName: "SBI Large Cap", category: "Large Cap", investedAmount: 30000, currentValue: 36000 },
-    { fundName: "Parag Parikh Flexi Cap", category: "Flexi Cap", investedAmount: 60000, currentValue: 78000 },
+    { fundName: "Mirae Asset Large Cap", category: "Large Cap", investedAmount: 50000, currentValue: 62000, buyDate: "2022-01-10" },
+    { fundName: "Axis Bluechip", category: "Large Cap", investedAmount: 40000, currentValue: 48000, buyDate: "2022-04-20" },
+    { fundName: "SBI Large Cap", category: "Large Cap", investedAmount: 30000, currentValue: 36000, buyDate: "2021-09-15" },
+    { fundName: "Parag Parikh Flexi Cap", category: "Flexi Cap", investedAmount: 60000, currentValue: 78000, buyDate: "2021-07-22" },
   ],
   cashBalance: 25000,
   riskProfile: "Moderate",

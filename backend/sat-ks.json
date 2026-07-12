@@ -1,0 +1,632 @@
+{
+  "email": "satyaki.dey.ks@gmail.com",
+  "name": "satyaki.dey.ks",
+  "onboardedAt": "2026-07-13T02:15:18.361492",
+  "profile": {
+    "avoidSectors": [
+      "Construction"
+    ],
+    "focusSectors": [
+      "Financial"
+    ],
+    "goals": [
+      "Buy a house worth 1 crore in 10 years"
+    ],
+    "horizon": "10 years",
+    "investmentStyle": "SIP",
+    "monthlyInvestment": 35000,
+    "name": null,
+    "riskAppetite": "Moderate-Aggressive"
+  },
+  "holdings": {
+    "stocks": [
+      {
+        "symbol": "RELIANCE",
+        "name": "Reliance Industries Ltd",
+        "qty": 50,
+        "avgBuyPrice": 2450,
+        "currentPrice": 2980,
+        "currentValue": 149000,
+        "buyDate": "2023-04-15"
+      },
+      {
+        "symbol": "TCS",
+        "name": "Tata Consultancy Services",
+        "qty": 25,
+        "avgBuyPrice": 3200,
+        "currentPrice": 3845,
+        "currentValue": 96125,
+        "buyDate": "2022-11-20"
+      },
+      {
+        "symbol": "HDFCBANK",
+        "name": "HDFC Bank Ltd",
+        "qty": 100,
+        "avgBuyPrice": 1420,
+        "currentPrice": 1530,
+        "currentValue": 153000,
+        "buyDate": "2022-08-10"
+      },
+      {
+        "symbol": "INFY",
+        "name": "Infosys Ltd",
+        "qty": 80,
+        "avgBuyPrice": 1350,
+        "currentPrice": 1580,
+        "currentValue": 126400,
+        "buyDate": "2023-01-05"
+      },
+      {
+        "symbol": "ICICIBANK",
+        "name": "ICICI Bank Ltd",
+        "qty": 120,
+        "avgBuyPrice": 850,
+        "currentPrice": 975,
+        "currentValue": 117000,
+        "buyDate": "2022-06-22"
+      },
+      {
+        "symbol": "BAJFINANCE",
+        "name": "Bajaj Finance Ltd",
+        "qty": 15,
+        "avgBuyPrice": 6800,
+        "currentPrice": 7250,
+        "currentValue": 108750,
+        "buyDate": "2023-07-18"
+      },
+      {
+        "symbol": "ITC",
+        "name": "ITC Ltd",
+        "qty": 200,
+        "avgBuyPrice": 385,
+        "currentPrice": 425,
+        "currentValue": 85000,
+        "buyDate": "2021-12-01"
+      },
+      {
+        "symbol": "SBIN",
+        "name": "State Bank of India",
+        "qty": 150,
+        "avgBuyPrice": 520,
+        "currentPrice": 585,
+        "currentValue": 87750,
+        "buyDate": "2023-03-10"
+      },
+      {
+        "symbol": "HINDUNILVR",
+        "name": "Hindustan Unilever Ltd",
+        "qty": 40,
+        "avgBuyPrice": 2350,
+        "currentPrice": 2580,
+        "currentValue": 103200,
+        "buyDate": "2022-05-14"
+      },
+      {
+        "symbol": "MARUTI",
+        "name": "Maruti Suzuki India Ltd",
+        "qty": 10,
+        "avgBuyPrice": 9500,
+        "currentPrice": 10250,
+        "currentValue": 102500,
+        "buyDate": "2023-09-02"
+      }
+    ],
+    "mutualFunds": [
+      {
+        "fundName": "HDFC Flexi Cap Fund Direct Growth",
+        "category": "Flexi Cap",
+        "currentValue": 125000,
+        "investedAmount": 100000,
+        "buyDate": "2022-03-15"
+      },
+      {
+        "fundName": "Parag Parikh Flexi Cap Fund Direct",
+        "category": "Flexi Cap",
+        "currentValue": 180000,
+        "investedAmount": 150000,
+        "buyDate": "2021-10-08"
+      },
+      {
+        "fundName": "Axis Bluechip Fund Direct Growth",
+        "category": "Large Cap",
+        "currentValue": 95000,
+        "investedAmount": 80000,
+        "buyDate": "2022-07-20"
+      },
+      {
+        "fundName": "ICICI Prudential Bluechip Fund Direct",
+        "category": "Large Cap",
+        "currentValue": 110000,
+        "investedAmount": 90000,
+        "buyDate": "2023-02-14"
+      },
+      {
+        "fundName": "Mirae Asset Large Cap Fund Direct",
+        "category": "Large Cap",
+        "currentValue": 88000,
+        "investedAmount": 75000,
+        "buyDate": "2022-12-01"
+      },
+      {
+        "fundName": "SBI Small Cap Fund Direct Growth",
+        "category": "Small Cap",
+        "currentValue": 145000,
+        "investedAmount": 120000,
+        "buyDate": "2021-08-25"
+      },
+      {
+        "fundName": "Axis Small Cap Fund Direct",
+        "category": "Small Cap",
+        "currentValue": 132000,
+        "investedAmount": 110000,
+        "buyDate": "2022-04-10"
+      },
+      {
+        "fundName": "DSP Midcap Fund Direct Growth",
+        "category": "Mid Cap",
+        "currentValue": 92000,
+        "investedAmount": 85000,
+        "buyDate": "2023-06-01"
+      }
+    ]
+  },
+  "agentState": {
+    "lastChecked": "2026-07-13T02:25:22.474554",
+    "verdict": "All Good",
+    "verdictReason": "Portfolio is broadly healthy with 9 out of 10 stocks in green today and no critical risk exposures threatening the 10-year house goal.",
+    "overallSummary": "Your \u20b920.96L portfolio is performing well today with broad market momentum across banking, IT, and auto sectors. The \u20b935,000 monthly SIP maintained over 10 years, combined with your existing corpus, positions you strongly to meet the \u20b91 crore house target assuming 12-13% CAGR. ITC's marginal dip is negligible and does not pose any structural concern.",
+    "topAlerts": [
+      {
+        "holding": "ITC",
+        "issue": "Slight 0.04% decline today flagged by system, but fundamentally stable FMCG stock",
+        "action": "No action needed; hold and monitor quarterly earnings for any demand slowdown signals"
+      }
+    ],
+    "alerts": [
+      {
+        "symbol": "ITC",
+        "name": "ITC Ltd",
+        "is_mf": false,
+        "change_pct": -0.04,
+        "current_value": 85000.0,
+        "issue": "Down 0.0% today \u2014 significant single-day decline",
+        "action": "Review position in ITC. Consider partial exit or stop-loss review."
+      }
+    ],
+    "watchlist": [],
+    "activityLog": [
+      {
+        "timestamp": "02:25:11",
+        "icon": "\ud83d\udd04",
+        "message": "Starting portfolio analysis\u2026",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:11",
+        "icon": "\ud83d\udce1",
+        "message": "Fetching live prices for 10 stocks\u2026",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:12",
+        "icon": "\ud83d\udcc8",
+        "message": "RELIANCE \u20b91307.8 (+2.14%)",
+        "level": "success"
+      },
+      {
+        "timestamp": "02:25:12",
+        "icon": "\ud83d\udcc8",
+        "message": "TCS \u20b92069.0 (+0.49%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:12",
+        "icon": "\ud83d\udcc8",
+        "message": "HDFCBANK \u20b9824.95 (+0.91%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:12",
+        "icon": "\ud83d\udcc8",
+        "message": "INFY \u20b91068.0 (+1.64%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:12",
+        "icon": "\ud83d\udcc8",
+        "message": "ICICIBANK \u20b91401.2 (+1.26%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:12",
+        "icon": "\ud83d\udcc8",
+        "message": "BAJFINANCE \u20b91020.5 (+1.66%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:12",
+        "icon": "\ud83d\udcc9",
+        "message": "ITC \u20b9281.75 (-0.04%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:12",
+        "icon": "\ud83d\udcc8",
+        "message": "SBIN \u20b91036.0 (+1.31%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:12",
+        "icon": "\ud83d\udcc8",
+        "message": "HINDUNILVR \u20b92150.6 (+0.28%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:12",
+        "icon": "\ud83d\udcc8",
+        "message": "MARUTI \u20b913854.0 (+0.99%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:12",
+        "icon": "\ud83d\udd0d",
+        "message": "Scanning news for top holdings: HDFCBANK, RELIANCE, INFY, ICICIBANK, BAJFINANCE",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:12",
+        "icon": "\ud83d\udfe2",
+        "message": "HDFCBANK news sentiment: Bullish (3 articles)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:12",
+        "icon": "\ud83d\udfe2",
+        "message": "RELIANCE news sentiment: Bullish (3 articles)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:12",
+        "icon": "\u26aa",
+        "message": "INFY news sentiment: Neutral (3 articles)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:13",
+        "icon": "\u26aa",
+        "message": "ICICIBANK news sentiment: Neutral (3 articles)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:13",
+        "icon": "\ud83d\udfe2",
+        "message": "BAJFINANCE news sentiment: Bullish (3 articles)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:13",
+        "icon": "\ud83e\uddee",
+        "message": "Computing portfolio alerts\u2026",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:13",
+        "icon": "\ud83d\udea8",
+        "message": "ALERT: ITC \u2014 Down 0.0% today \u2014 significant single-day decline",
+        "level": "error"
+      },
+      {
+        "timestamp": "02:25:13",
+        "icon": "\ud83e\udd16",
+        "message": "Synthesising portfolio verdict with AI\u2026",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:25:22",
+        "icon": "\u2705",
+        "message": "Analysis complete \u2014 Verdict: All Good. Portfolio is broadly healthy with 9 out of 10 stocks in green today and no critical risk exposures threatening the 10-year house goal.",
+        "level": "success"
+      },
+      {
+        "timestamp": "02:20:02",
+        "icon": "\ud83d\udd04",
+        "message": "Starting portfolio analysis\u2026",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:02",
+        "icon": "\ud83d\udce1",
+        "message": "Fetching live prices for 10 stocks\u2026",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:03",
+        "icon": "\ud83d\udcc8",
+        "message": "RELIANCE \u20b91307.8 (+2.14%)",
+        "level": "success"
+      },
+      {
+        "timestamp": "02:20:03",
+        "icon": "\ud83d\udcc8",
+        "message": "TCS \u20b92069.0 (+0.49%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:03",
+        "icon": "\ud83d\udcc8",
+        "message": "HDFCBANK \u20b9824.95 (+0.91%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:03",
+        "icon": "\ud83d\udcc8",
+        "message": "INFY \u20b91068.0 (+1.64%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:03",
+        "icon": "\ud83d\udcc8",
+        "message": "ICICIBANK \u20b91401.2 (+1.26%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:03",
+        "icon": "\ud83d\udcc8",
+        "message": "BAJFINANCE \u20b91020.5 (+1.66%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:03",
+        "icon": "\ud83d\udcc9",
+        "message": "ITC \u20b9281.75 (-0.04%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:03",
+        "icon": "\ud83d\udcc8",
+        "message": "SBIN \u20b91036.0 (+1.31%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:03",
+        "icon": "\ud83d\udcc8",
+        "message": "HINDUNILVR \u20b92150.6 (+0.28%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:03",
+        "icon": "\ud83d\udcc8",
+        "message": "MARUTI \u20b913854.0 (+0.99%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:03",
+        "icon": "\ud83d\udd0d",
+        "message": "Scanning news for top holdings: HDFCBANK, RELIANCE, INFY, ICICIBANK, BAJFINANCE",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:03",
+        "icon": "\ud83d\udfe2",
+        "message": "HDFCBANK news sentiment: Bullish (3 articles)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:03",
+        "icon": "\ud83d\udfe2",
+        "message": "RELIANCE news sentiment: Bullish (3 articles)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:04",
+        "icon": "\u26aa",
+        "message": "INFY news sentiment: Neutral (3 articles)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:04",
+        "icon": "\u26aa",
+        "message": "ICICIBANK news sentiment: Neutral (3 articles)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:04",
+        "icon": "\ud83d\udfe2",
+        "message": "BAJFINANCE news sentiment: Bullish (3 articles)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:04",
+        "icon": "\ud83e\uddee",
+        "message": "Computing portfolio alerts\u2026",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:04",
+        "icon": "\u26a0\ufe0f",
+        "message": "CAUTION: ITC \u2014 Down 0.0% today (2 consecutive declines)",
+        "level": "warn"
+      },
+      {
+        "timestamp": "02:20:04",
+        "icon": "\ud83e\udd16",
+        "message": "Synthesising portfolio verdict with AI\u2026",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:20:11",
+        "icon": "\u2705",
+        "message": "Analysis complete \u2014 Verdict: All Good. Portfolio is broadly healthy with 9 of 10 stocks gaining today and no immediate action items requiring attention.",
+        "level": "success"
+      },
+      {
+        "timestamp": "02:15:18",
+        "icon": "\ud83d\udd04",
+        "message": "Starting portfolio analysis\u2026",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:15:18",
+        "icon": "\ud83d\udce1",
+        "message": "Fetching live prices for 10 stocks\u2026",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:15:19",
+        "icon": "\ud83d\udcc8",
+        "message": "RELIANCE \u20b91307.8 (+2.14%)",
+        "level": "success"
+      },
+      {
+        "timestamp": "02:15:19",
+        "icon": "\ud83d\udcc8",
+        "message": "TCS \u20b92069.0 (+0.49%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:15:19",
+        "icon": "\ud83d\udcc8",
+        "message": "HDFCBANK \u20b9824.95 (+0.91%)",
+        "level": "info"
+      },
+      {
+        "timestamp": "02:15:19",
+        "icon": "\ud83d\udcc8",
+        "message": "INFY \u20b91068.0 (+1.64%)",
+        "level": "info"
+      }
+    ],
+    "lastPrices": {
+      "RELIANCE": {
+        "price": 1307.8,
+        "prev_close": 1280.4,
+        "change_pct": 2.14
+      },
+      "TCS": {
+        "price": 2069.0,
+        "prev_close": 2059.0,
+        "change_pct": 0.49
+      },
+      "HDFCBANK": {
+        "price": 824.95,
+        "prev_close": 817.55,
+        "change_pct": 0.91
+      },
+      "INFY": {
+        "price": 1068.0,
+        "prev_close": 1050.8,
+        "change_pct": 1.64
+      },
+      "ICICIBANK": {
+        "price": 1401.2,
+        "prev_close": 1383.7,
+        "change_pct": 1.26
+      },
+      "BAJFINANCE": {
+        "price": 1020.5,
+        "prev_close": 1003.8,
+        "change_pct": 1.66
+      },
+      "ITC": {
+        "price": 281.75,
+        "prev_close": 281.85,
+        "change_pct": -0.04
+      },
+      "SBIN": {
+        "price": 1036.0,
+        "prev_close": 1022.6,
+        "change_pct": 1.31
+      },
+      "HINDUNILVR": {
+        "price": 2150.6,
+        "prev_close": 2144.5,
+        "change_pct": 0.28
+      },
+      "MARUTI": {
+        "price": 13854.0,
+        "prev_close": 13718.0,
+        "change_pct": 0.99
+      }
+    },
+    "trendState": {
+      "RELIANCE": {
+        "down_count": 0
+      },
+      "TCS": {
+        "down_count": 0
+      },
+      "HDFCBANK": {
+        "down_count": 0
+      },
+      "INFY": {
+        "down_count": 0
+      },
+      "ICICIBANK": {
+        "down_count": 0
+      },
+      "BAJFINANCE": {
+        "down_count": 0
+      },
+      "ITC": {
+        "down_count": 3
+      },
+      "SBIN": {
+        "down_count": 0
+      },
+      "HINDUNILVR": {
+        "down_count": 0
+      },
+      "MARUTI": {
+        "down_count": 0
+      }
+    },
+    "newsSentiment": {
+      "HDFCBANK": {
+        "label": "Bullish",
+        "score": 0.105,
+        "headlines": [
+          "India\u2019s Largest Private Bank Lost Over 3,000 Employees to AI",
+          "Asian Equities Traded in the US as American Depositary Receipts Higher in Wednesday Trading",
+          "Asian Equities Traded in the US as American Depositary Receipts Soar in Monday Trading"
+        ]
+      },
+      "RELIANCE": {
+        "label": "Bullish",
+        "score": 0.21,
+        "headlines": [
+          "Meta (META) Builds Its First India AI Data Center With Reliance",
+          "Billionaire Ambani wants AI in every call, app, and home",
+          "Reliance\u2019s Jio Platforms to Seek India Listing"
+        ]
+      },
+      "INFY": {
+        "label": "Neutral",
+        "score": 0.044,
+        "headlines": [
+          "Nandan Nilekani leaves GP role at Fundamentum as it launches $200M third fund",
+          "Infosys Limited (INFY) Partners with Sentara To Enable AI Integration and Use in Hospitals",
+          "Asian Equities Traded in the US as American Depositary Receipts Drop Sharply in Tuesday Trading"
+        ]
+      },
+      "ICICIBANK": {
+        "label": "Neutral",
+        "score": 0.069,
+        "headlines": [
+          "InsuranceDekho parent selects banks for possible IPO",
+          "Asian Equities Traded in the US as American Depositary Receipts Soar in Monday Trading",
+          "India's ICICI Bank to join peers in dollar debt funding under RBI swap window, sources say"
+        ]
+      },
+      "BAJFINANCE": {
+        "label": "Bullish",
+        "score": 0.104,
+        "headlines": [
+          "Indian non-bank lenders plan $1.6 billion in debt sales as yields decline, bankers say",
+          "India's Bajaj Finance jumps as easing credit costs, asset quality gains boost outlook",
+          "Indian non-bank lender Bajaj Finance posts 22% profit growth, pushes AI adoption"
+        ]
+      }
+    },
+    "lastReportSentAt": null
+  }
+}

@@ -309,6 +309,23 @@ def bulk_prices():
 
 
 
+@flask_app.route("/api/portfolio/deep-analyse", methods=["POST"])
+def portfolio_deep_analyse():
+    from portfolio_analysis import compute_portfolio_metrics
+    data = request.get_json() or {}
+    try:
+        result = compute_portfolio_metrics(
+            stocks=data.get("stocks", []),
+            mutual_funds=data.get("mutualFunds", []),
+            benchmark=data.get("benchmark", "nifty50"),
+        )
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+
+
 # -----------------------------
 # Global Markets Routes
 # -----------------------------
@@ -414,7 +431,7 @@ _INDICES = [
     {"symbol": "^CNXIT",     "name": "Nifty IT",        "region": "India", "flag": "🇮🇳"},
     {"symbol": "^CNXPHARMA", "name": "Nifty Pharma",    "region": "India", "flag": "🇮🇳"},
     {"symbol": "^CNXAUTO",   "name": "Nifty Auto",      "region": "India", "flag": "🇮🇳"},
-    {"symbol": "^NSMIDCP100","name": "Nifty Midcap 100","region": "India", "flag": "🇮🇳"},
+    {"symbol": "^NSEMDCP50", "name": "Nifty Midcap 50", "region": "India", "flag": "🇮🇳"},
     {"symbol": "^GSPC",      "name": "S&P 500",         "region": "USA",   "flag": "🇺🇸"},
     {"symbol": "^IXIC",      "name": "NASDAQ",          "region": "USA",   "flag": "🇺🇸"},
     {"symbol": "^DJI",       "name": "Dow Jones",       "region": "USA",   "flag": "🇺🇸"},
@@ -469,7 +486,7 @@ def market_data():
         "success":    True,
         "indices":    results[:n],
         "commodities": results[n:],
-        "timestamp":  datetime.datetime.utcnow().isoformat() + "Z",
+        "timestamp":  datetime.datetime.now(datetime.timezone.utc).isoformat().replace("+00:00", "Z"),
     }
     _market_cache["data"] = payload
     _market_cache["ts"]   = now
@@ -477,9 +494,158 @@ def market_data():
 
 
 # -----------------------------
+# Agent Routes
+# -----------------------------
+
+@flask_app.route("/api/agent/status", methods=["GET"])
+def agent_status():
+    from agent_service import get_agent_status
+    email = request.args.get("email", "").strip().lower()
+    if not email:
+        return jsonify({"status": "error", "detail": "email param required"}), 400
+    return jsonify(get_agent_status(email))
+
+
+@flask_app.route("/api/agent/onboard", methods=["POST"])
+def agent_onboard():
+    from agent_service import onboard_user
+    data     = request.get_json() or {}
+    email    = (data.get("email") or "").strip().lower()
+    holdings = data.get("holdings", {})
+    profile  = data.get("profile", {})
+    if not email:
+        return jsonify({"success": False, "error": "email required"}), 400
+    return jsonify(onboard_user(email, holdings, profile))
+
+
+@flask_app.route("/api/agent/dashboard", methods=["GET"])
+def agent_dashboard():
+    from agent_service import get_dashboard
+    email = request.args.get("email", "").strip().lower()
+    if not email:
+        return jsonify({"success": False, "error": "email required"}), 400
+    return jsonify(get_dashboard(email))
+
+
+@flask_app.route("/api/agent/stream", methods=["GET"])
+def agent_stream():
+    from flask import Response, stream_with_context
+    from agent_service import subscribe_sse, unsubscribe_sse
+    import json as _json
+
+    email = request.args.get("email", "").strip().lower()
+    if not email:
+        return jsonify({"error": "email required"}), 400
+
+    q = subscribe_sse(email)
+
+    def event_stream():
+        # heartbeat first
+        yield "data: {\"type\":\"connected\"}\n\n"
+        try:
+            while True:
+                try:
+                    event = q.get(timeout=25)
+                    yield f"data: {_json.dumps(event)}\n\n"
+                except Exception:
+                    # send keepalive ping
+                    yield "data: {\"type\":\"ping\"}\n\n"
+        except GeneratorExit:
+            pass
+        finally:
+            unsubscribe_sse(email, q)
+
+    return Response(
+        stream_with_context(event_stream()),
+        mimetype="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+            "Connection": "keep-alive",
+        },
+    )
+
+
+@flask_app.route("/api/agent/analyse", methods=["POST"])
+def agent_analyse():
+    from agent_service import trigger_analyse
+    data  = request.get_json() or {}
+    email = (data.get("email") or "").strip().lower()
+    if not email:
+        return jsonify({"success": False, "error": "email required"}), 400
+    return jsonify(trigger_analyse(email))
+
+
+@flask_app.route("/api/agent/report/send", methods=["POST"])
+def agent_report_send():
+    from agent_service import get_dashboard, _load_index, _load_user
+    from agent_email import send_report
+    data  = request.get_json() or {}
+    email = (data.get("email") or "").strip().lower()
+    if not email:
+        return jsonify({"success": False, "error": "email required"}), 400
+    try:
+        index = _load_index()
+        if email not in index or not index[email].get("isDataPresent"):
+            return jsonify({"success": False, "error": "not onboarded"}), 400
+        user = _load_user(index[email]["dataFile"])
+        if not user:
+            return jsonify({"success": False, "error": "user data missing"}), 404
+        send_report(email, user)
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@flask_app.route("/api/agent/chat", methods=["POST"])
+def agent_chat():
+    from agent_service import extract_profile_with_llm
+    data       = request.get_json() or {}
+    transcript = data.get("transcript", "")
+    if not transcript:
+        return jsonify({"success": False, "error": "transcript required"}), 400
+    profile = extract_profile_with_llm(transcript)
+    return jsonify({"success": True, "profile": profile})
+
+
+@flask_app.route("/api/agent/history", methods=["GET"])
+def agent_price_history():
+    """Returns 30-day daily close prices for a given NSE stock symbol."""
+    symbol = request.args.get("symbol", "").strip().upper()
+    if not symbol:
+        return jsonify({"success": False, "error": "symbol required"}), 400
+    try:
+        import yfinance as yf
+        ns   = symbol + ".NS"
+        hist = yf.Ticker(ns).history(period="1mo", interval="1d")
+        if hist.empty:
+            return jsonify({"success": False, "error": "no data"}), 404
+        data = [
+            {"date": str(idx.date()), "close": round(float(row["Close"]), 2)}
+            for idx, row in hist.iterrows()
+        ]
+        return jsonify({"success": True, "symbol": symbol, "data": data})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@flask_app.route("/api/agent/reset", methods=["PUT"])
+def agent_reset():
+    from agent_service import reset_user
+    data  = request.get_json() or {}
+    email = (data.get("email") or "").strip().lower()
+    if not email:
+        return jsonify({"success": False, "error": "email required"}), 400
+    return jsonify(reset_user(email))
+
+
+# -----------------------------
 # Entry Point
 # -----------------------------
 
+# Start autonomous agent loop
+from agent_service import start_agent_loop
+start_agent_loop()
 
 # Wrap Flask app with ASGI adapter for uvicorn
 app = WsgiToAsgi(flask_app)

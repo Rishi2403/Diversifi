@@ -1,0 +1,12 @@
+type,symbol,name,qty,avgBuyPrice,currentPrice,currentValue,category,investedAmount,buyDate
+stock,HAL,Hindustan Aeronautics Ltd,30,1800,4800,144000,,,2022-06-15
+stock,BEL,Bharat Electronics Ltd,1000,100,330,330000,,,2022-07-10
+stock,BHEL,Bharat Heavy Electricals Ltd,500,65,280,140000,,,2022-08-20
+stock,CGPOWER,CG Power and Industrial Solutions Ltd,150,300,720,108000,,,2022-09-05
+stock,COFORGE,Coforge Ltd,15,4000,8200,123000,,,2022-06-01
+stock,PERSISTENT,Persistent Systems Ltd,12,3500,6800,81600,,,2022-07-15
+stock,TATAELXSI,Tata Elxsi Ltd,8,5500,8500,68000,,,2022-11-20
+stock,DIXON,Dixon Technologies Ltd,10,4500,15000,150000,,,2022-08-10
+mf,,Nippon India Small Cap Fund Direct Growth,,,,250000,Small Cap,100000,2022-05-15
+mf,,Axis Small Cap Fund Direct Growth,,,,195000,Small Cap,80000,2022-06-20
+mf,,SBI Small Cap Fund Direct Growth,,,,148000,Small Cap,60000,2022-07-01

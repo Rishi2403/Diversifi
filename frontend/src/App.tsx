@@ -22,6 +22,9 @@ import GlobalMarketsPage from "./pages/GlobalMarketsPage";
 import ResearchPage from "@/pages/ResearchPage";
 import SuggestPage from "@/pages/SuggestPage";
 import AnalysePage from "@/pages/AnalysePage";
+import AlgoTradingPage from "@/pages/AlgoTradingPage";
+import AgentPage from "@/pages/AgentPage";
+import AgentSetupPage from "@/pages/AgentSetupPage";
 
 const queryClient = new QueryClient();
 
@@ -147,6 +150,23 @@ const App = () => (
                     <Header />
                     <AnalysePage />
                   </>
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/algo-trading" element={<AlgoTradingPage />} />
+            <Route
+              path="/agent"
+              element={
+                <ProtectedRoute>
+                  <AgentPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/agent/setup"
+              element={
+                <ProtectedRoute>
+                  <AgentSetupPage />
                 </ProtectedRoute>
               }
             />

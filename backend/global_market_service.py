@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 
 
 COMMODITIES = [
@@ -112,7 +112,7 @@ def fetch_global_market_data():
         "currencies":      build(CURRENCIES),
         "sectors":         build(NIFTY_SECTORS),
         "country_indices": country_indices,
-        "timestamp":       datetime.utcnow().isoformat() + "Z",
+        "timestamp":       datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
     }
 
 

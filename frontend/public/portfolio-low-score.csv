@@ -1,0 +1,12 @@
+type,symbol,name,qty,avgBuyPrice,currentPrice,currentValue,category,investedAmount,buyDate
+stock,WIPRO,Wipro Ltd,50,540,285,14250,,,2025-08-15
+stock,TECHM,Tech Mahindra Ltd,20,1800,1350,27000,,,2025-09-10
+stock,HCLTECH,HCL Technologies Ltd,15,2200,1720,25800,,,2025-10-20
+stock,INFY,Infosys Ltd,20,2050,1580,31600,,,2025-11-05
+stock,TCS,Tata Consultancy Services Ltd,5,4600,3845,19225,,,2026-01-15
+stock,MPHASIS,Mphasis Ltd,10,3100,2200,22000,,,2025-09-01
+mf,,Mirae Asset Large Cap Fund Direct Growth,,,,41000,Large Cap,50000,2025-08-20
+mf,,Axis Bluechip Fund Direct Growth,,,,33500,Large Cap,40000,2025-09-15
+mf,,HDFC Top 100 Fund Direct Growth,,,,29000,Large Cap,35000,2025-10-10
+mf,,ICICI Prudential Bluechip Fund Direct Growth,,,,25000,Large Cap,30000,2026-01-05
+mf,,SBI Large Cap Fund Direct Growth,,,,21000,Large Cap,25000,2025-09-28

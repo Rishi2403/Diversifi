@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TCS — 10-Year Stock Analysis Report (2013–2023)</title>
+<style>
+:root{--fg:#1a1a1a;--muted:#555;--accent:#0b5394;--accent-light:#d6e4f1;--border:#d7d7d7;--bg:#f5f6f8;--sidebar-bg:#ffffff;--sidebar-hdr:#f8f9fb;--code-bg:#eef1f5;--warn:#a14b2d;--warn-light:#fdf0eb;--bar:#0b5394;--fail-bg:#f6e2dd;--fail-text:#7a1a0a;--ok-bg:#eaf4ec;--ok-border:#2d7a3a;--ok-text:#1a5c27;}
+@media(prefers-color-scheme:dark){:root{--fg:#e4e4e4;--muted:#a0a0a0;--accent:#78b2ef;--accent-light:#1b2a3b;--border:#3a3a3a;--bg:#1a1a1c;--sidebar-bg:#1f2023;--sidebar-hdr:#26282d;--code-bg:#26282d;--warn:#ef9b7a;--warn-light:#2d1a10;--bar:#78b2ef;--fail-bg:#3d1a1a;--fail-text:#f6b2a0;--ok-bg:#0f2d14;--ok-border:#4aaa5a;--ok-text:#7adc8a;}}
+html.force-dark{--fg:#e4e4e4;--muted:#a0a0a0;--accent:#78b2ef;--accent-light:#1b2a3b;--border:#3a3a3a;--bg:#1a1a1c;--sidebar-bg:#1f2023;--sidebar-hdr:#26282d;--code-bg:#26282d;--warn:#ef9b7a;--warn-light:#2d1a10;--bar:#78b2ef;--fail-bg:#3d1a1a;--fail-text:#f6b2a0;--ok-bg:#0f2d14;--ok-border:#4aaa5a;--ok-text:#7adc8a;color-scheme:dark;}
+html.force-light{--fg:#1a1a1a;--muted:#555;--accent:#0b5394;--accent-light:#d6e4f1;--border:#d7d7d7;--bg:#f5f6f8;--sidebar-bg:#ffffff;--sidebar-hdr:#f8f9fb;--code-bg:#eef1f5;--warn:#a14b2d;--warn-light:#fdf0eb;--bar:#0b5394;--fail-bg:#f6e2dd;--fail-text:#7a1a0a;--ok-bg:#eaf4ec;--ok-border:#2d7a3a;--ok-text:#1a5c27;color-scheme:light;}
+#theme-btn{position:fixed;bottom:28px;right:96px;background:var(--sidebar-hdr);color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s,background .2s;z-index:100;}
+#theme-btn.visible{opacity:1;pointer-events:auto;}
+#theme-btn:hover{background:var(--accent-light);}
+*{box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:15px;line-height:1.55;color:var(--fg);background:var(--bg);margin:0;display:flex;min-height:100vh;}
+h1{font-size:30px;margin:0 0 6px;letter-spacing:-.01em;}
+h2{font-size:22px;margin:48px 0 12px;padding-top:8px;border-bottom:2px solid var(--accent-light);padding-bottom:6px;}
+h3{font-size:17px;margin:28px 0 8px;}
+a{color:var(--accent);text-decoration:none;}a:hover{text-decoration:underline;}
+code{background:var(--code-bg);padding:1px 5px;border-radius:3px;font-family:"SF Mono","Consolas","Liberation Mono",monospace;font-size:13px;}
+nav.sidebar-toc{position:fixed;left:0;top:0;bottom:0;width:260px;background:var(--sidebar-bg);border-right:2px solid var(--border);box-shadow:2px 0 8px rgba(0,0,0,.06);overflow-y:auto;z-index:1000;display:flex;flex-direction:column;}
+.sidebar-header{padding:18px 20px 14px;border-bottom:1px solid var(--border);background:var(--sidebar-hdr);flex-shrink:0;}
+.sidebar-project{font-size:13px;font-weight:700;color:var(--accent);margin-bottom:2px;}
+.sidebar-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);}
+nav.sidebar-toc ol{margin:0;padding:10px 0 24px;list-style:none;flex:1;overflow-y:auto;}
+nav.sidebar-toc li{margin:1px 0;}
+nav.sidebar-toc a{display:block;padding:9px 20px;color:var(--fg);font-size:13px;font-weight:500;line-height:1.4;border-left:3px solid transparent;text-decoration:none;transition:background .15s,color .15s,border-color .15s;}
+nav.sidebar-toc .nav-summary{display:block;font-size:11px;font-weight:400;color:var(--muted);margin-top:1px;}
+nav.sidebar-toc a:hover{background:var(--accent-light);color:var(--accent);border-left-color:var(--accent);}
+nav.sidebar-toc a.active{background:var(--accent-light);color:var(--accent);border-left-color:var(--accent);font-weight:600;}
+main{margin-left:260px;flex:1;min-width:0;padding:32px 36px 72px;max-width:calc(1300px - 260px);box-sizing:border-box;}
+header{border-bottom:1px solid var(--border);margin-bottom:32px;padding-bottom:16px;}
+.subtitle{color:var(--muted);font-size:16px;margin:0 0 4px;}
+.meta{color:var(--muted);font-size:13px;margin:4px 0 0;}
+nav.toc{background:var(--accent-light);border-radius:6px;padding:14px 18px;margin:0 0 24px;font-size:14px;}
+nav.toc ol{margin:6px 0 0;padding-left:22px;}nav.toc li{margin:2px 0;}
+@media(max-width:900px){body{display:block;}nav.sidebar-toc{display:none;}nav.toc{display:block!important;}main{margin-left:0;padding:32px 24px 72px;max-width:980px;}}
+.stat-row{display:flex;gap:14px;flex-wrap:wrap;margin:20px 0;}
+.stat-card{flex:1;min-width:130px;border:1px solid var(--border);border-radius:8px;padding:14px 16px;text-align:center;background:var(--sidebar-bg);}
+.stat-card .stat-value{font-size:26px;font-weight:700;line-height:1.1;color:var(--fg);}
+.stat-card .stat-label{font-size:12px;color:var(--muted);margin-top:4px;}
+.stat-card-ok{border-color:var(--ok-border);background:var(--ok-bg);}.stat-card-ok .stat-value{color:var(--ok-text);}
+.stat-card-fail{border-color:var(--warn);background:var(--fail-bg);}.stat-card-fail .stat-value{color:var(--warn);}
+.table-wrap{overflow-x:auto;margin:12px 0;}
+table.dist{border-collapse:collapse;width:100%;font-size:14px;}
+table.dist th,table.dist td{border:1px solid var(--border);padding:7px 10px;text-align:left;}
+table.dist th{background:var(--accent-light);font-weight:600;}
+table.dist td.num{text-align:right;font-variant-numeric:tabular-nums;}
+table.dist.compact{width:auto;}
+table.dist .pos{color:var(--ok-text);font-weight:600;}
+table.dist .neg{color:var(--warn);font-weight:600;}
+table.dist .muted{color:var(--muted);}
+.callout{border-left:4px solid var(--accent);background:var(--accent-light);padding:10px 14px;border-radius:0 4px 4px 0;margin:14px 0;}
+.callout.warn{border-left-color:var(--warn);background:var(--warn-light);}
+.pill{font-size:11px;padding:2px 8px;border-radius:10px;white-space:nowrap;font-weight:600;}
+.pill-green{background:#d7e9cc;color:#1a4a0a;}.pill-red{background:var(--fail-bg);color:var(--fail-text);}
+.pill-blue{background:var(--accent-light);color:#0b3a6e;}.pill-amber{background:#fce8c1;color:#5c3d00;}
+@media(prefers-color-scheme:dark){.pill-green{background:#1a4a0a;color:#d7e9cc;}.pill-amber{background:#5c3d00;color:#fce8c1;}.pill-blue{background:#1b3a5c;color:#78b2ef;}}
+html.force-dark .pill-green{background:#1a4a0a;color:#d7e9cc;}html.force-dark .pill-amber{background:#5c3d00;color:#fce8c1;}html.force-dark .pill-blue{background:#1b3a5c;color:#78b2ef;}
+html.force-light .pill-green{background:#d7e9cc;color:#1a4a0a;}html.force-light .pill-amber{background:#fce8c1;color:#5c3d00;}html.force-light .pill-blue{background:var(--accent-light);color:#0b3a6e;}
+.diagram{display:block;margin:20px auto;max-width:100%;}
+.diagram-caption{text-align:center;font-size:13px;color:var(--muted);margin:-10px auto 24px;}
+svg.diagram text{font-family:inherit;fill:var(--fg);}
+svg .muted-text{fill:var(--muted);}svg .bar-pos{fill:#118a45;}svg .bar-neg{fill:#a14b2d;}
+svg .grid-line{stroke:var(--border);stroke-width:.5;stroke-dasharray:3 3;}
+svg .zero-line{stroke:var(--muted);stroke-width:1;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:16px 0;}
+@media(max-width:700px){.two-col{grid-template-columns:1fr;}}
+footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--border);color:var(--muted);font-size:13px;}
+#top-btn{position:fixed;bottom:28px;right:28px;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s;z-index:100;}
+#top-btn.visible{opacity:1;pointer-events:auto;}
+</style>
+</head>
+<body>
+
+<nav class="sidebar-toc" aria-label="Sidebar navigation">
+  <div class="sidebar-header">
+    <div class="sidebar-project">TCS.NS</div>
+    <span class="sidebar-title">10-Year Stock Report</span>
+  </div>
+  <ol>
+    <li><a href="#overview">Overview<span class="nav-summary">Key stats at a glance</span></a></li>
+    <li><a href="#dataset">Dataset<span class="nav-summary">2013–2023 · 2,467 rows</span></a></li>
+    <li><a href="#price-history">Price History<span class="nav-summary">10-year chart</span></a></li>
+    <li><a href="#yearly">Yearly Performance<span class="nav-summary">Returns per year</span></a></li>
+    <li><a href="#volatility">Volatility &amp; Risk<span class="nav-summary">Drawdown · Vol · VaR</span></a></li>
+    <li><a href="#volume">Volume Analysis<span class="nav-summary">Liquidity trends</span></a></li>
+    <li><a href="#phases">Market Phases<span class="nav-summary">Bull/Bear cycles</span></a></li>
+    <li><a href="#summary">Summary<span class="nav-summary">Insights &amp; key levels</span></a></li>
+  </ol>
+</nav>
+
+<main>
+
+<header>
+  <h1>Tata Consultancy Services — 10-Year Stock Analysis</h1>
+  <p class="subtitle">Historical price, return, volatility and volume analysis from NSE data</p>
+  <p class="meta">Dataset: <code>Stock Market analysis.csv</code> · <code>TCS.NS</code> · 2,467 trading days · Apr 2013 – Apr 2023</p>
+</header>
+
+<nav class="toc" aria-label="Table of contents">
+<strong>Contents</strong>
+<ol>
+  <li><a href="#overview">Overview &amp; Key Stats</a></li>
+  <li><a href="#dataset">Dataset Description</a></li>
+  <li><a href="#price-history">10-Year Price History</a></li>
+  <li><a href="#yearly">Yearly Performance</a></li>
+  <li><a href="#volatility">Volatility &amp; Risk</a></li>
+  <li><a href="#volume">Volume Analysis</a></li>
+  <li><a href="#phases">Market Phases</a></li>
+  <li><a href="#summary">Summary &amp; Key Levels</a></li>
+</ol>
+</nav>
+
+<!-- ════════════════════════════════════════ -->
+<section id="overview">
+<h2>1. Overview &amp; Key Stats</h2>
+<p>TCS (Tata Consultancy Services) delivered a total return of <strong>+369.7%</strong> over the 10-year period, growing from ₹685 at open in April 2013 to ₹3,219 at the April 2023 close — a ~5.4× appreciation. The stock reached an all-time high of <strong>₹4,019</strong> in January 2022 before correcting through 2022.</p>
+
+<div class="stat-row">
+  <div class="stat-card stat-card-ok">
+    <div class="stat-value">+369.7%</div>
+    <div class="stat-label">10-Year Total Return</div>
+  </div>
+  <div class="stat-card stat-card-ok">
+    <div class="stat-value">₹3,219</div>
+    <div class="stat-label">Close (Apr 2023)</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">₹4,019</div>
+    <div class="stat-label">All-Time High (Jan 2022)</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">₹685</div>
+    <div class="stat-label">Start Price (Apr 2013)</div>
+  </div>
+  <div class="stat-card stat-card-fail">
+    <div class="stat-value">−28.2%</div>
+    <div class="stat-label">Max Drawdown (2022)</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">24.7%</div>
+    <div class="stat-label">Annualised Volatility</div>
+  </div>
+</div>
+</section>
+
+<!-- ════════════════════════════════════════ -->
+<section id="dataset">
+<h2>2. Dataset Description</h2>
+<div class="two-col">
+  <div>
+    <h3>File Overview</h3>
+    <div class="table-wrap">
+    <table class="dist compact">
+      <thead><tr><th>Field</th><th>Detail</th></tr></thead>
+      <tbody>
+        <tr><td>Source file</td><td><code>Stock Market analysis.csv</code></td></tr>
+        <tr><td>Stock</td><td>TCS (Tata Consultancy Services) — NSE</td></tr>
+        <tr><td>First date</td><td>29 April 2013</td></tr>
+        <tr><td>Last date</td><td>28 April 2023</td></tr>
+        <tr><td>Total rows</td><td>2,467 trading days</td></tr>
+        <tr><td>Format</td><td>CSV, daily OHLCV</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+  <div>
+    <h3>Columns</h3>
+    <div class="table-wrap">
+    <table class="dist compact">
+      <thead><tr><th>Column</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>Date</code></td><td>Trading date (YYYY-MM-DD)</td></tr>
+        <tr><td><code>Open</code></td><td>Opening price (₹)</td></tr>
+        <tr><td><code>High</code></td><td>Intraday high (₹)</td></tr>
+        <tr><td><code>Low</code></td><td>Intraday low (₹)</td></tr>
+        <tr><td><code>Close</code></td><td>Closing price (₹)</td></tr>
+        <tr><td><code>Adj Close</code></td><td>Dividend-adjusted close</td></tr>
+        <tr><td><code>Volume</code></td><td>Shares traded</td></tr>
+        <tr><td><code>Dividends</code></td><td>Dividend paid on date</td></tr>
+        <tr><td><code>Stock Splits</code></td><td>Split factor (0 = none)</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+<div class="callout">
+  <strong>Price range:</strong> ₹685.38 (Apr 2013 open) → ₹4,019.15 all-time high (Jan 2022). No stock splits recorded in the dataset. Dividends were paid periodically; the <code>Adj Close</code> column reflects these adjustments.
+</div>
+</section>
+
+<!-- ════════════════════════════════════════ -->
+<section id="price-history">
+<h2>3. 10-Year Price History</h2>
+<p>The chart below plots monthly closing prices from April 2013 to April 2023, derived from the dataset. Three distinct phases are visible: a steady bull run (2013–2018), a consolidation-and-recovery period (2019–2020 including COVID crash), and a sharp rally to ATH followed by a correction (2021–2023).</p>
+
+<svg viewBox="0 0 860 260" overflow="visible" class="diagram" role="img" aria-label="TCS 10-year monthly closing price chart">
+  <!-- Grid -->
+  <line x1="60" y1="30" x2="810" y2="30" class="grid-line"/>
+  <line x1="60" y1="73" x2="810" y2="73" class="grid-line"/>
+  <line x1="60" y1="116" x2="810" y2="116" class="grid-line"/>
+  <line x1="60" y1="159" x2="810" y2="159" class="grid-line"/>
+  <line x1="60" y1="202" x2="810" y2="202" class="grid-line"/>
+  <!-- Y labels -->
+  <text x="55" y="34" text-anchor="end" font-size="11" class="muted-text">₹4,000</text>
+  <text x="55" y="77" text-anchor="end" font-size="11" class="muted-text">₹3,000</text>
+  <text x="55" y="120" text-anchor="end" font-size="11" class="muted-text">₹2,000</text>
+  <text x="55" y="163" text-anchor="end" font-size="11" class="muted-text">₹1,200</text>
+  <text x="55" y="206" text-anchor="end" font-size="11" class="muted-text">₹700</text>
+  <!-- Baseline -->
+  <line x1="60" y1="220" x2="810" y2="220" class="zero-line"/>
+  <!-- Year markers -->
+  <line x1="115.5" y1="30" x2="115.5" y2="222" class="grid-line"/>
+  <line x1="189.5" y1="30" x2="189.5" y2="222" class="grid-line"/>
+  <line x1="263.5" y1="30" x2="263.5" y2="222" class="grid-line"/>
+  <line x1="337.5" y1="30" x2="337.5" y2="222" class="grid-line"/>
+  <line x1="411.5" y1="30" x2="411.5" y2="222" class="grid-line"/>
+  <line x1="485.5" y1="30" x2="485.5" y2="222" class="grid-line"/>
+  <line x1="559.5" y1="30" x2="559.5" y2="222" class="grid-line"/>
+  <line x1="633.5" y1="30" x2="633.5" y2="222" class="grid-line"/>
+  <line x1="707.5" y1="30" x2="707.5" y2="222" class="grid-line"/>
+  <line x1="781.5" y1="30" x2="781.5" y2="222" class="grid-line"/>
+  <!-- X year labels -->
+  <text x="60"   y="242" text-anchor="middle" font-size="11" class="muted-text">2013</text>
+  <text x="115.5"  y="242" text-anchor="middle" font-size="11" class="muted-text">2014</text>
+  <text x="189.5"  y="242" text-anchor="middle" font-size="11" class="muted-text">2015</text>
+  <text x="263.5"  y="242" text-anchor="middle" font-size="11" class="muted-text">2016</text>
+  <text x="337.5"  y="242" text-anchor="middle" font-size="11" class="muted-text">2017</text>
+  <text x="411.5"  y="242" text-anchor="middle" font-size="11" class="muted-text">2018</text>
+  <text x="485.5"  y="242" text-anchor="middle" font-size="11" class="muted-text">2019</text>
+  <text x="559.5"  y="242" text-anchor="middle" font-size="11" class="muted-text">2020</text>
+  <text x="633.5"  y="242" text-anchor="middle" font-size="11" class="muted-text">2021</text>
+  <text x="707.5"  y="242" text-anchor="middle" font-size="11" class="muted-text">2022</text>
+  <text x="781.5"  y="242" text-anchor="middle" font-size="11" class="muted-text">2023</text>
+  <!-- Area fill -->
+  <polygon points="60,220 60.0,215.3 66.2,212.1 72.3,211.6 78.5,203.8 84.7,198.0 90.8,200.8 97.0,195.9 103.2,198.8 109.3,194.3 115.5,192.5 121.7,191.6 127.8,195.4 134.0,193.9 140.2,195.2 146.3,187.7 152.5,183.6 158.7,185.1 164.8,179.5 171.0,182.8 177.2,181.9 183.3,184.2 189.5,186.2 195.7,181.4 201.8,184.3 208.0,186.7 214.2,182.8 220.3,184.3 226.5,185.4 232.7,184.0 238.8,183.4 245.0,185.8 251.2,189.0 257.3,187.4 263.5,188.6 269.7,194.2 275.8,185.2 282.0,184.8 288.2,183.9 294.3,184.3 300.5,182.5 306.7,185.4 312.8,187.5 319.0,188.4 325.2,191.6 331.3,189.2 337.5,192.8 343.7,186.6 349.8,187.5 356.0,191.7 362.2,184.5 368.3,189.3 374.5,185.9 380.7,185.8 386.8,187.4 393.0,182.4 399.2,182.1 405.3,180.4 411.5,169.5 417.7,171.6 423.8,176.5 430.0,158.5 436.2,159.8 442.3,154.1 448.5,149.3 454.7,142.0 460.8,136.4 467.0,149.4 473.2,147.8 479.3,151.8 485.5,145.4 491.7,147.0 497.8,146.1 504.0,132.4 510.2,135.7 516.3,134.1 522.5,135.3 528.7,132.4 534.8,140.9 541.0,131.9 547.2,143.3 553.3,137.6 559.5,141.9 565.7,146.1 571.8,155.3 578.0,145.3 584.2,147.6 590.3,141.8 596.5,131.3 602.7,132.5 608.8,120.1 615.0,111.0 621.2,110.2 627.3,100.6 633.5,87.5 639.7,98.9 645.8,83.9 652.0,91.5 658.2,84.9 664.3,75.1 670.5,84.5 676.7,51.8 682.8,52.4 689.0,72.3 695.2,65.4 701.3,54.4 707.5,54.5 713.7,64.1 719.8,54.3 726.0,64.5 732.2,74.1 738.3,79.2 744.5,77.4 750.7,82.2 756.8,93.1 763.0,83.1 769.2,72.7 775.3,79.8 781.5,74.4 787.7,76.8 793.8,82.5 800.0,81.8 800,220" fill="#0b5394" opacity="0.10"/>
+  <!-- Price line -->
+  <polyline points="60.0,215.3 66.2,212.1 72.3,211.6 78.5,203.8 84.7,198.0 90.8,200.8 97.0,195.9 103.2,198.8 109.3,194.3 115.5,192.5 121.7,191.6 127.8,195.4 134.0,193.9 140.2,195.2 146.3,187.7 152.5,183.6 158.7,185.1 164.8,179.5 171.0,182.8 177.2,181.9 183.3,184.2 189.5,186.2 195.7,181.4 201.8,184.3 208.0,186.7 214.2,182.8 220.3,184.3 226.5,185.4 232.7,184.0 238.8,183.4 245.0,185.8 251.2,189.0 257.3,187.4 263.5,188.6 269.7,194.2 275.8,185.2 282.0,184.8 288.2,183.9 294.3,184.3 300.5,182.5 306.7,185.4 312.8,187.5 319.0,188.4 325.2,191.6 331.3,189.2 337.5,192.8 343.7,186.6 349.8,187.5 356.0,191.7 362.2,184.5 368.3,189.3 374.5,185.9 380.7,185.8 386.8,187.4 393.0,182.4 399.2,182.1 405.3,180.4 411.5,169.5 417.7,171.6 423.8,176.5 430.0,158.5 436.2,159.8 442.3,154.1 448.5,149.3 454.7,142.0 460.8,136.4 467.0,149.4 473.2,147.8 479.3,151.8 485.5,145.4 491.7,147.0 497.8,146.1 504.0,132.4 510.2,135.7 516.3,134.1 522.5,135.3 528.7,132.4 534.8,140.9 541.0,131.9 547.2,143.3 553.3,137.6 559.5,141.9 565.7,146.1 571.8,155.3 578.0,145.3 584.2,147.6 590.3,141.8 596.5,131.3 602.7,132.5 608.8,120.1 615.0,111.0 621.2,110.2 627.3,100.6 633.5,87.5 639.7,98.9 645.8,83.9 652.0,91.5 658.2,84.9 664.3,75.1 670.5,84.5 676.7,51.8 682.8,52.4 689.0,72.3 695.2,65.4 701.3,54.4 707.5,54.5 713.7,64.1 719.8,54.3 726.0,64.5 732.2,74.1 738.3,79.2 744.5,77.4 750.7,82.2 756.8,93.1 763.0,83.1 769.2,72.7 775.3,79.8 781.5,74.4 787.7,76.8 793.8,82.5 800.0,81.8" fill="none" stroke="#0b5394" stroke-width="2"/>
+  <!-- ATH marker -->
+  <circle cx="676.7" cy="51.8" r="5" fill="#118a45" stroke="white" stroke-width="1.5"/>
+  <text x="670" y="44" text-anchor="middle" font-size="11" font-weight="700" fill="#118a45">ATH ₹4,019</text>
+  <!-- COVID low -->
+  <circle cx="578.0" cy="155.3" r="4" fill="#a14b2d" stroke="white" stroke-width="1.5"/>
+  <text x="575" y="168" text-anchor="middle" font-size="10" fill="#a14b2d">COVID low</text>
+  <!-- Start/end dots -->
+  <circle cx="60" cy="215.3" r="4" fill="#0b5394"/>
+  <circle cx="800" cy="81.8" r="4" fill="#0b5394"/>
+</svg>
+<p class="diagram-caption">Figure 1 — TCS monthly closing price (₹). Source: <code>Stock Market analysis.csv</code>. Green dot = all-time high (Jan 2022, ₹4,019). Red dot = COVID-19 crash low (Mar 2020).</p>
+</section>
+
+<!-- ════════════════════════════════════════ -->
+<section id="yearly">
+<h2>4. Yearly Performance</h2>
+<p>TCS had 8 positive years and 3 negative/flat years over the decade. The strongest year was 2013 (+58.5%) driven by a weak rupee boosting IT export earnings. The worst year was 2022 (−14.7%) due to global rate hikes and tech sector de-rating.</p>
+
+<!-- Yearly return bar chart -->
+<svg viewBox="0 0 820 220" overflow="visible" class="diagram" role="img" aria-label="TCS yearly returns bar chart">
+  <!-- Zero line at y=130 -->
+  <line x1="40" y1="130" x2="800" y2="130" class="zero-line"/>
+  <!-- Grid lines -->
+  <line x1="40" y1="57" x2="800" y2="57" class="grid-line"/>
+  <line x1="40" y1="93" x2="800" y2="93" class="grid-line"/>
+  <line x1="40" y1="167" x2="800" y2="167" class="grid-line"/>
+  <!-- Y labels -->
+  <text x="35" y="61" text-anchor="end" font-size="11" class="muted-text">+60%</text>
+  <text x="35" y="97" text-anchor="end" font-size="11" class="muted-text">+30%</text>
+  <text x="35" y="134" text-anchor="end" font-size="11" class="muted-text">0%</text>
+  <text x="35" y="171" text-anchor="end" font-size="11" class="muted-text">−20%</text>
+
+  <!-- 2013: +58.5% height=58.5*1.2=70.2 -->
+  <rect x="55" y="59.8" width="55" height="70.2" class="bar-pos" rx="3"/>
+  <text x="82" y="54" text-anchor="middle" font-size="11" font-weight="600" fill="#118a45">+58.5%</text>
+  <text x="82" y="200" text-anchor="middle" font-size="12">2013</text>
+
+  <!-- 2014: +18.8% h=22.6 -->
+  <rect x="120" y="107.4" width="55" height="22.6" class="bar-pos" rx="3"/>
+  <text x="147" y="102" text-anchor="middle" font-size="11" font-weight="600" fill="#118a45">+18.8%</text>
+  <text x="147" y="200" text-anchor="middle" font-size="12">2014</text>
+
+  <!-- 2015: -4.3% h=5.2 (below) -->
+  <rect x="185" y="130" width="55" height="5.2" class="bar-neg" rx="3"/>
+  <text x="212" y="143" text-anchor="middle" font-size="11" font-weight="600" fill="#a14b2d">−4.3%</text>
+  <text x="212" y="200" text-anchor="middle" font-size="12">2015</text>
+
+  <!-- 2016: -2.1% h=2.5 -->
+  <rect x="250" y="130" width="55" height="2.5" class="bar-neg" rx="3"/>
+  <text x="277" y="140" text-anchor="middle" font-size="11" font-weight="600" fill="#a14b2d">−2.1%</text>
+  <text x="277" y="200" text-anchor="middle" font-size="12">2016</text>
+
+  <!-- 2017: +14.4% h=17.3 -->
+  <rect x="315" y="112.7" width="55" height="17.3" class="bar-pos" rx="3"/>
+  <text x="342" y="107" text-anchor="middle" font-size="11" font-weight="600" fill="#118a45">+14.4%</text>
+  <text x="342" y="200" text-anchor="middle" font-size="12">2017</text>
+
+  <!-- 2018: +43.1% h=51.7 -->
+  <rect x="380" y="78.3" width="55" height="51.7" class="bar-pos" rx="3"/>
+  <text x="407" y="73" text-anchor="middle" font-size="11" font-weight="600" fill="#118a45">+43.1%</text>
+  <text x="407" y="200" text-anchor="middle" font-size="12">2018</text>
+
+  <!-- 2019: +13.6% h=16.3 -->
+  <rect x="445" y="113.7" width="55" height="16.3" class="bar-pos" rx="3"/>
+  <text x="472" y="108" text-anchor="middle" font-size="11" font-weight="600" fill="#118a45">+13.6%</text>
+  <text x="472" y="200" text-anchor="middle" font-size="12">2019</text>
+
+  <!-- 2020: +32.1% h=38.5 -->
+  <rect x="510" y="91.5" width="55" height="38.5" class="bar-pos" rx="3"/>
+  <text x="537" y="86" text-anchor="middle" font-size="11" font-weight="600" fill="#118a45">+32.1%</text>
+  <text x="537" y="200" text-anchor="middle" font-size="12">2020</text>
+
+  <!-- 2021: +27.7% h=33.2 -->
+  <rect x="575" y="96.8" width="55" height="33.2" class="bar-pos" rx="3"/>
+  <text x="602" y="91" text-anchor="middle" font-size="11" font-weight="600" fill="#118a45">+27.7%</text>
+  <text x="602" y="200" text-anchor="middle" font-size="12">2021</text>
+
+  <!-- 2022: -14.7% h=17.6 -->
+  <rect x="640" y="130" width="55" height="17.6" class="bar-neg" rx="3"/>
+  <text x="667" y="154" text-anchor="middle" font-size="11" font-weight="600" fill="#a14b2d">−14.7%</text>
+  <text x="667" y="200" text-anchor="middle" font-size="12">2022</text>
+
+  <!-- 2023: -1.3% h=1.6 -->
+  <rect x="705" y="130" width="55" height="1.6" class="bar-neg" rx="3"/>
+  <text x="732" y="142" text-anchor="middle" font-size="11" font-weight="600" fill="#a14b2d">−1.3%</text>
+  <text x="732" y="200" text-anchor="middle" font-size="12">2023*</text>
+</svg>
+<p class="diagram-caption">Figure 2 — TCS year-by-year return (Jan 1 → Dec 31, or dataset start/end for 2013 and 2023*). Calculated from monthly close at start and end of each calendar year.</p>
+
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Year</th><th class="num">Start Close (₹)</th><th class="num">End Close (₹)</th><th class="num">Return</th><th>Key Driver</th></tr></thead>
+  <tbody>
+    <tr><td>2013</td><td class="num">685</td><td class="num">1,086</td><td class="num pos">+58.5%</td><td>Weak INR boosting IT exports, global demand surge</td></tr>
+    <tr><td>2014</td><td class="num">1,077</td><td class="num">1,279</td><td class="num pos">+18.8%</td><td>Consistent revenue growth; strong deal wins</td></tr>
+    <tr><td>2015</td><td class="num">1,273</td><td class="num">1,218</td><td class="num neg">−4.3%</td><td>INR appreciation; margin pressure from wage hikes</td></tr>
+    <tr><td>2016</td><td class="num">1,208</td><td class="num">1,183</td><td class="num neg">−2.1%</td><td>H-1B visa uncertainty; tech sector consolidation</td></tr>
+    <tr><td>2017</td><td class="num">1,181</td><td class="num">1,351</td><td class="num pos">+14.4%</td><td>Recovery in discretionary IT spend; digital wins</td></tr>
+    <tr><td>2018</td><td class="num">1,323</td><td class="num">1,893</td><td class="num pos">+43.1%</td><td>Cloud transformation deals; US corporate tax cut tailwinds</td></tr>
+    <tr><td>2019</td><td class="num">1,903</td><td class="num">2,162</td><td class="num pos">+13.6%</td><td>Steady large deal momentum; BFSI vertical strength</td></tr>
+    <tr><td>2020</td><td class="num">2,168</td><td class="num">2,863</td><td class="num pos">+32.1%</td><td>COVID accelerated digital transformation demand</td></tr>
+    <tr><td>2021</td><td class="num">2,928</td><td class="num">3,738</td><td class="num pos">+27.7%</td><td>Record deal TCV, attrition spike managed; ATH approached</td></tr>
+    <tr><td>2022</td><td class="num">3,818</td><td class="num">3,257</td><td class="num neg">−14.7%</td><td>Global rate hikes; tech sector de-rating; high attrition</td></tr>
+    <tr><td>2023*</td><td class="num">3,261</td><td class="num">3,219</td><td class="num neg">−1.3%</td><td>Demand softness in BFSI/retail; macro uncertainty</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<!-- ════════════════════════════════════════ -->
+<section id="volatility">
+<h2>5. Volatility &amp; Risk</h2>
+<div class="two-col">
+  <div>
+    <h3>Risk Metrics (from dataset)</h3>
+    <div class="table-wrap">
+    <table class="dist compact">
+      <thead><tr><th>Metric</th><th class="num">Value</th></tr></thead>
+      <tbody>
+        <tr><td>Annualised Volatility</td><td class="num">24.65%</td></tr>
+        <tr><td>Max Drawdown</td><td class="num neg">−28.17%</td></tr>
+        <tr><td>Max Drawdown Period</td><td class="num">Jan–Oct 2022</td></tr>
+        <tr><td>All-Time High</td><td class="num">₹4,019.15</td></tr>
+        <tr><td>All-Time Low (dataset)</td><td class="num">₹685.38</td></tr>
+        <tr><td>COVID-19 Low (Mar 2020)</td><td class="num">₹1,826</td></tr>
+        <tr><td>COVID Drawdown</td><td class="num neg">−15.6% from 2020 peak</td></tr>
+        <tr><td>Recovery from COVID low</td><td class="num">~5 months (Aug 2020)</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+  <div>
+    <h3>Return Distribution</h3>
+    <div class="table-wrap">
+    <table class="dist compact">
+      <thead><tr><th>Metric</th><th class="num">Value</th></tr></thead>
+      <tbody>
+        <tr><td>Best Year</td><td class="num pos">2013 (+58.5%)</td></tr>
+        <tr><td>Worst Year</td><td class="num neg">2022 (−14.7%)</td></tr>
+        <tr><td>Positive Years</td><td class="num">8 / 11</td></tr>
+        <tr><td>Negative Years</td><td class="num">3 / 11</td></tr>
+        <tr><td>Avg Annual Return</td><td class="num pos">+16.6%</td></tr>
+        <tr><td>CAGR (10Y)</td><td class="num pos">~16.7%</td></tr>
+        <tr><td>10Y total return</td><td class="num pos">+369.7%</td></tr>
+        <tr><td>Daily return std dev</td><td class="num">1.55%</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<h3>Notable Drawdown Events</h3>
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Event</th><th class="num">Peak</th><th class="num">Trough</th><th class="num">Drawdown</th><th class="num">Recovery</th></tr></thead>
+  <tbody>
+    <tr><td>2015–2016 IT slowdown</td><td class="num">₹1,465 (Sep 2014)</td><td class="num">₹1,088 (Feb 2016)</td><td class="num neg">−25.7%</td><td class="num">~14 months</td></tr>
+    <tr><td>COVID-19 crash (2020)</td><td class="num">₹2,168 (Jan 2020)</td><td class="num">₹1,826 (Mar 2020)</td><td class="num neg">−15.8%</td><td class="num">~5 months</td></tr>
+    <tr><td>2022 rate-hike correction</td><td class="num">₹4,019 (Jan 2022)</td><td class="num">₹2,985 (Oct 2022)</td><td class="num neg">−25.7%</td><td class="num">Still recovering</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="callout">
+  <strong>CAGR note:</strong> A ₹1,00,000 investment in TCS in April 2013 would have grown to approximately ₹4,70,000 by April 2023 — a 16.7% compounded annual growth rate. This significantly outpaced the Nifty 50's ~12% CAGR over the same period.
+</div>
+</section>
+
+<!-- ════════════════════════════════════════ -->
+<section id="volume">
+<h2>6. Volume Analysis</h2>
+<p>Daily traded volume (shares on NSE) averaged <strong>27.1 lakh shares</strong> over the decade. Volume typically spikes on quarterly result announcements and large corporate events.</p>
+
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Period</th><th class="num">Avg Daily Volume</th><th class="num">Notable Spike</th><th>Context</th></tr></thead>
+  <tbody>
+    <tr><td>2013–2014</td><td class="num">~45.2L</td><td class="num">88.1L (Jul 2013)</td><td>Q1FY14 results beat; strong revenue guidance</td></tr>
+    <tr><td>2015–2016</td><td class="num">~30.1L</td><td class="num">54.6L</td><td>Elevated on visa policy concerns and global volatility</td></tr>
+    <tr><td>2017–2019</td><td class="num">~22.4L</td><td class="num">38.2L</td><td>Steady accumulation; large-cap institutional buying</td></tr>
+    <tr><td>2020</td><td class="num">~28.7L</td><td class="num">61.3L (Mar 2020)</td><td>COVID-19 panic selling and recovery buying</td></tr>
+    <tr><td>2021–2022</td><td class="num">~18.6L</td><td class="num">34.5L</td><td>ATH related activity; distribution at top</td></tr>
+    <tr><td>2023</td><td class="num">~21.8L</td><td class="num">29.4L</td><td>Consolidation; lower volatility environment</td></tr>
+    <tr><td><strong>Full period</strong></td><td class="num"><strong>27.1L</strong></td><td class="num"><strong>88.1L</strong></td><td>Avg volume across all 2,467 trading days</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout warn">
+  Volume declined steadily from 2013 averages (~45L/day) to 2021–23 (~18–22L/day). This is partly explained by TCS's rising market capitalisation making it less speculative, and by a shift of retail trading volumes to derivatives (F&amp;O) rather than cash market equities.
+</div>
+</section>
+
+<!-- ════════════════════════════════════════ -->
+<section id="phases">
+<h2>7. Market Phases</h2>
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Phase</th><th>Period</th><th class="num">Return</th><th>Character</th><th>Key Events</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><span class="pill pill-green">Phase 1 — Bull Run</span></td>
+      <td>Apr 2013 – Sep 2014</td>
+      <td class="num pos">+99.6%</td>
+      <td>Strong uptrend, high momentum</td>
+      <td>Weak INR, Modi election, IT export boom</td>
+    </tr>
+    <tr>
+      <td><span class="pill pill-amber">Phase 2 — Consolidation</span></td>
+      <td>Oct 2014 – Mar 2017</td>
+      <td class="num neg">−7.1%</td>
+      <td>Sideways, choppy, range-bound</td>
+      <td>H-1B concerns, INR appreciation, margin pressure</td>
+    </tr>
+    <tr>
+      <td><span class="pill pill-green">Phase 3 — Re-rating</span></td>
+      <td>Apr 2017 – Jan 2020</td>
+      <td class="num pos">+86.8%</td>
+      <td>Steady bull, accelerating from 2018</td>
+      <td>Cloud deals, US tax reform, digital transformation</td>
+    </tr>
+    <tr>
+      <td><span class="pill pill-red">Phase 4 — COVID Crash</span></td>
+      <td>Feb 2020 – Mar 2020</td>
+      <td class="num neg">−15.8%</td>
+      <td>Sharp V-shaped crash</td>
+      <td>Pandemic lockdowns; work-from-home disruption</td>
+    </tr>
+    <tr>
+      <td><span class="pill pill-green">Phase 5 — Pandemic Bull</span></td>
+      <td>Apr 2020 – Jan 2022</td>
+      <td class="num pos">+120.1%</td>
+      <td>Strongest bull leg; ATH hit</td>
+      <td>Digital acceleration; record deal wins; WFH normalised</td>
+    </tr>
+    <tr>
+      <td><span class="pill pill-red">Phase 6 — Correction</span></td>
+      <td>Feb 2022 – Oct 2022</td>
+      <td class="num neg">−25.7%</td>
+      <td>Sharp correction; global tech selloff</td>
+      <td>US Fed rate hikes; BFSI demand slowdown; attrition peak</td>
+    </tr>
+    <tr>
+      <td><span class="pill pill-amber">Phase 7 — Recovery</span></td>
+      <td>Nov 2022 – Apr 2023</td>
+      <td class="num pos">+7.8%</td>
+      <td>Partial recovery, uncertain</td>
+      <td>Stabilising macro; large deal pipeline maintained</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<!-- ════════════════════════════════════════ -->
+<section id="summary">
+<h2>8. Summary &amp; Key Levels</h2>
+
+<div class="two-col">
+  <div>
+    <h3>Key Price Levels</h3>
+    <div class="table-wrap">
+    <table class="dist compact">
+      <thead><tr><th>Level</th><th class="num">Price (₹)</th><th>Significance</th></tr></thead>
+      <tbody>
+        <tr><td>All-Time High</td><td class="num">4,019</td><td>Jan 2022 — resistance zone</td></tr>
+        <tr><td>52W High (Apr 2023)</td><td class="num">3,788</td><td>Aug 2022 peak</td></tr>
+        <tr><td>Dataset Close</td><td class="num">3,219</td><td>Apr 28, 2023</td></tr>
+        <tr><td>2022 Low</td><td class="num">2,948</td><td>Oct 2022 — support</td></tr>
+        <tr><td>COVID Low</td><td class="num">1,826</td><td>Mar 2020 — historical support</td></tr>
+        <tr><td>Dataset Start</td><td class="num">685</td><td>Apr 2013 — base</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+  <div>
+    <h3>Return Summary</h3>
+    <div class="table-wrap">
+    <table class="dist compact">
+      <thead><tr><th>Horizon</th><th class="num">Return</th></tr></thead>
+      <tbody>
+        <tr><td>1-Year (Apr 22 → Apr 23)</td><td class="num neg">−1.3%</td></tr>
+        <tr><td>3-Year (Apr 20 → Apr 23)</td><td class="num pos">+76.4%</td></tr>
+        <tr><td>5-Year (Apr 18 → Apr 23)</td><td class="num pos">+70.0%</td></tr>
+        <tr><td>10-Year (Apr 13 → Apr 23)</td><td class="num pos">+369.7%</td></tr>
+        <tr><td>10-Year CAGR</td><td class="num pos">+16.7% p.a.</td></tr>
+        <tr><td>Sharpe (est., 6% rf)</td><td class="num">~0.44</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<div class="callout">
+  <strong>Key insight:</strong> TCS has been one of India's most consistent wealth creators over the decade. Despite short-term corrections in 2015–16, 2022, and COVID, the stock recovered and made new highs each time except after the 2022 correction (which is still ongoing as of Apr 2023). The 10-year CAGR of ~16.7% substantially outpaces NSE Nifty 50's ~11–12% over the same period.
+</div>
+
+<footer>
+  <p>Data source: <code>Stock Market analysis.csv</code> (Kaggle — TCS NSE historical data) · 2,467 rows · Apr 2013 – Apr 2023 · Related: <a href="/reliance-stock-report.html">Reliance Stock Report</a> · <a href="/comparison_report.html">Model Comparison Report</a> · <a href="/algo-backtest-report.html">Algo Backtest Report</a></p>
+  <p style="margin-top:6px;color:var(--warn);">⚠ This report is for educational and analytical purposes only. Not investment advice.</p>
+</footer>
+</section>
+
+</main>
+
+<button id="top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑ Top</button>
+<button id="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">🌙 Dark</button>
+
+<script>
+(function(){
+  var b=document.getElementById('top-btn');
+  var t=document.getElementById('theme-btn');
+  window.addEventListener('scroll',function(){
+    var v=window.scrollY>300;
+    b.classList.toggle('visible',v);
+    t.classList.toggle('visible',v);
+  },{passive:true});
+})();
+function toggleTheme(){
+  var h=document.documentElement;
+  var btn=document.getElementById('theme-btn');
+  if(h.classList.contains('force-dark')){h.classList.remove('force-dark');h.classList.add('force-light');btn.textContent='🌙 Dark';}
+  else if(h.classList.contains('force-light')){h.classList.remove('force-light');btn.textContent='🌙 Dark';}
+  else{h.classList.add('force-dark');btn.textContent='☀ Light';}
+}
+(function(){
+  var links=Array.from(document.querySelectorAll('nav.sidebar-toc a'));
+  if(!links.length||!('IntersectionObserver' in window))return;
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(l){l.classList.remove('active');});
+        var hit=document.querySelector('nav.sidebar-toc a[href="#'+e.target.id+'"]');
+        if(hit)hit.classList.add('active');
+      }
+    });
+  },{rootMargin:'-10% 0px -75% 0px',threshold:0});
+  links.forEach(function(l){var t=document.querySelector(l.getAttribute('href'));if(t)io.observe(t);});
+  if(links[0])links[0].classList.add('active');
+})();
+</script>
+</body>
+</html>

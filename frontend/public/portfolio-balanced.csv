@@ -1,0 +1,18 @@
+type,symbol,name,qty,avgBuyPrice,currentPrice,currentValue,category,investedAmount,buyDate
+stock,HDFCBANK,HDFC Bank Ltd,30,1300,1530,45900,,,2022-08-15
+stock,ICICIBANK,ICICI Bank Ltd,40,750,975,39000,,,2022-06-20
+stock,RELIANCE,Reliance Industries Ltd,15,2300,2980,44700,,,2022-07-10
+stock,TCS,Tata Consultancy Services Ltd,8,3200,3845,30760,,,2022-09-05
+stock,COFORGE,Coforge Ltd,5,4000,8200,41000,,,2022-10-12
+stock,SUNPHARMA,Sun Pharmaceutical Industries Ltd,30,900,1680,50400,,,2022-08-25
+stock,MARUTI,Maruti Suzuki India Ltd,5,8000,10250,51250,,,2022-11-15
+stock,ITC,ITC Ltd,200,310,425,85000,,,2022-05-20
+stock,BHARTIARTL,Bharti Airtel Ltd,20,750,1600,32000,,,2022-06-01
+stock,LT,Larsen & Toubro Ltd,10,2700,3800,38000,,,2022-07-20
+stock,TATASTEEL,Tata Steel Ltd,300,100,155,46500,,,2022-09-10
+stock,DLF,DLF Ltd,40,450,850,34000,,,2022-08-05
+mf,,Parag Parikh Flexi Cap Fund Direct Growth,,,,200000,Flexi Cap,120000,2022-03-15
+mf,,UTI Nifty 50 Index Fund Direct Growth,,,,115000,Index,80000,2022-04-10
+mf,,Axis Midcap Fund Direct Growth,,,,95000,Mid Cap,60000,2022-05-20
+mf,,Nippon India Small Cap Fund Direct Growth,,,,110000,Small Cap,50000,2022-06-01
+mf,,SBI Equity Hybrid Fund Direct Growth,,,,55000,Hybrid,40000,2022-07-15

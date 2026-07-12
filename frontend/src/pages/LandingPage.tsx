@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { TrendingUp, TrendingDown, BarChart2, Shield, Zap } from "lucide-react";
+import { TrendingUp, TrendingDown, BarChart2, Shield, Zap, Cpu } from "lucide-react";
 import { Header } from "@/components/Header";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 
@@ -195,43 +195,78 @@ export default function LandingPage() {
           </div>
 
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
               {
                 Icon: BarChart2,
                 title: "Portfolio Health Score",
                 description:
                   "0–100 score measuring diversification, concentration risk, MF overlap, and benchmark alignment against Nifty 50 / 500.",
+                link: null,
               },
               {
                 Icon: Zap,
                 title: "Multi-Agent AI",
                 description:
                   "8+ specialized AI agents analyse sentiment, trends, and technicals to deliver comprehensive, explainable insights.",
+                link: null,
               },
               {
                 Icon: Shield,
                 title: "Risk Analytics",
                 description:
                   "Monte Carlo simulations with 5,000 runs model portfolio outcomes across bull, bear, and black-swan scenarios.",
+                link: null,
               },
-            ].map(({ Icon, title, description }, i) => (
-              <div
-                key={i}
-                className="bg-card border border-border rounded-xl p-6 hover:border-[#00D09C]/40 transition-colors"
-              >
-                <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center mb-4"
-                  style={{ backgroundColor: "rgba(0,208,156,0.1)" }}
+              {
+                Icon: Cpu,
+                title: "Algo Trading Engine",
+                description:
+                  "+18.4% simulated return · 1.84 Sharpe · 64.2% win rate. LangGraph multi-agent ensemble backtested on Nifty 50 H1 2025.",
+                link: "/algo-trading",
+              },
+            ].map(({ Icon, title, description, link }, i) => {
+              const inner = (
+                <>
+                  <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center mb-4"
+                    style={{ backgroundColor: link ? "rgba(0,208,156,0.15)" : "rgba(0,208,156,0.1)" }}
+                  >
+                    <Icon className="w-5 h-5" style={{ color: "#00D09C" }} />
+                  </div>
+                  <h3 className="text-base font-bold text-foreground mb-2 flex items-center gap-2">
+                    {title}
+                    {link && (
+                      <span
+                        className="text-xs font-semibold px-1.5 py-0.5 rounded"
+                        style={{ background: "rgba(0,208,156,0.12)", color: "#00D09C" }}
+                      >
+                        NEW
+                      </span>
+                    )}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {description}
+                  </p>
+                </>
+              );
+              return link ? (
+                <Link
+                  key={i}
+                  to={link}
+                  className="bg-card border border-border rounded-xl p-6 hover:border-[#00D09C]/60 transition-colors block"
                 >
-                  <Icon className="w-5 h-5" style={{ color: "#00D09C" }} />
+                  {inner}
+                </Link>
+              ) : (
+                <div
+                  key={i}
+                  className="bg-card border border-border rounded-xl p-6 hover:border-[#00D09C]/40 transition-colors"
+                >
+                  {inner}
                 </div>
-                <h3 className="text-base font-bold text-foreground mb-2">{title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {description}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -319,6 +354,14 @@ export default function LandingPage() {
             <span className="text-muted-foreground text-xs">© 2025</span>
           </div>
           <div className="flex items-center gap-6">
+            <Link
+              to="/algo-trading"
+              className="text-xs font-semibold transition-colors flex items-center gap-1"
+              style={{ color: "#00D09C" }}
+            >
+              <Cpu className="w-3 h-3" />
+              Algo Trading
+            </Link>
             <a
               href="#"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"

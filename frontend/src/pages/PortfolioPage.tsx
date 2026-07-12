@@ -13,8 +13,13 @@ import { RecommendationsPanel } from "@/components/portfolio/RecommendationsPane
 import { RebalancingActions } from "@/components/portfolio/RebalancingActions";
 import { ProjectedAllocationChart } from "@/components/portfolio/ProjectedAllocationChart";
 import { PortfolioSyncPanel } from "@/components/portfolio/PortfolioSyncPanel";
+import { PerformanceChart } from "@/components/portfolio/PerformanceChart";
+import { RiskMetricsRow } from "@/components/portfolio/RiskMetricsRow";
+import { TaxHarvestPanel } from "@/components/portfolio/TaxHarvestPanel";
+import { HoldingsPerformanceTable } from "@/components/portfolio/HoldingsPerformanceTable";
 
 const STORAGE_KEY = "diversifi_portfolio";
+const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
 const GOALS = [
   { value: "wealth_growth", label: "💰 Wealth Growth" },
@@ -30,12 +35,17 @@ function formatINR(n: number) {
 }
 
 // ─── Card Wrapper ─────────────────────────────────────────────────────────────
-function Card({ title, subtitle, children, className = "" }: { title: string; subtitle?: string; children: React.ReactNode; className?: string }) {
+function Card({ title, subtitle, children, className = "", badge }: {
+  title: string; subtitle?: string; children: React.ReactNode; className?: string; badge?: React.ReactNode;
+}) {
   return (
     <div className={`bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-5 ${className}`}>
-      <div className="mb-4">
-        <h3 className="text-sm font-bold text-gray-900 dark:text-white">{title}</h3>
-        {subtitle && <p className="text-xs text-gray-500 dark:text-white/40 mt-0.5">{subtitle}</p>}
+      <div className="mb-4 flex items-start justify-between gap-2">
+        <div>
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white">{title}</h3>
+          {subtitle && <p className="text-xs text-gray-500 dark:text-white/40 mt-0.5">{subtitle}</p>}
+        </div>
+        {badge}
       </div>
       {children}
     </div>
@@ -45,9 +55,11 @@ function Card({ title, subtitle, children, className = "" }: { title: string; su
 // ─── Stock Holdings Table ─────────────────────────────────────────────────────
 function StockTable({ stocks, onChange }: { stocks: StockHolding[]; onChange: (s: StockHolding[]) => void }) {
   const update = (i: number, field: keyof StockHolding, val: string) => {
-    const next = stocks.map((s, idx) =>
-      idx === i ? { ...s, [field]: field === "symbol" || field === "name" ? val.toUpperCase() : parseFloat(val) || 0 } : s
-    );
+    const next = stocks.map((s, idx) => {
+      if (idx !== i) return s;
+      if (field === "symbol" || field === "name" || field === "buyDate") return { ...s, [field]: field === "symbol" ? val.toUpperCase() : val };
+      return { ...s, [field]: parseFloat(val) || 0 };
+    });
     if (field === "qty" || field === "currentPrice") {
       const s = next[i];
       next[i] = { ...s, currentValue: s.qty * s.currentPrice };
@@ -59,11 +71,11 @@ function StockTable({ stocks, onChange }: { stocks: StockHolding[]; onChange: (s
 
   return (
     <div className="space-y-2">
-      <div className="grid grid-cols-5 gap-2 text-[10px] font-black text-gray-400 dark:text-white/30 uppercase tracking-widest px-1">
-        <span>Symbol</span><span>Qty</span><span>Avg Price ₹</span><span>Curr Price ₹</span><span>Value ₹</span>
+      <div className="grid grid-cols-6 gap-2 text-[10px] font-black text-gray-400 dark:text-white/30 uppercase tracking-widest px-1">
+        <span>Symbol</span><span>Qty</span><span>Avg Price ₹</span><span>Curr Price ₹</span><span>Value ₹</span><span>Buy Date</span>
       </div>
       {stocks.map((s, i) => (
-        <div key={i} className="grid grid-cols-5 gap-2 items-center group">
+        <div key={i} className="grid grid-cols-6 gap-2 items-center group">
           {(["symbol", "qty", "avgBuyPrice", "currentPrice"] as const).map((f) => (
             <input key={f} value={(s as any)[f]} onChange={(e) => update(i, f, e.target.value)}
               className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white
@@ -71,8 +83,12 @@ function StockTable({ stocks, onChange }: { stocks: StockHolding[]; onChange: (s
               placeholder={f === "symbol" ? "RELIANCE" : "0"}
             />
           ))}
+          <div className="text-xs text-gray-600 dark:text-white/60">{formatINR(s.currentValue)}</div>
           <div className="flex items-center gap-1">
-            <span className="text-xs text-gray-600 dark:text-white/60 flex-1">{formatINR(s.currentValue)}</span>
+            <input value={s.buyDate ?? ""} onChange={(e) => update(i, "buyDate", e.target.value)}
+              type="date"
+              className="flex-1 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]/50 transition-colors"
+            />
             <button onClick={() => removeRow(i)} className="opacity-0 group-hover:opacity-100 text-red-400/70 hover:text-red-400 text-xs px-1 transition-all">✕</button>
           </div>
         </div>
@@ -87,18 +103,22 @@ const MF_CATEGORIES = ["Large Cap", "Mid Cap", "Small Cap", "Flexi Cap", "ELSS",
 
 function MFTable({ funds, onChange }: { funds: MFHolding[]; onChange: (f: MFHolding[]) => void }) {
   const update = (i: number, field: keyof MFHolding, val: string) => {
-    onChange(funds.map((f, idx) => idx === i ? { ...f, [field]: field === "fundName" || field === "category" ? val : parseFloat(val) || 0 } : f));
+    onChange(funds.map((f, idx) => {
+      if (idx !== i) return f;
+      if (field === "fundName" || field === "category" || field === "buyDate") return { ...f, [field]: val };
+      return { ...f, [field]: parseFloat(val) || 0 };
+    }));
   };
   const addRow = () => onChange([...funds, { fundName: "", category: "Large Cap", investedAmount: 0, currentValue: 0 }]);
   const removeRow = (i: number) => onChange(funds.filter((_, idx) => idx !== i));
 
   return (
     <div className="space-y-2">
-      <div className="grid grid-cols-4 gap-2 text-[10px] font-black text-gray-400 dark:text-white/30 uppercase tracking-widest px-1">
-        <span className="col-span-2">Fund Name</span><span>Category</span><span>Curr Value ₹</span>
+      <div className="grid grid-cols-5 gap-2 text-[10px] font-black text-gray-400 dark:text-white/30 uppercase tracking-widest px-1">
+        <span className="col-span-2">Fund Name</span><span>Category</span><span>Curr Value ₹</span><span>Buy Date</span>
       </div>
       {funds.map((f, i) => (
-        <div key={i} className="grid grid-cols-4 gap-2 items-center group">
+        <div key={i} className="grid grid-cols-5 gap-2 items-center group">
           <input value={f.fundName} onChange={(e) => update(i, "fundName", e.target.value)}
             className="col-span-2 w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]/50 transition-colors"
             placeholder="Mirae Asset Large Cap" />
@@ -106,9 +126,13 @@ function MFTable({ funds, onChange }: { funds: MFHolding[]; onChange: (f: MFHold
             className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]/50 transition-colors">
             {MF_CATEGORIES.map((c) => <option key={c} value={c} className="bg-white dark:bg-card">{c}</option>)}
           </select>
+          <input value={f.currentValue || ""} onChange={(e) => update(i, "currentValue", e.target.value)}
+            className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]/50 transition-colors" placeholder="0" />
           <div className="flex items-center gap-1">
-            <input value={f.currentValue || ""} onChange={(e) => update(i, "currentValue", e.target.value)}
-              className="flex-1 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]/50 transition-colors" placeholder="0" />
+            <input value={f.buyDate ?? ""} onChange={(e) => update(i, "buyDate", e.target.value)}
+              type="date"
+              className="flex-1 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]/50 transition-colors"
+            />
             <button onClick={() => removeRow(i)} className="opacity-0 group-hover:opacity-100 text-red-400/70 hover:text-red-400 text-xs px-1 transition-all">✕</button>
           </div>
         </div>
@@ -118,9 +142,28 @@ function MFTable({ funds, onChange }: { funds: MFHolding[]; onChange: (f: MFHold
   );
 }
 
+// ─── Deep analysis types ──────────────────────────────────────────────────────
+interface DeepAnalysis {
+  performance: {
+    portfolio_cagr: number | null;
+    benchmark_cagr: number | null;
+    port_6m_return: number | null;
+    bench_6m_return: number | null;
+    alpha: number | null;
+    beta: number | null;
+    sharpe: number | null;
+    total_invested: number;
+    total_current: number;
+    total_pnl: number;
+  };
+  holdings: any[];
+  chart_data: { date: string; portfolio: number; benchmark: number }[];
+  tax: any;
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function PortfolioPage() {
-  const [step, setStep] = useState(0); // 0=sync, 1=profile, 2=stocks, 3=mf+cash
+  const [step, setStep] = useState(0);
   const [input, setInput] = useState<PortfolioInput>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -128,9 +171,11 @@ export default function PortfolioPage() {
     } catch { return DEMO_PORTFOLIO; }
   });
   const [analysis, setAnalysis] = useState<PortfolioAnalysis | null>(null);
+  const [deepAnalysis, setDeepAnalysis] = useState<DeepAnalysis | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
+  const [deepLoading, setDeepLoading] = useState(false);
+  const [deepError, setDeepError] = useState<string | null>(null);
 
-  // Persist to localStorage
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(input));
   }, [input]);
@@ -141,13 +186,36 @@ export default function PortfolioPage() {
 
   const runAnalysis = () => {
     setAnalyzing(true);
+    setDeepAnalysis(null);
+    setDeepError(null);
+
+    // Phase 1: instant frontend analysis
     setTimeout(() => {
       setAnalysis(analyzePortfolio(input));
       setAnalyzing(false);
-    }, 800);
+    }, 600);
+
+    // Phase 2: async backend deep analysis
+    setDeepLoading(true);
+    fetch(`${API_BASE}/api/portfolio/deep-analyse`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        stocks: input.stocks,
+        mutualFunds: input.mutualFunds,
+        benchmark: input.benchmark,
+      }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) setDeepAnalysis(data);
+        else setDeepError(data.error ?? "Deep analysis failed");
+      })
+      .catch((e) => setDeepError(e.message))
+      .finally(() => setDeepLoading(false));
   };
 
-  const reset = () => { setAnalysis(null); setStep(0); };
+  const reset = () => { setAnalysis(null); setDeepAnalysis(null); setDeepError(null); setStep(0); };
 
   const STEPS = ["Import", "Profile", "Stocks", "Funds & Cash"];
   const totalValue = input.stocks.reduce((a, s) => a + s.currentValue, 0)
@@ -155,29 +223,21 @@ export default function PortfolioPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Background */}
       <div className="fixed inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 20% 20%, rgba(0,208,156,0.04) 0%, transparent 60%)" }} />
 
       {/* Header */}
-      <header className="top-0 z-50 backdrop-blur-xl px-8 md:px-12 py-6 ">
-          <div className="flex items-center gap-4">
-            <div className="w-px h-5 bg-gray-300 dark:bg-white/15" />
-            <div>
-              <h1 className="text-lg font-black text-gray-900 dark:text-white leading-none">
-                Portfolio Analyzer
-              </h1>
-              <p className="text-[10px] text-gray-500 mt-2 dark:text-white/40 uppercase tracking-widest">
-                AI-Powered Rebalancing
-              </p>
-            </div>
+      <header className="top-0 z-50 backdrop-blur-xl px-8 md:px-12 py-6">
+        <div className="flex items-center gap-4">
+          <div className="w-px h-5 bg-gray-300 dark:bg-white/15" />
+          <div>
+            <h1 className="text-lg font-black text-gray-900 dark:text-white leading-none">Portfolio Analyzer</h1>
+            <p className="text-[10px] text-gray-500 mt-2 dark:text-white/40 uppercase tracking-widest">AI-Powered Rebalancing</p>
           </div>
+        </div>
         {analysis && (
           <div className="flex mt-6 items-center gap-3">
             <span className="text-xs text-gray-500 dark:text-white/40">Total: <span className="text-gray-900 dark:text-white font-bold">{formatINR(totalValue)}</span></span>
-            <Link
-              to="/portfolio-simulation"
-              className="flex items-center gap-1.5 text-xs text-gray-900 dark:text-white bg-[#00D09C]/20 border border-[#00D09C] hover:bg-[#00D09C]/30 px-3 py-1.5 rounded-lg transition-all"
-            >
+            <Link to="/portfolio-simulation" className="flex items-center gap-1.5 text-xs text-gray-900 dark:text-white bg-[#00D09C]/20 border border-[#00D09C] hover:bg-[#00D09C]/30 px-3 py-1.5 rounded-lg transition-all">
               <Play className="w-3.5 h-3.5" /> Simulate
             </Link>
             <button onClick={reset} className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-white/50 hover:text-gray-900 dark:hover:text-white px-3 py-1.5 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
@@ -272,7 +332,7 @@ export default function PortfolioPage() {
                 {/* Step 2: Stocks */}
                 {step === 2 && (
                   <div className="bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-6 space-y-4">
-                    <p className="text-xs text-gray-500 dark:text-white/40">Enter your stock holdings. Current Price × Qty = Current Value (auto-calculated).</p>
+                    <p className="text-xs text-gray-500 dark:text-white/40">Enter your stock holdings. Buy Date enables CAGR and tax analysis.</p>
                     <StockTable stocks={input.stocks} onChange={(s) => set("stocks", s)} />
                   </div>
                 )}
@@ -289,7 +349,6 @@ export default function PortfolioPage() {
                       <input type="number" value={input.cashBalance || ""} onChange={(e) => set("cashBalance", parseFloat(e.target.value) || 0)}
                         placeholder="25000" className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]/50" />
                     </div>
-                    {/* Summary */}
                     <div className="bg-[#00D09C]/10 border border-[#00D09C]/25 rounded-2xl p-4">
                       <p className="text-xs text-gray-600 dark:text-white/50 mb-2">Portfolio Summary</p>
                       <div className="grid grid-cols-3 gap-4 text-center">
@@ -347,7 +406,6 @@ export default function PortfolioPage() {
               <div className="col-span-2 sm:col-span-1 bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-5 flex flex-col items-center justify-center gap-3">
                 <HealthScoreCard score={analysis.diversificationScore} label="Diversification" size={140} />
               </div>
-              {/* Stats */}
               <div className="col-span-2 bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-5 grid grid-cols-2 gap-4 content-center">
                 {[
                   { label: "Total Value", val: formatINR(analysis.totalValue) },
@@ -362,6 +420,61 @@ export default function PortfolioPage() {
                 ))}
               </div>
             </div>
+
+            {/* ── DEEP ANALYSIS: Risk Metrics ── */}
+            <Card
+              title="Performance Metrics"
+              subtitle="CAGR, Alpha, Beta, Sharpe — based on live market data"
+              badge={
+                deepLoading ? (
+                  <span className="flex items-center gap-1.5 text-[10px] text-gray-400 dark:text-white/30 bg-gray-100 dark:bg-white/5 px-2 py-1 rounded-lg">
+                    <Loader2 className="w-3 h-3 animate-spin" /> Fetching live data…
+                  </span>
+                ) : deepError ? (
+                  <span className="text-[10px] text-red-400 bg-red-500/10 px-2 py-1 rounded-lg">Live data unavailable</span>
+                ) : deepAnalysis ? (
+                  <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-lg">Live</span>
+                ) : null
+              }
+            >
+              {(deepLoading || !deepAnalysis) && !deepError ? (
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="h-20 bg-gray-100 dark:bg-white/5 rounded-xl animate-pulse" />
+                  ))}
+                </div>
+              ) : deepAnalysis ? (
+                <RiskMetricsRow
+                  portfolioCagr={deepAnalysis.performance.portfolio_cagr}
+                  benchmarkCagr={deepAnalysis.performance.benchmark_cagr}
+                  port6mReturn={deepAnalysis.performance.port_6m_return}
+                  bench6mReturn={deepAnalysis.performance.bench_6m_return}
+                  alpha={deepAnalysis.performance.alpha}
+                  beta={deepAnalysis.performance.beta}
+                  sharpe={deepAnalysis.performance.sharpe}
+                />
+              ) : (
+                <p className="text-xs text-gray-400 dark:text-white/30 text-center py-4">
+                  Could not fetch live performance data. Ensure the backend is running.
+                </p>
+              )}
+            </Card>
+
+            {/* ── DEEP ANALYSIS: Performance Chart ── */}
+            <Card
+              title="Portfolio vs Benchmark (6 months)"
+              subtitle={`Normalised to 100 — vs ${input.benchmark === "nifty50" ? "Nifty 50" : "Nifty 500"}`}
+              badge={deepLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400 dark:text-white/30" /> : undefined}
+            >
+              {deepLoading ? (
+                <div className="h-52 bg-gray-100 dark:bg-white/5 rounded-xl animate-pulse" />
+              ) : (
+                <PerformanceChart
+                  data={deepAnalysis?.chart_data ?? []}
+                  benchmarkLabel={input.benchmark === "nifty50" ? "Nifty 50" : "Nifty 500"}
+                />
+              )}
+            </Card>
 
             {/* Score breakdown */}
             <Card title="Score Breakdown" subtitle="What drives your diversification score">
@@ -407,6 +520,40 @@ export default function PortfolioPage() {
               </Card>
             </div>
 
+            {/* ── DEEP ANALYSIS: Holdings Performance Table ── */}
+            <Card
+              title="Holdings Performance"
+              subtitle="Per-holding CAGR, P&L, holding period, and tax classification"
+              badge={deepLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400 dark:text-white/30" /> : undefined}
+            >
+              {deepLoading ? (
+                <div className="space-y-2">
+                  {Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-10 bg-gray-100 dark:bg-white/5 rounded-lg animate-pulse" />)}
+                </div>
+              ) : (
+                <HoldingsPerformanceTable holdings={deepAnalysis?.holdings ?? []} />
+              )}
+            </Card>
+
+            {/* ── DEEP ANALYSIS: Tax Harvest Panel ── */}
+            <Card
+              title="Tax Analysis & Loss Harvesting"
+              subtitle="FY2025-26 — LTCG 12.5% (above ₹1.25L exemption), STCG 20%"
+              badge={deepLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400 dark:text-white/30" /> : undefined}
+            >
+              {deepLoading ? (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-4 gap-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-20 bg-gray-100 dark:bg-white/5 rounded-xl animate-pulse" />)}</div>
+                </div>
+              ) : deepAnalysis?.tax ? (
+                <TaxHarvestPanel tax={deepAnalysis.tax} />
+              ) : (
+                <p className="text-xs text-gray-400 dark:text-white/30 text-center py-4">
+                  Tax analysis will appear after live data loads. Ensure buy dates are set for your holdings.
+                </p>
+              )}
+            </Card>
+
             {/* Recommendations */}
             <Card title="🤖 AI Recommendations" subtitle="Personalized insights based on your portfolio and risk profile">
               <RecommendationsPanel recommendations={analysis.recommendations} />
@@ -422,7 +569,7 @@ export default function PortfolioPage() {
               </Card>
             </div>
 
-            {/* Re-analyze button */}
+            {/* Re-analyze */}
             <div className="flex justify-center pb-8">
               <button onClick={reset} className="flex items-center gap-2 text-sm text-gray-500 dark:text-white/50 hover:text-gray-900 dark:hover:text-white px-6 py-3 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
                 <RotateCcw className="w-4 h-4" /> Edit Portfolio & Re-analyze

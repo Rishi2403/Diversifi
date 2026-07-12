@@ -4,37 +4,69 @@ import type { StockHolding, MFHolding } from "@/lib/portfolioEngine";
 
 interface Props {
   onStocksLoaded: (stocks: StockHolding[]) => void;
+  onMFLoaded?: (mfs: MFHolding[]) => void;
 }
 
 type Tab = "csv" | "manual";
 
-// Map common CSV column names to our schema
-function parseCSV(text: string): StockHolding[] {
-  const lines = text.trim().split("\n");
-  if (lines.length < 2) return [];
+interface ParseResult {
+  stocks: StockHolding[];
+  mfs: MFHolding[];
+}
+
+function parseUnifiedCSV(text: string): ParseResult {
+  const lines = text.trim().split("\n").filter(Boolean);
+  if (lines.length < 2) return { stocks: [], mfs: [] };
+
   const headers = lines[0].split(",").map((h) => h.trim().toLowerCase().replace(/"/g, ""));
-  const get = (row: string[], keys: string[]) => {
+
+  const col = (row: string[], ...keys: string[]): string => {
     for (const k of keys) {
       const idx = headers.findIndex((h) => h.includes(k));
-      if (idx !== -1) return row[idx]?.replace(/"/g, "").trim() || "";
+      if (idx !== -1) return (row[idx] ?? "").replace(/"/g, "").trim();
     }
     return "";
   };
-  return lines.slice(1).filter(Boolean).map((line) => {
+
+  const stocks: StockHolding[] = [];
+  const mfs: MFHolding[] = [];
+
+  for (const line of lines.slice(1)) {
     const row = line.split(",");
-    const symbol = get(row, ["symbol", "ticker", "scrip", "stock"]).toUpperCase();
-    const qty = parseFloat(get(row, ["qty", "quantity", "shares", "units"])) || 0;
-    const avgPrice = parseFloat(get(row, ["avg", "average", "buy price", "cost"])) || 0;
-    const curPrice = parseFloat(get(row, ["ltp", "current price", "last price", "cmp"])) || avgPrice;
-    const curValue = parseFloat(get(row, ["current value", "market value", "value"])) || qty * curPrice;
-    return { symbol, qty, avgBuyPrice: avgPrice, currentPrice: curPrice, currentValue: curValue };
-  }).filter((s) => s.symbol && s.qty > 0);
+    const type = col(row, "type").toLowerCase();
+
+    if (type === "stock" || (!type && col(row, "symbol", "ticker"))) {
+      const symbol = col(row, "symbol", "ticker", "scrip").toUpperCase();
+      const qty = parseFloat(col(row, "qty", "quantity", "shares")) || 0;
+      const avgBuyPrice = parseFloat(col(row, "avgbuyprice", "avg", "average", "buy")) || 0;
+      const currentPrice = parseFloat(col(row, "currentprice", "ltp", "cmp", "last")) || avgBuyPrice;
+      const currentValue = parseFloat(col(row, "currentvalue", "market value", "value")) || qty * currentPrice;
+      const name = col(row, "name");
+      const buyDate = col(row, "buydate", "buy date", "date");
+
+      if (symbol && qty > 0) {
+        stocks.push({ symbol, name: name || undefined, qty, avgBuyPrice, currentPrice, currentValue, buyDate: buyDate || undefined });
+      }
+    } else if (type === "mf" || type === "mutual fund") {
+      const fundName = col(row, "name", "fundname", "fund");
+      const category = col(row, "category") || "Flexi Cap";
+      const investedAmount = parseFloat(col(row, "investedamount", "invested", "cost", "amount")) || 0;
+      const currentValue = parseFloat(col(row, "currentvalue", "value", "market")) || 0;
+      const buyDate = col(row, "buydate", "buy date", "date");
+
+      if (fundName && currentValue > 0) {
+        mfs.push({ fundName, category, investedAmount, currentValue, buyDate: buyDate || undefined });
+      }
+    }
+  }
+
+  return { stocks, mfs };
 }
 
 export function PortfolioSyncPanel({ onStocksLoaded, onMFLoaded }: Props) {
   const [tab, setTab] = useState<Tab>("csv");
   const [csvStatus, setCsvStatus] = useState<"idle" | "success" | "error">("idle");
-  const [csvCount, setCsvCount] = useState(0);
+  const [csvCounts, setCsvCounts] = useState({ stocks: 0, mfs: 0 });
   const [dragging, setDragging] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -42,10 +74,12 @@ export function PortfolioSyncPanel({ onStocksLoaded, onMFLoaded }: Props) {
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target?.result as string;
-      const parsed = parseCSV(text);
-      if (parsed.length > 0) {
-        onStocksLoaded(parsed);
-        setCsvCount(parsed.length);
+      const { stocks, mfs } = parseUnifiedCSV(text);
+
+      if (stocks.length > 0 || mfs.length > 0) {
+        if (stocks.length > 0) onStocksLoaded(stocks);
+        if (mfs.length > 0 && onMFLoaded) onMFLoaded(mfs);
+        setCsvCounts({ stocks: stocks.length, mfs: mfs.length });
         setCsvStatus("success");
       } else {
         setCsvStatus("error");
@@ -61,7 +95,6 @@ export function PortfolioSyncPanel({ onStocksLoaded, onMFLoaded }: Props) {
 
   return (
     <div className="bg-white/5 border text-gray-800 dark:border-white/10 rounded-2xl overflow-hidden">
-      {/* Tab bar */}
       <div className="flex border-b text-gray-800 dark:border-white/10">
         {TABS.map((t) => (
           <button
@@ -79,12 +112,10 @@ export function PortfolioSyncPanel({ onStocksLoaded, onMFLoaded }: Props) {
       </div>
 
       <div className="p-5">
-        {/* CSV */}
         {tab === "csv" && (
           <div className="space-y-4">
             <p className="text-xs text-gray-500 dark:text-white/50 leading-relaxed">
-              Export your portfolio as CSV from <strong className="text-gray-700 dark:text-white/70">Groww → Portfolio → Download</strong> or
-              any other platform (Zerodha, INDMoney, Upstox) and upload here.
+              Upload a portfolio CSV with columns: <code className="bg-gray-100 dark:bg-white/10 px-1 rounded">type, symbol, name, qty, avgBuyPrice, currentPrice, currentValue, category, investedAmount, buyDate</code>. Download our <a href="/sample-portfolio.csv" className="text-[#00D09C] underline" download>sample template</a>.
             </p>
             <div
               onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
@@ -97,23 +128,23 @@ export function PortfolioSyncPanel({ onStocksLoaded, onMFLoaded }: Props) {
             >
               <Upload className="w-8 h-8 mx-auto mb-2 text-gray-300 dark:text-white/30" />
               <p className="text-sm font-medium text-gray-600 dark:text-white/60">Drop CSV file here or <span className="text-[#00D09C]">click to browse</span></p>
-              <p className="text-xs text-gray-400 dark:text-white/30 mt-1">Supports Groww, Zerodha, INDMoney, Upstox CSV formats</p>
+              <p className="text-xs text-gray-400 dark:text-white/30 mt-1">Stocks and Mutual Funds in one file</p>
               <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
             </div>
             {csvStatus === "success" && (
               <div className="flex items-center gap-2 text-green-400 text-sm font-bold bg-green-500/10 border border-green-500/20 rounded-xl p-3">
-                <CheckCircle className="w-4 h-4" /> Imported {csvCount} holdings successfully!
+                <CheckCircle className="w-4 h-4" />
+                Imported {csvCounts.stocks} stocks and {csvCounts.mfs} mutual funds!
               </div>
             )}
             {csvStatus === "error" && (
               <div className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-xl p-3">
-                Could not parse CSV. Please ensure Symbol, Qty, and Price columns are present.
+                Could not parse CSV. Ensure the file has a <strong>type</strong> column with values "stock" or "mf".
               </div>
             )}
           </div>
         )}
 
-        {/* MANUAL */}
         {tab === "manual" && (
           <div className="text-center py-6 space-y-2">
             <PenLine className="w-8 h-8 mx-auto text-white/30" />

@@ -35,4 +35,4 @@ flask_swagger_ui
 growwapi
 openai
 asgiref
-yfinance
+yfinancepytz>=2024.1
