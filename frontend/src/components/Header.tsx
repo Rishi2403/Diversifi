@@ -7,10 +7,10 @@ export function Header() {
   const location = useLocation();
 
   const navLinks = [
-    { name: "Analyse", path: "/portfolio-analyser", alt: "/portfolio" },
+    { name: "Analyse",  path: "/portfolio-analyser", alt: "/portfolio" },
     { name: "Simulate", path: "/portfolio-simulation" },
-    { name: "News", path: "/global-trade" },
-    { name: "Chat", path: "/chat" },
+    { name: "Research", path: "/research" },
+    { name: "News",     path: "/global-trade" },
   ];
 
   return (
@@ -31,7 +31,8 @@ export function Header() {
             {navLinks.map((link) => {
               const isActive =
                 location.pathname === link.path ||
-                ("alt" in link && location.pathname === link.alt);
+                ("alt" in link && location.pathname === link.alt) ||
+                (link.path !== "/" && location.pathname.startsWith(link.path + "/"));
               return (
                 <Link
                   key={link.path}

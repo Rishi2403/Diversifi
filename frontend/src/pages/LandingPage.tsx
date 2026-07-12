@@ -1,22 +1,52 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { TrendingUp, TrendingDown, BarChart2, Shield, Zap } from "lucide-react";
 import { Header } from "@/components/Header";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 
+interface TickerItem { name: string; value: string; change: string; pct: string; up: boolean; }
 
-const TICKERS = [
-  { name: "NIFTY 50", value: "23,415.05", change: "+127.35", pct: "+0.55%", up: true },
-  { name: "SENSEX", value: "77,209.90", change: "+387.45", pct: "+0.50%", up: true },
-  { name: "BANK NIFTY", value: "50,127.80", change: "-215.60", pct: "-0.43%", up: false },
-  { name: "NIFTY IT", value: "38,204.15", change: "+520.75", pct: "+1.38%", up: true },
-  { name: "NIFTY MIDCAP", value: "52,891.40", change: "+243.20", pct: "+0.46%", up: true },
-  { name: "INDIA VIX", value: "13.85", change: "-0.42", pct: "-2.94%", up: false },
-  { name: "NIFTY PHARMA", value: "21,340.60", change: "+180.30", pct: "+0.85%", up: true },
-  { name: "USD/INR", value: "83.42", change: "+0.15", pct: "+0.18%", up: false },
+const FALLBACK_TICKERS: TickerItem[] = [
+  { name: "NIFTY 50",        value: "23,415.05", change: "+127.35", pct: "+0.55%", up: true  },
+  { name: "SENSEX",          value: "77,209.90", change: "+387.45", pct: "+0.50%", up: true  },
+  { name: "BANK NIFTY",      value: "50,127.80", change: "-215.60", pct: "-0.43%", up: false },
+  { name: "NIFTY IT",        value: "38,204.15", change: "+520.75", pct: "+1.38%", up: true  },
+  { name: "NIFTY PHARMA",    value: "21,340.60", change: "+180.30", pct: "+0.85%", up: true  },
+  { name: "NIFTY AUTO",      value: "22,140.30", change: "+95.10",  pct: "+0.43%", up: true  },
+  { name: "NIFTY MIDCAP 100",value: "52,891.40", change: "+243.20", pct: "+0.46%", up: true  },
+  { name: "S&P 500",         value: "5,308.15",  change: "+28.20",  pct: "+0.53%", up: true  },
+  { name: "NASDAQ",          value: "18,673.40", change: "+92.60",  pct: "+0.50%", up: true  },
+  { name: "DOW JONES",       value: "39,142.20", change: "+130.50", pct: "+0.33%", up: true  },
 ];
 
+function toTickerItems(indices: any[]): TickerItem[] {
+  // Indian indices first, then global
+  const sorted = [...indices].sort((a, b) =>
+    (a.region === "India" ? 0 : 1) - (b.region === "India" ? 0 : 1)
+  );
+  return sorted.map((idx) => ({
+    name: idx.name.toUpperCase(),
+    value: idx.price.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+    change: (idx.change >= 0 ? "+" : "") + Math.abs(idx.change).toFixed(2),
+    pct: (idx.changePct >= 0 ? "+" : "") + idx.changePct.toFixed(2) + "%",
+    up: idx.changePct >= 0,
+  }));
+}
 
 export default function LandingPage() {
+  const [tickers, setTickers] = useState<TickerItem[]>(FALLBACK_TICKERS);
+
+  useEffect(() => {
+    fetch("/api/markets")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.success && Array.isArray(data.indices) && data.indices.length > 0) {
+          setTickers(toTickerItems(data.indices));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <main className="min-h-screen w-full bg-background overflow-hidden">
       {/* Market Ticker Strip */}
@@ -25,7 +55,7 @@ export default function LandingPage() {
           className="flex whitespace-nowrap"
           style={{ animation: "ticker 40s linear infinite" }}
         >
-          {[...TICKERS, ...TICKERS, ...TICKERS].map((t, i) => (
+          {[...tickers, ...tickers, ...tickers].map((t, i) => (
             <div
               key={i}
               className="inline-flex items-center gap-2 px-5 shrink-0 border-r border-border h-9"
@@ -82,15 +112,27 @@ export default function LandingPage() {
           </p>
 
 
-          <a
-            href="/comparison_report.html"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-[#00D09C]/60 transition-all w-fit"
-          >
-            <BarChart2 className="w-3.5 h-3.5" />
-            View Model Comparison Report
-          </a>
+          <div className="flex flex-wrap gap-2">
+            <a
+              href="/comparison_report.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-[#00D09C]/60 transition-all"
+            >
+              <BarChart2 className="w-3.5 h-3.5" />
+              View Model Comparison Report
+            </a>
+            <a
+              href="/algo-backtest-report.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-[#00D09C]/60 transition-all"
+            >
+              <TrendingUp className="w-3.5 h-3.5" />
+              View Algo Backtest Report
+            </a>
+          </div>
+
 
 
           <div className="flex items-center gap-3 pt-2">
@@ -113,7 +155,7 @@ export default function LandingPage() {
               </Link>
             </SignedIn>
             <Link
-              to="/global-trade"
+              to="/global-market"
               className="px-6 py-2.5 rounded-md font-semibold text-sm border border-border text-foreground hover:bg-muted transition-all"
             >
               Global Markets

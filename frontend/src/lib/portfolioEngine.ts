@@ -129,7 +129,7 @@ export const SECTOR_MAP: Record<string, string> = {
   ULTRACEMCO: "Industrials", SHREECEM: "Industrials", ACC: "Industrials",
   AMBUJACEM: "Industrials", GRASIM: "Industrials",
   // Auto
-  MARUTI: "Auto", TATAMOTORS: "Auto", BAJAJ_AUTO: "Auto",
+  MARUTI: "Auto", TMPV: "Auto", TMCV: "Auto", BAJAJ_AUTO: "Auto",
   EICHERMOT: "Auto", HEROMOTOCO: "Auto", "M&M": "Auto",
   TVSMOTORS: "Auto", ASHOKLEY: "Auto", BOSCHLTD: "Auto",
   // Consumer Cyclical

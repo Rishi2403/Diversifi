@@ -172,18 +172,9 @@ class NewsService:
             sa_news = self.scrape_seeking_alpha_news(symbol, remaining)
             all_news.extend(sa_news)
         
-        # If we still don't have enough news, try MarketWatch
-        if len(all_news) < limit:
-            remaining = limit - len(all_news)
-            marketwatch_news = self.scrape_marketwatch_news(symbol, remaining)
-            all_news.extend(marketwatch_news)
-        
-        # If we have scraped news, return it
         if all_news:
             return all_news[:limit]
-        
-        # Fall back to mock data if scraping fails
-        logger.warning(f"Web scraping failed for {symbol}, using mock data")
+
         return self.fetch_mock_news(symbol, limit)
 
     def fetch_mock_news(self, symbol: str, limit: int = 3) -> List[Dict[str, str]]:

@@ -305,8 +305,9 @@ export default function GlobalMarketsPage() {
       fetch(
         "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=8&page=1&sparkline=false"
       ).then((r) => r.json()),
+      
       fetch(
-        "https://api.frankfurter.app/latest?from=USD&to=INR,EUR,GBP,JPY,CNY,AUD,CAD,CHF"
+        "https://api.frankfurter.dev/v2/rates?base=USD&quotes=INR,EUR,GBP,JPY,CNY,AUD,CAD,CHF"
       ).then((r) => r.json()),
       fetchMarketNews(),
     ]);
@@ -325,8 +326,17 @@ export default function GlobalMarketsPage() {
       anyFailed = true;
     }
 
-    if (forexRes.status === "fulfilled" && forexRes.value?.rates) {
-      setForex(forexRes.value);
+    if (forexRes.status === "fulfilled") {
+      const val = forexRes.value;
+      if (Array.isArray(val) && val.length > 0) {
+        const rates: Record<string, number> = {};
+        for (const item of val) rates[item.quote] = item.rate;
+        setForex({ base: val[0].base ?? "USD", rates });
+      } else if (val?.rates) {
+        setForex(val);
+      } else {
+        anyFailed = true;
+      }
     } else {
       anyFailed = true;
     }

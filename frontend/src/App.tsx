@@ -18,6 +18,10 @@ import SignInPage from "@/pages/SignInPage";
 import SignUpPage from "@/pages/SignUpPage";
 import ProfilePage from "@/pages/ProfilePage";
 import AdvancedSimulationPage from "@/pages/AdvancedSimulationPage";
+import GlobalMarketsPage from "./pages/GlobalMarketsPage";
+import ResearchPage from "@/pages/ResearchPage";
+import SuggestPage from "@/pages/SuggestPage";
+import AnalysePage from "@/pages/AnalysePage";
 
 const queryClient = new QueryClient();
 
@@ -61,14 +65,23 @@ const App = () => (
               }
             />
             <Route
-              path="/portfolio"
+              path="/global-trade"
               element={
                 <ProtectedRoute>
                   <>
                     <Header />
-                    <PortfolioPage />
+                    <GlobalTradePage />
                   </>
                 </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/global-market"
+              element={
+                  <>
+                    <Header />
+                    <GlobalMarketsPage />
+                  </>
               }
             />
             <Route
@@ -100,6 +113,39 @@ const App = () => (
                   <>
                     <Header />
                     <AdvancedSimulationPage />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/research"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header />
+                    <ResearchPage />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/research/suggest"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header />
+                    <SuggestPage />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/research/analyse"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header />
+                    <AnalysePage />
                   </>
                 </ProtectedRoute>
               }

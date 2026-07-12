@@ -331,20 +331,95 @@ def fii_dii_data():
 
 
 # -----------------------------
+# Research Routes
+# -----------------------------
+
+@flask_app.route("/api/research/pulse", methods=["GET"])
+def research_pulse():
+    from research_service import get_pulse_data
+    return jsonify(get_pulse_data())
+
+
+@flask_app.route("/api/research/analyse", methods=["POST"])
+def research_analyse():
+    from research_service import analyse_stock
+    data   = request.get_json() or {}
+    symbol = data.get("symbol", "").strip()
+    if not symbol:
+        return jsonify({"success": False, "error": "No symbol provided"}), 400
+    return jsonify(analyse_stock(symbol))
+
+
+@flask_app.route("/api/research/suggest", methods=["POST"])
+def research_suggest():
+    from research_service import suggest_stocks
+    data = request.get_json() or {}
+    try:
+        result = suggest_stocks(
+            amount          = int(data.get("amount", 50000)),
+            horizon         = data.get("horizon", "Medium"),
+            risk            = data.get("risk", "Moderate"),
+            sector          = data.get("sector"),
+            investment_type = data.get("investment_type", "lumpsum"),
+            duration_years  = int(data.get("duration_years", 0)),
+        )
+        return jsonify({"success": True, "suggestions": result})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+
+@flask_app.route("/api/research/mf/pulse", methods=["GET"])
+def research_mf_pulse():
+    from mf_service import get_mf_pulse_data
+    return jsonify(get_mf_pulse_data())
+
+
+@flask_app.route("/api/research/mf/analyse", methods=["POST"])
+def research_mf_analyse():
+    from mf_service import analyse_mf
+    data  = request.get_json() or {}
+    query = data.get("query", "").strip()
+    if not query:
+        return jsonify({"success": False, "error": "No query provided"}), 400
+    return jsonify(analyse_mf(query))
+
+
+@flask_app.route("/api/research/mf/suggest", methods=["POST"])
+def research_mf_suggest():
+    from mf_service import suggest_mfs
+    data = request.get_json() or {}
+    try:
+        result = suggest_mfs(
+            amount          = int(data.get("amount", 50000)),
+            horizon         = data.get("horizon", "Medium"),
+            risk            = data.get("risk", "Moderate"),
+            category        = data.get("category"),
+            investment_type = data.get("investment_type", "lumpsum"),
+            duration_years  = int(data.get("duration_years", 0)),
+        )
+        return jsonify({"success": True, "suggestions": result})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# -----------------------------
 # Markets Route
 # -----------------------------
 
 _INDICES = [
-    {"symbol": "^NSEI",     "name": "Nifty 50",      "region": "India",     "flag": "🇮🇳"},
-    {"symbol": "^BSESN",    "name": "Sensex",         "region": "India",     "flag": "🇮🇳"},
-    {"symbol": "^GSPC",     "name": "S&P 500",        "region": "USA",       "flag": "🇺🇸"},
-    {"symbol": "^IXIC",     "name": "NASDAQ",         "region": "USA",       "flag": "🇺🇸"},
-    {"symbol": "^DJI",      "name": "Dow Jones",      "region": "USA",       "flag": "🇺🇸"},
-    {"symbol": "^FTSE",     "name": "FTSE 100",       "region": "UK",        "flag": "🇬🇧"},
-    {"symbol": "^GDAXI",    "name": "DAX",            "region": "Germany",   "flag": "🇩🇪"},
-    {"symbol": "^N225",     "name": "Nikkei 225",     "region": "Japan",     "flag": "🇯🇵"},
-    {"symbol": "^HSI",      "name": "Hang Seng",      "region": "Hong Kong", "flag": "🇭🇰"},
-    {"symbol": "000001.SS", "name": "Shanghai Comp.", "region": "China",     "flag": "🇨🇳"},
+    {"symbol": "^NSEI",      "name": "Nifty 50",        "region": "India", "flag": "🇮🇳"},
+    {"symbol": "^BSESN",     "name": "Sensex",          "region": "India", "flag": "🇮🇳"},
+    {"symbol": "^NSEBANK",   "name": "Bank Nifty",      "region": "India", "flag": "🇮🇳"},
+    {"symbol": "^CNXIT",     "name": "Nifty IT",        "region": "India", "flag": "🇮🇳"},
+    {"symbol": "^CNXPHARMA", "name": "Nifty Pharma",    "region": "India", "flag": "🇮🇳"},
+    {"symbol": "^CNXAUTO",   "name": "Nifty Auto",      "region": "India", "flag": "🇮🇳"},
+    {"symbol": "^NSMIDCP100","name": "Nifty Midcap 100","region": "India", "flag": "🇮🇳"},
+    {"symbol": "^GSPC",      "name": "S&P 500",         "region": "USA",   "flag": "🇺🇸"},
+    {"symbol": "^IXIC",      "name": "NASDAQ",          "region": "USA",   "flag": "🇺🇸"},
+    {"symbol": "^DJI",       "name": "Dow Jones",       "region": "USA",   "flag": "🇺🇸"},
+    {"symbol": "^FTSE",      "name": "FTSE 100",        "region": "UK",    "flag": "🇬🇧"},
+    {"symbol": "^N225",      "name": "Nikkei 225",      "region": "Japan", "flag": "🇯🇵"},
 ]
 
 _COMMODITIES = [

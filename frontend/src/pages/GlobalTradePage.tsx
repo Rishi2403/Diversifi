@@ -489,11 +489,11 @@ export default function GlobalTradePage() {
 
 
       {/* Back */}
-      <div className="absolute top-6 left-6 z-50">
+      {/* <div className="absolute top-6 left-6 z-50">
         <Link to="/" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors bg-white/5 backdrop-blur-md px-5 py-2.5 rounded-xl border border-white/10 hover:bg-white/10">
           <ArrowLeft className="w-4 h-4" /><span className="text-sm font-medium">Back to Platform</span>
         </Link>
-      </div>
+      </div> */}
 
 
       {/* Title */}
@@ -760,7 +760,7 @@ export default function GlobalTradePage() {
           onPolygonClick={handleCountryClick}
           polygonsTransitionDuration={300}
           polygonLabel={({ properties: d }: any) => `
-            <div style="background:rgba(0,0,0,0.8);padding:4px 8px;border-radius:6px;color:white;border:1px solid rgba(255,255,255,0.2);font-family:sans-serif;font-size:12px;pointer-events:none;">
+            <div style="background:rgba(0,0,0,0.8);padding:4px 8px;border-radius:6px;color:white;border:1px solid rgba(255,255,255,0.2);font-size:12px;pointer-events:none;">
               <b>${d.ADMIN}</b> <span style="color:rgba(255,255,255,0.5);font-size:10px;">${d.ISO_A3}</span>
             </div>`}
           arcsData={CONFLICT_ARCS}
