@@ -112,7 +112,7 @@ export default function LandingPage() {
           </p>
 
 
-          <div className="flex flex-wrap gap-2">
+          {/* <div className="flex flex-wrap gap-2">
             <a
               href="/comparison_report.html"
               target="_blank"
@@ -131,7 +131,7 @@ export default function LandingPage() {
               <TrendingUp className="w-3.5 h-3.5" />
               View Algo Backtest Report
             </a>
-          </div>
+          </div> */}
 
 
 
