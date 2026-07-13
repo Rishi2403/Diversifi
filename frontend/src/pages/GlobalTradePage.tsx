@@ -84,8 +84,8 @@ const INDIA_IMPACT_BY_COUNTRY: Record<string, CountryImpact> = {
   },
   IND: {
     tradeVolume: "Domestic",
-    exports: "N/A — Domestic benchmark index",
-    imports: "N/A — Domestic benchmark index",
+    exports: "N/A - Domestic benchmark index",
+    imports: "N/A - Domestic benchmark index",
     sectorImpact: [
       { sector: "Banking & Finance", stocks: "HDFC Bank, ICICI Bank, SBI, Kotak", sensitivity: "high", direction: "up", note: "RBI rate decisions and credit growth are the primary domestic drivers" },
       { sector: "Consumer & FMCG", stocks: "HUL, ITC, Nestle, Dabur", sensitivity: "medium", direction: "up", note: "Rural demand recovery and food inflation directly affect volume growth" },
@@ -102,24 +102,24 @@ type AlertImpact = { headline: string; severity: "Critical" | "High" | "Moderate
 
 const INDIA_IMPACT_BY_ALERT: Record<string, AlertImpact> = {
   "Strait of Hormuz": {
-    headline: "Crude supply shock: +8–15% oil price spike expected",
+    headline: "Crude supply shock: +8-15% oil price spike expected",
     severity: "Critical",
     sectors: [
-      { name: "Energy — ONGC, BPCL, Oil India", dir: "up", note: "Upstream producers benefit directly from higher crude realisation" },
-      { name: "Aviation — IndiGo, SpiceJet, Air India", dir: "down", note: "ATF costs rise 12–18%; every $10/bbl = ~₹800 Cr industry headwind" },
-      { name: "Paints & Adhesives — Asian Paints, Pidilite", dir: "down", note: "Crude-linked input costs compress margins 150–200 bps" },
-      { name: "Fertilisers — Coromandel, Chambal, GSFC", dir: "down", note: "Natural gas and shipping costs surge simultaneously" },
-      { name: "IT Services — TCS, Infosys", dir: "neutral", note: "No direct commodity exposure; often acts as defensive safe haven" },
+      { name: "Energy - ONGC, BPCL, Oil India", dir: "up", note: "Upstream producers benefit directly from higher crude realisation" },
+      { name: "Aviation - IndiGo, SpiceJet, Air India", dir: "down", note: "ATF costs rise 12-18%; every $10/bbl = ~₹800 Cr industry headwind" },
+      { name: "Paints & Adhesives - Asian Paints, Pidilite", dir: "down", note: "Crude-linked input costs compress margins 150-200 bps" },
+      { name: "Fertilisers - Coromandel, Chambal, GSFC", dir: "down", note: "Natural gas and shipping costs surge simultaneously" },
+      { name: "IT Services - TCS, Infosys", dir: "neutral", note: "No direct commodity exposure; often acts as defensive safe haven" },
     ],
-    forex: "INR likely to depreciate 0.8–1.5% vs USD as import bill widens; RBI expected to sell dollars to defend ₹84 level.",
+    forex: "INR likely to depreciate 0.8-1.5% vs USD as import bill widens; RBI expected to sell dollars to defend ₹84 level.",
   },
   "Eastern Europe Conflict": {
     headline: "Wheat, sunflower oil, fertiliser supply chains disrupted",
     severity: "High",
     sectors: [
-      { name: "FMCG & Edible Oils — HUL, Adani Wilmar, Patanjali", dir: "down", note: "Sunflower oil shortage drives edible oil inflation; input cost pressure on all FMCG" },
-      { name: "Fertilisers — GSFC, Coromandel, Chambal", dir: "down", note: "Urea and potash supply tightens globally; India fertiliser subsidy bill rises" },
-      { name: "Defence — BEL, HAL, Bharat Forge", dir: "up", note: "Prolonged conflict accelerates India's domestic defence procurement" },
+      { name: "FMCG & Edible Oils - HUL, Adani Wilmar, Patanjali", dir: "down", note: "Sunflower oil shortage drives edible oil inflation; input cost pressure on all FMCG" },
+      { name: "Fertilisers - GSFC, Coromandel, Chambal", dir: "down", note: "Urea and potash supply tightens globally; India fertiliser subsidy bill rises" },
+      { name: "Defence - BEL, HAL, Bharat Forge", dir: "up", note: "Prolonged conflict accelerates India's domestic defence procurement" },
     ],
     forex: "Elevated commodity prices widen India's current account deficit; moderate INR depreciation pressure.",
   },
@@ -127,8 +127,8 @@ const INDIA_IMPACT_BY_ALERT: Record<string, AlertImpact> = {
     headline: "Central Asia overland corridor at risk; limited direct India impact",
     severity: "Moderate",
     sectors: [
-      { name: "Logistics & Ports — Adani Ports, CONCOR, Gateway Distriparks", dir: "down", note: "INSTC overland route disruption; sea shipping demand rises incrementally" },
-      { name: "Defence & Aerospace — BEL, HAL, Data Patterns", dir: "up", note: "Regional instability accelerates defence procurement urgency" },
+      { name: "Logistics & Ports - Adani Ports, CONCOR, Gateway Distriparks", dir: "down", note: "INSTC overland route disruption; sea shipping demand rises incrementally" },
+      { name: "Defence & Aerospace - BEL, HAL, Data Patterns", dir: "up", note: "Regional instability accelerates defence procurement urgency" },
     ],
     forex: "Minimal direct forex impact; investor risk-off sentiment may drive marginal FII outflows.",
   },
@@ -148,7 +148,7 @@ const CURRENCY_HINTS: Record<string, string> = {
   "USDINR=X": "Weak INR → IT exporters ↑ (TCS, Infosys) · Importers ↓ · RBI intervenes >₹84",
   "EURINR=X": "EUR/INR relevant for pharma exports to Europe and luxury goods imports",
   "JPYINR=X": "JPY weakness → yen carry unwinds → FII outflows from Indian equities",
-  "GBPINR=X": "GBP/INR: Tata Group UK ops, India–UK FTA discussions impact trade flows",
+  "GBPINR=X": "GBP/INR: Tata Group UK ops, India-UK FTA discussions impact trade flows",
 };
 
 
@@ -177,7 +177,7 @@ const STRATEGIC_ALERTS: AlertPoint[] = [
   },
   {
     lat: 50.5, lng: 35.0, name: "Eastern Europe Conflict", type: "conflict",
-    description: "Active conventional warfare zone causing massive regional disruption. Grain, fertiliser, and energy supply chains remain severely constrained, with no ceasefire visible on the horizon.",
+    description: "Active conventional warfare zone causing massive regional disruption. Grain, fertiliser and energy supply chains remain severely constrained, with no ceasefire visible on the horizon.",
     affectedSectors: [
       { name: "Global Agriculture", risk: "Severe Shortages" },
       { name: "European Energy Supply", risk: "Price Volatility" },

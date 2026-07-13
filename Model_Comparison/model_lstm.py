@@ -2,14 +2,14 @@
 LSTM Model for Tesla Stock Price Prediction
 Implements the architecture from:
   "Advanced Stock Market Prediction Using Long Short-Term Memory Networks"
-  (arXiv:2505.05325v1) — Rajneesh Chaudhary, IIITM Gwalior
+  (arXiv:2505.05325v1) - Rajneesh Chaudhary, IIITM Gwalior
 
 Architecture  : 64 → Dropout(0.2) → 32 → Dense(1)
 Lookback      : 60 trading days
 Normalisation : MinMax [0,1]
 Optimiser     : Adam (lr=0.001)
 Loss          : MSE
-Epochs        : 100 (no early stopping — mirrors pure paper spec)
+Epochs        : 100 (no early stopping - mirrors pure paper spec)
 Note          : Paper achieves 2.72% MAPE with NASDAQ data + sentiment.
                 Here we use TSLA data only (no sentiment feed), which
                 represents the baseline LSTM without augmentation.
@@ -84,7 +84,7 @@ def run_lstm(data_path: str) -> dict:
     opt    = torch.optim.Adam(model.parameters(), lr=0.001)
     crit   = nn.MSELoss()
 
-    # 100 epochs — paper spec, no early stopping
+    # 100 epochs - paper spec, no early stopping
     # (without sentiment augmentation the model tends to overfit
     #  the training regime, hurting generalisation on regime shifts)
     model.train()

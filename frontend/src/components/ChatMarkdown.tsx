@@ -100,7 +100,7 @@ export function ChatMarkdown({ content, invert }: ChatMarkdownProps) {
     .join(" ");
 
   const mdComponents: React.ComponentProps<typeof ReactMarkdown>["components"] = {
-    // Headings — scoped small sizes for chat bubbles
+    // Headings - scoped small sizes for chat bubbles
     h1: ({ children }) => (
       <p className="text-base font-bold mt-3 mb-1 leading-snug">{children}</p>
     ),

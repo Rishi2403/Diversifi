@@ -20,7 +20,7 @@ export function PerformanceChart({ data, benchmarkLabel }: Props) {
   if (!data || data.length === 0) {
     return (
       <div className="flex items-center justify-center h-40 text-gray-400 dark:text-white/30 text-sm">
-        Performance chart unavailable — insufficient historical data
+        Performance chart unavailable - insufficient historical data
       </div>
     );
   }

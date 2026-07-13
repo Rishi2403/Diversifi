@@ -10,7 +10,7 @@ def pre_market_scan(
 ):
     """
     Scans pre-market / early market data and returns top candidates.
-    FUNCTIONAL ONLY — no LLM.
+    FUNCTIONAL ONLY - no LLM.
     """
 
     candidates = []

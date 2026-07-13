@@ -1,7 +1,7 @@
 """
-research_service.py — Scoring engine for Market Pulse, Suggest, and Analyse.
+research_service.py - Scoring engine for Market Pulse, Suggest and Analyse.
 
-Signal Score (0–100):
+Signal Score (0-100):
   Technical   35 pts  RSI + DMA crossover + MACD
   Momentum    25 pts  5-day & 30-day returns + volume surge
   Fundamental 20 pts  PE ratio quality + EPS sign

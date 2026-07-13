@@ -1,4 +1,4 @@
-# Model Comparison — Tesla Stock Prediction
+# Model Comparison - Tesla Stock Prediction
 
 A three-way empirical comparison of time-series prediction models applied to
 TSLA (Tesla Inc.) daily closing prices, producing a fully self-contained HTML
@@ -11,8 +11,8 @@ report with embedded charts and architecture diagrams.
 | # | Model | Source | Approach |
 |---|-------|--------|----------|
 | 1 | **LangGraph Ensemble** | Diversifi backend (`trading_lang.py`) | 4-node state-machine pipeline: feature engineering → GBR + RF signal generation → weighted ensemble → confidence calibration |
-| 2 | **ARIMA (Notebook)** | `Tesla-Stock-Prediction/Time_Series.ipynb` | Walk-forward ARIMA(2,0,0) — optimal order selected via 3×3×3 grid search |
-| 3 | **LSTM (PDF Paper)** | arXiv:2505.05325v1 | Two-layer LSTM (64→32 units), 60-day sliding window, MinMax normalisation, 100 epochs — implemented in PyTorch |
+| 2 | **ARIMA (Notebook)** | `Tesla-Stock-Prediction/Time_Series.ipynb` | Walk-forward ARIMA(2,0,0) - optimal order selected via 3×3×3 grid search |
+| 3 | **LSTM (PDF Paper)** | arXiv:2505.05325v1 | Two-layer LSTM (64→32 units), 60-day sliding window, MinMax normalisation, 100 epochs - implemented in PyTorch |
 
 ---
 
@@ -53,7 +53,7 @@ Model_Comparison/
 ├── model_lstm.py           # LSTM model implementation (PyTorch)
 ├── model_langgraph.py      # LangGraph ensemble model
 ├── run_comparison.py       # Orchestrator + HTML report generator
-├── comparison_report.html  # Generated report (not committed — see .gitignore)
+├── comparison_report.html  # Generated report (not committed - see .gitignore)
 ├── requirements.txt        # Python dependencies
 ├── README.md               # This file
 ├── ARCHITECTURE.md         # Detailed architectural documentation
@@ -98,8 +98,8 @@ overfitting that affects the LSTM.
 **LSTM is third** because the model was trained (without sentiment augmentation) on a
 sustained bull-market period. With 100 epochs and no early stopping on a small dataset
 (698 training sequences), the network overfits to the uptrend pattern and struggles to
-generalise to the subsequent correction — a known limitation noted in the original paper
-(§X), which attributes 8–12% performance gains specifically to VADER sentiment enrichment.
+generalise to the subsequent correction - a known limitation noted in the original paper
+(§X), which attributes 8-12% performance gains specifically to VADER sentiment enrichment.
 
 ---
 

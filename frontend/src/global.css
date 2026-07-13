@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    /* Light Mode — Groww-inspired */
+    /* Light Mode - Groww-inspired */
     --background: 210 20% 96%;
     --foreground: 225 7% 10%;
 
@@ -59,7 +59,7 @@
   }
 
   .dark {
-    /* Dark Mode — Groww dark inspired */
+    /* Dark Mode - Groww dark inspired */
     --background: 225 7% 9%;
     --foreground: 0 0% 95%;
 
@@ -207,4 +207,14 @@
   100% {
     transform: translateX(-50%);
   }
+}
+
+/* Fix native <select> dropdown popup in dark mode */
+.dark select {
+  color-scheme: dark;
+}
+
+.dark select option {
+  background-color: #1a1c1f;
+  color: #f0f0f0;
 }

@@ -1,5 +1,5 @@
 """
-agent_service.py — Autonomous Portfolio Agent.
+agent_service.py - Autonomous Portfolio Agent.
 
 Background loop (every 5 min) per active user:
   1. Fetches live stock prices via yfinance
@@ -170,7 +170,7 @@ def _compute_alerts(holdings_with_prices: list[dict], prev_alerts: list[dict]) -
                 "change_pct": chg, "current_value": h.get("current_value", 0)}
 
         if chg <= -8 or (trend >= 3 and chg < 0):
-            immediate.append({**base, "issue": f"Down {abs(chg):.1f}% today — significant single-day decline",
+            immediate.append({**base, "issue": f"Down {abs(chg):.1f}% today - significant single-day decline",
                                "action": f"Review position in {sym}. Consider partial exit or stop-loss review."})
         elif chg <= -3 or (trend >= 2 and chg < 0):
             caution.append({**base, "issue": f"Down {abs(chg):.1f}% today ({trend} consecutive declines)",
@@ -355,11 +355,11 @@ def _analyse_user(email: str, data_file: str) -> None:
 
     if immediate:
         for a in immediate:
-            _emit("🚨", f"ALERT: {a['symbol']} — {a['issue']}", "error")
+            _emit("🚨", f"ALERT: {a['symbol']} - {a['issue']}", "error")
             _push(email, {"type": "alert_added", "alert": {**a, "tier": "immediate"}})
     if caution:
         for a in caution:
-            _emit("⚠️",  f"CAUTION: {a['symbol']} — {a['issue']}", "warn")
+            _emit("⚠️",  f"CAUTION: {a['symbol']} - {a['issue']}", "warn")
             _push(email, {"type": "alert_added", "alert": {**a, "tier": "caution"}})
     if not immediate and not caution:
         _emit("✅", "All holdings within normal range", "success")
@@ -372,7 +372,7 @@ def _analyse_user(email: str, data_file: str) -> None:
     icon_map = {"All Good": "✅", "Caution": "⚠️", "Immediate Action": "🚨"}
     level_map = {"All Good": "success", "Caution": "warn", "Immediate Action": "error"}
     _emit(icon_map.get(verdict, "✅"),
-          f"Analysis complete — Verdict: {verdict}. {verdict_data.get('verdictReason', '')}",
+          f"Analysis complete - Verdict: {verdict}. {verdict_data.get('verdictReason', '')}",
           level_map.get(verdict, "info"))
 
     _push(email, {"type": "verdict_update",
@@ -410,7 +410,7 @@ def _analyse_user(email: str, data_file: str) -> None:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _is_market_hours() -> bool:
-    """Returns True if current IST time is within NSE market hours (Mon–Fri 9:15–15:30)."""
+    """Returns True if current IST time is within NSE market hours (Mon-Fri 9:15-15:30)."""
     try:
         import pytz
         now_ist = datetime.datetime.now(pytz.timezone("Asia/Kolkata"))

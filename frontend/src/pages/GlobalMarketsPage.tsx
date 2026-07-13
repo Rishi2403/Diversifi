@@ -52,18 +52,25 @@ const fmt = (n: number, dec = 2) =>
 
 const fmtPct = (n: number) => `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`;
 
-const fmtCrypto = (n: number) => {
-  if (n >= 1000) return `$${fmt(n, 2)}`;
-  if (n >= 1) return `$${n.toFixed(4)}`;
-  if (n >= 0.01) return `$${n.toFixed(6)}`;
-  return `$${n.toPrecision(4)}`;
+const fmtInr = (n: number, dec = 0) =>
+  "₹" + n.toLocaleString("en-IN", { minimumFractionDigits: dec, maximumFractionDigits: dec });
+
+const fmtCryptoInr = (n: number) => {
+  if (n >= 1e7) return `₹${(n / 1e7).toFixed(2)} Cr`;
+  if (n >= 1e5) return `₹${(n / 1e5).toFixed(2)} L`;
+  if (n >= 100)  return `₹${n.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+  if (n >= 1)    return `₹${n.toFixed(4)}`;
+  if (n >= 0.01) return `₹${n.toFixed(6)}`;
+  return `₹${n.toPrecision(4)}`;
 };
 
-const fmtMktCap = (n: number) => {
-  if (n >= 1e12) return `$${(n / 1e12).toFixed(2)}T`;
-  if (n >= 1e9) return `$${(n / 1e9).toFixed(1)}B`;
-  return `$${(n / 1e6).toFixed(0)}M`;
+const fmtMktCapInr = (n: number) => {
+  if (n >= 1e12) return `₹${(n / 1e12).toFixed(2)}T`;
+  if (n >= 1e9)  return `₹${(n / 1e9).toFixed(1)}B`;
+  return `₹${(n / 1e6).toFixed(0)}M`;
 };
+
+const INR_FALLBACK = 84.5;
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -130,28 +137,32 @@ const IndexCard = ({ item, delay = 0 }: { item: MarketItem; delay?: number }) =>
   </motion.div>
 );
 
-const CommodityCard = ({ item, delay = 0 }: { item: MarketItem; delay?: number }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay }}
-    className="bg-card border border-border rounded-xl p-4 hover:border-[#00D09C]/40 transition-colors cursor-default"
-  >
-    <div className="flex items-center justify-between mb-1">
-      <p className="font-semibold text-sm">{item.name}</p>
-      <ChangeTag pct={item.changePct} />
-    </div>
-    <p className="text-lg font-bold tabular-nums">${fmt(item.price)}</p>
-    <p className="text-xs text-muted-foreground mt-0.5">{item.unit}</p>
-    <p
-      className={`text-xs mt-0.5 tabular-nums font-medium ${
-        item.change >= 0 ? "text-[#00D09C]" : "text-red-400"
-      }`}
+const CommodityCard = ({ item, inrRate, delay = 0 }: { item: MarketItem; inrRate: number; delay?: number }) => {
+  const priceInr  = item.price  * inrRate;
+  const changeInr = item.change * inrRate;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay }}
+      className="bg-card border border-border rounded-xl p-4 hover:border-[#00D09C]/40 transition-colors cursor-default"
     >
-      {item.change >= 0 ? "▲" : "▼"} ${Math.abs(item.change).toFixed(2)}
-    </p>
-  </motion.div>
-);
+      <div className="flex items-center justify-between mb-1">
+        <p className="font-semibold text-sm">{item.name}</p>
+        <ChangeTag pct={item.changePct} />
+      </div>
+      <p className="text-lg font-bold tabular-nums">{fmtInr(priceInr)}</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{item.unit}</p>
+      <p
+        className={`text-xs mt-0.5 tabular-nums font-medium ${
+          item.change >= 0 ? "text-[#00D09C]" : "text-red-400"
+        }`}
+      >
+        {changeInr >= 0 ? "▲" : "▼"} {fmtInr(Math.abs(changeInr))}
+      </p>
+    </motion.div>
+  );
+};
 
 const CryptoCard = ({ item, delay = 0 }: { item: CryptoItem; delay?: number }) => {
   const isUp = item.price_change_percentage_24h >= 0;
@@ -174,7 +185,7 @@ const CryptoCard = ({ item, delay = 0 }: { item: CryptoItem; delay?: number }) =
           <p className="text-xs text-muted-foreground uppercase">{item.symbol}</p>
         </div>
       </div>
-      <p className="text-base font-bold tabular-nums">{fmtCrypto(item.current_price)}</p>
+      <p className="text-base font-bold tabular-nums">{fmtCryptoInr(item.current_price)}</p>
       <div className="flex items-center justify-between mt-1">
         <span
           className={`inline-flex items-center gap-0.5 text-xs font-semibold ${
@@ -184,7 +195,7 @@ const CryptoCard = ({ item, delay = 0 }: { item: CryptoItem; delay?: number }) =
           {isUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
           {fmtPct(item.price_change_percentage_24h)}
         </span>
-        <span className="text-xs text-muted-foreground">{fmtMktCap(item.market_cap)}</span>
+        <span className="text-xs text-muted-foreground">{fmtMktCapInr(item.market_cap)}</span>
       </div>
     </motion.div>
   );
@@ -303,7 +314,7 @@ export default function GlobalMarketsPage() {
     const [marketsRes, cryptoRes, forexRes, newsRes] = await Promise.allSettled([
       fetch("/api/markets").then((r) => r.json()),
       fetch(
-        "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=8&page=1&sparkline=false"
+        "https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&order=market_cap_desc&per_page=8&page=1&sparkline=false"
       ).then((r) => r.json()),
       
       fetch(
@@ -359,6 +370,7 @@ export default function GlobalMarketsPage() {
     };
   }, [fetchAll]);
 
+  const inrRate  = forex?.rates?.INR ?? INR_FALLBACK;
   const chartData = (markets?.indices ?? []).map((idx) => ({
     name: idx.name,
     change: idx.changePct,
@@ -501,7 +513,7 @@ export default function GlobalMarketsPage() {
             ) : (
               <div className="grid grid-cols-2 gap-3">
                 {(markets?.commodities ?? []).map((item, i) => (
-                  <CommodityCard key={item.symbol} item={item} delay={i * 0.05} />
+                  <CommodityCard key={item.symbol} item={item} inrRate={inrRate} delay={i * 0.05} />
                 ))}
               </div>
             )}
@@ -512,7 +524,7 @@ export default function GlobalMarketsPage() {
             <SectionHeader
               icon={<DollarSign className="w-4 h-4" />}
               title="Forex Rates"
-              subtitle="Currency exchange rates — base: USD"
+              subtitle="Currency exchange rates - base: USD"
             />
             {loading || !forex ? (
               <div className="bg-card border border-border rounded-xl overflow-hidden">

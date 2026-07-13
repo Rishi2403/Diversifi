@@ -116,7 +116,7 @@ export default function ProfileConfirmation({ profile, stockCount, mfCount, onCo
         {loading ? (
           <><Loader2 className="w-4 h-4 animate-spin" />Setting up agent…</>
         ) : (
-          "Looks good — Start Monitoring"
+          "Looks good - Start Monitoring"
         )}
       </button>
     </div>

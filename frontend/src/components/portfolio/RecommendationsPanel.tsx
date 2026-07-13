@@ -12,7 +12,7 @@ export function RecommendationsPanel({ recommendations }: Props) {
   if (recommendations.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500 dark:text-white/40 text-sm">
-        ✅ Portfolio looks well balanced — no major recommendations.
+        ✅ Portfolio looks well balanced - no major recommendations.
       </div>
     );
   }

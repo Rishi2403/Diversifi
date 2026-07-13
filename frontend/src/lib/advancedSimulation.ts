@@ -72,15 +72,19 @@ export interface InflationScenario {
   duration: number; // years
 }
 
+export interface SIPAllocation {
+  fundName: string;
+  amount: number; // monthly ₹
+}
+
 export interface YearlyInvestmentPlan {
   year: number;
-  sipAmount: number; // monthly
+  sipMode: "total" | "fundwise";
+  sipAmount: number; // monthly total (when sipMode === "total")
+  sipAllocations: SIPAllocation[]; // per-fund (when sipMode === "fundwise")
   swpAmount: number; // monthly
   lumpsum: number; // one-time at start of year
-  stockPurchases?: {
-    symbol: string;
-    amount: number;
-  }[];
+  stockPurchases?: { symbol: string; amount: number }[];
 }
 
 export interface AdvancedSimulationInput {
@@ -163,7 +167,8 @@ export interface AdvancedSimulationResult {
  * Analyze which holdings are affected by scenarios using LLM
  */
 export async function analyzeHoldingImpacts(
-  input: AdvancedSimulationInput
+  input: AdvancedSimulationInput,
+  onProgress?: (pct: number, label: string) => void
 ): Promise<HoldingImpact[]> {
   const FOUNDRY_API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
   const FOUNDRY_RESOURCE = import.meta.env.VITE_ANTHROPIC_FOUNDRY_RESOURCE;
@@ -212,7 +217,7 @@ export async function analyzeHoldingImpacts(
 
   for (let i = 0; i < holdings.length; i++) {
     const holding = holdings[i];
-    console.log(`📊 Analyzing ${i + 1}/${holdings.length}: ${holding.name}`);
+    onProgress?.(Math.round((i / holdings.length) * 100), `${holding.name} (${i + 1}/${holdings.length})`);
 
     try {
       const impact = await analyzeHoldingWithLLM(holding, allScenarios, FOUNDRY_API_KEY, FOUNDRY_RESOURCE);
@@ -267,7 +272,7 @@ Consider:
 - Industry-specific scenarios affect relevant sectors
 - Geopolitical scenarios affect companies with exposure to those regions
 
-Return ONLY a JSON array — one entry per scenario, using the EXACT id string from above:
+Return ONLY a JSON array - one entry per scenario, using the EXACT id string from above:
 [
   {
     "scenarioId": "<exact id from above>",
@@ -485,7 +490,7 @@ function runSingleAdvancedSimulation(
         month >= scenarioMonth &&
         month < scenarioMonth + scenarioDurationMonths
       ) {
-        if (Math.random() < scenario.probability / 12) {
+        if (Math.random() < 1 - Math.pow(1 - scenario.probability, 1 / 12)) {
           // Apply impact to affected holdings
           for (const holdingImpact of holdingImpacts) {
             const affected = holdingImpact.affectedBy.find(
@@ -516,7 +521,7 @@ function runSingleAdvancedSimulation(
         month >= scenarioMonth &&
         month < scenarioMonth + scenarioDurationMonths
       ) {
-        if (Math.random() < scenario.probability / 12) {
+        if (Math.random() < 1 - Math.pow(1 - scenario.probability, 1 / 12)) {
           const affected = holdingImpacts.filter((h) =>
             h.affectedBy.some((a) => a.scenarioId === scenario.id)
           );
@@ -574,10 +579,11 @@ function runSingleAdvancedSimulation(
     // Apply investment plan for current year
     const plan = input.investmentPlans.find((p) => p.year === currentYear);
     if (plan) {
-      // Monthly SIP
-      if (plan.sipAmount > 0) {
-        portfolioValue += plan.sipAmount;
-      }
+      // Monthly SIP — resolved from sipMode
+      const effectiveSip = plan.sipMode === "fundwise"
+        ? (plan.sipAllocations || []).reduce((s, a) => s + a.amount, 0)
+        : (plan.sipAmount || 0);
+      if (effectiveSip > 0) portfolioValue += effectiveSip;
 
       // Monthly SWP
       if (plan.swpAmount > 0) {
@@ -610,23 +616,34 @@ function runSingleAdvancedSimulation(
 }
 
 export async function runAdvancedSimulation(
-  input: AdvancedSimulationInput
+  input: AdvancedSimulationInput,
+  onProgress?: (pct: number, label: string) => void
 ): Promise<AdvancedSimulationResult> {
-  // Step 1: Analyze holding impacts using LLM
-  console.log("Analyzing holding impacts with LLM...");
-  const holdingImpacts = await analyzeHoldingImpacts(input);
-  console.log("Holding impacts analyzed:", holdingImpacts);
+  // Step 1: Analyze holding impacts using LLM (0–55%)
+  onProgress?.(0, "Starting AI analysis...");
+  const holdingImpacts = await analyzeHoldingImpacts(input, (pct, label) => {
+    onProgress?.(Math.round(pct * 0.55), `Analysing ${label}`);
+  });
 
-  // Step 2: Run Monte Carlo simulations
-  const numSimulations = input.simulations || 10000;
+  // Step 2: Run Monte Carlo simulations (55–95%) — chunked for UI responsiveness
+  const numSimulations = input.simulations || 5000;
   const allPaths: any[] = [];
   const finalValues: number[] = [];
+  const YIELD_EVERY = 500;
 
   for (let i = 0; i < numSimulations; i++) {
     const path = runSingleAdvancedSimulation(input, holdingImpacts, i);
     allPaths.push(path);
     finalValues.push(path.finalValue);
+
+    if (i > 0 && i % YIELD_EVERY === 0) {
+      const pct = 55 + Math.round((i / numSimulations) * 40);
+      onProgress?.(pct, `Monte Carlo: ${Math.round((i / numSimulations) * 100)}% (${i.toLocaleString()} / ${numSimulations.toLocaleString()} paths)`);
+      await new Promise<void>((r) => setTimeout(r, 0));
+    }
   }
+
+  onProgress?.(95, "Computing statistics...");
 
   // Step 3: Calculate statistics
   const sortedValues = [...finalValues].sort((a, b) => a - b);
@@ -669,13 +686,13 @@ export async function runAdvancedSimulation(
   const lossCount = finalValues.filter((v) => v < initialValue).length;
   const probabilityOfLoss = lossCount / numSimulations;
 
-  // Risk metrics
-  const riskFreeRate = 0.06;
-  const excessReturn = mean / initialValue - 1 - riskFreeRate * input.timeHorizon;
-  const sharpeRatio = excessReturn / (standardDeviation / initialValue);
+  // Risk metrics — annualised Sharpe using input volatility as the return vol estimator
+  const annualisedReturn = Math.pow(mean / initialValue, 1 / input.timeHorizon) - 1;
+  const riskFreeRate = 0.065; // India 10-yr G-sec proxy
+  const sharpeRatio = (annualisedReturn - riskFreeRate) / (input.baseVolatility / 100);
 
   let maxDrawdown = 0;
-  allPaths.slice(0, 100).forEach((path) => {
+  allPaths.forEach((path) => {
     let peak = path.values[0];
     path.values.forEach((value: number) => {
       if (value > peak) peak = value;
@@ -693,6 +710,8 @@ export async function runAdvancedSimulation(
     const idx = Math.floor(Math.random() * numSimulations);
     samplePaths.push(allPaths[idx]);
   }
+
+  onProgress?.(100, "Simulation complete");
 
   return {
     paths: samplePaths,

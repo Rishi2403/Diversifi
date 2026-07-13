@@ -1,7 +1,7 @@
 """
-mf_service.py — Scoring engine for MF Market Pulse, Suggest, and Analyse.
+mf_service.py - Scoring engine for MF Market Pulse, Suggest and Analyse.
 
-Score (0–100):
+Score (0-100):
   1Y Returns   40 pts  long-term performance
   3M Returns   20 pts  recent trend
   1M Momentum  15 pts  short-term momentum

@@ -129,8 +129,8 @@ def handle_classifier_decision(state: AgentState) -> str:
 def mf_handler(state: AgentState) -> AgentState:
     prompt = f"""
     You are a Mutual Fund expert. Answer the user's question in a very clear,
-    simplified, and actionable way. Provide fund suggestions only if user intent is clear,
-    otherwise explain considerations such as risk level, time horizon, and goals.
+    simplified and actionable way. Provide fund suggestions only if user intent is clear,
+    otherwise explain considerations such as risk level, time horizon and goals.
 
     Question: "{state['question']}"
     """
@@ -142,7 +142,7 @@ def mf_handler(state: AgentState) -> AgentState:
 def general_finance_handler(state: AgentState) -> AgentState:
     prompt = f"""
     You are a financial advisor focused on personal finance topics like budgeting,
-    savings, insurance, tax planning, and general investment strategy.
+    savings, insurance, tax planning and general investment strategy.
     Provide a simplified and helpful explanation.
 
     Question: "{state['question']}"
@@ -190,7 +190,7 @@ def bull_handler(state: AgentState) -> AgentState:
     News Headlines: {headlines}
     Sentiment: {sentiment_summary}
 
-    Explain why the stock may rise, opportunities, catalysts, investor confidence, and upside targets.
+    Explain why the stock may rise, opportunities, catalysts, investor confidence and upside targets.
     Provide a bullish Buy recommendation if justified. Keep all of it very concise.
     """
     text = safe_llm_invoke(prompt)
@@ -209,7 +209,7 @@ def bear_handler(state: AgentState) -> AgentState:
     News Headlines: {headlines}
     Sentiment: {sentiment_summary}
 
-    Explain risks, weaknesses, uncertainty, red flags, and downside price levels.
+    Explain risks, weaknesses, uncertainty, red flags and downside price levels.
     Provide a Sell recommendation if justified. Keep all of it very concise.
     """
     text = safe_llm_invoke(prompt)
@@ -231,7 +231,7 @@ def stock_handler(state: AgentState) -> AgentState:
     {bear}
 
     Give a clear final decision (Buy / Hold / Sell), including price action expectations,
-    risk factors, and short-term vs long-term outlook. Be concise and professional.
+    risk factors and short-term vs long-term outlook. Be concise and professional.
     """
     text = safe_llm_invoke(prompt)
     state['answer'] = text
@@ -354,7 +354,7 @@ def chat_message(role, content):
 
 
 def main():
-    st.set_page_config(page_title="Finance Assistant — Integrated LangGraph", layout="wide")
+    st.set_page_config(page_title="Finance Assistant - Integrated LangGraph", layout="wide")
     # --- Dark/Light Mode Safe Styling ---
     st.markdown("""
     <style>
@@ -396,7 +396,7 @@ def main():
     </style>
     """, unsafe_allow_html=True)
 
-    st.title("💬 Finance Assistant — Full LangGraph Integration")
+    st.title("💬 Finance Assistant - Full LangGraph Integration")
 
     if 'chat' not in st.session_state:
         st.session_state.chat = []

@@ -8,7 +8,7 @@ Architecture mirrors LangGraph's state-machine pattern:
   ┌─────────────────────────────────────────────────────────────────┐
   │ Node 1: feature_engineering_node                                │
   │   → MA(5/10/20/50), RSI-14, Bollinger %B, Momentum(1/3/5/10),  │
-  │     Price/MA ratios, MA crossover signal, Lags(1–5), Volatility │
+  │     Price/MA ratios, MA crossover signal, Lags(1-5), Volatility │
   ├─────────────────────────────────────────────────────────────────┤
   │ Node 2: signal_generation_node (parallel sub-agents)            │
   │   Agent-A: GradientBoostingRegressor (n=300, depth=5, lr=0.03)  │
@@ -62,7 +62,7 @@ def _bollinger_pct(prices: pd.Series, window: int = 20) -> pd.Series:
 
 def feature_engineering_node(close: pd.Series) -> pd.DataFrame:
     """
-    Node 1 — Feature Engineering
+    Node 1 - Feature Engineering
     Computes all technical indicators for the prediction pipeline.
     """
     df = pd.DataFrame({"Close": close})
@@ -101,7 +101,7 @@ def feature_engineering_node(close: pd.Series) -> pd.DataFrame:
 
 def signal_generation_node(X_train: np.ndarray, y_train: np.ndarray):
     """
-    Node 2 — Parallel Signal Generation (two sub-agents)
+    Node 2 - Parallel Signal Generation (two sub-agents)
     Returns fitted GBR and RF models.
     """
     gbr = GradientBoostingRegressor(
@@ -128,7 +128,7 @@ def ensemble_voting_node(
     gbr, rf, X: np.ndarray,
     weights: tuple = (0.65, 0.35),
 ) -> np.ndarray:
-    """Node 3 — Weighted ensemble combination."""
+    """Node 3 - Weighted ensemble combination."""
     return weights[0] * gbr.predict(X) + weights[1] * rf.predict(X)
 
 
@@ -138,7 +138,7 @@ def confidence_calibration_node(
     window: int = 5,
 ) -> np.ndarray:
     """
-    Node 4 — Confidence Calibration
+    Node 4 - Confidence Calibration
     Lightly blends toward recent momentum to prevent drift during
     high-momentum regimes (e.g. sharp downtrends).
     """
@@ -178,7 +178,7 @@ def run_langgraph(data_path: str) -> dict:
     # Node 2: train both sub-agents once on the full training window
     gbr, rf   = signal_generation_node(X_tr_sc, y_train)
 
-    # Walk-forward prediction — expanding history
+    # Walk-forward prediction - expanding history
     all_close   = close.values.copy()
     predictions = []
 

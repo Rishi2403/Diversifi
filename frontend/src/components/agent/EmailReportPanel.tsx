@@ -60,7 +60,7 @@ export default function EmailReportPanel({ email, lastSentAt }: Props) {
       </div>
 
       <p className="text-muted-foreground text-xs mb-3">
-        Includes: portfolio snapshot, verdict, top alerts, holdings table, and live dashboard link.
+        Includes: portfolio snapshot, verdict, top alerts, holdings table and live dashboard link.
       </p>
 
       {status === "sent" ? (

@@ -1,6 +1,6 @@
 """
-Model Comparison Runner — Tesla Stock Prediction
-Runs ARIMA, LSTM, and LangGraph models on TSLA.CSV,
+Model Comparison Runner - Tesla Stock Prediction
+Runs ARIMA, LSTM and LangGraph models on TSLA.CSV,
 then generates a self-contained HTML comparison report.
 
 Usage:
@@ -67,7 +67,7 @@ def chart_train_test_split(results: list) -> str:
             color=PALETTE["actual"], linewidth=2.2, label="Test data (60 days)")
     ax.axvline(x=r["test"].index[0], color="#444", linestyle="--",
                linewidth=1.2, alpha=0.7)
-    ax.set_title("TSLA Close Price — Train / Test Split", fontsize=14)
+    ax.set_title("TSLA Close Price - Train / Test Split", fontsize=14)
     ax.set_xlabel("Date"); ax.set_ylabel("Price (USD)")
     ax.legend(fontsize=11)
     ax.grid(True, alpha=0.4, color=PALETTE["grid"])
@@ -310,7 +310,7 @@ def svg_arima_arch() -> str:
     <tspan x="770" y="46" font-size="12">Output</tspan>
   </text>
 </svg>
-<p class="diagram-caption">Figure — ARIMA pipeline (notebook approach)</p>"""
+<p class="diagram-caption">Figure - ARIMA pipeline (notebook approach)</p>"""
 
 
 def svg_lstm_arch() -> str:
@@ -359,7 +359,7 @@ def svg_lstm_arch() -> str:
     <tspan x="905" dy="1.3em" font-size="11" class="muted-text">Price out</tspan>
   </text>
 </svg>
-<p class="diagram-caption">Figure — LSTM architecture from PDF paper (PyTorch implementation)</p>"""
+<p class="diagram-caption">Figure - LSTM architecture from PDF paper (PyTorch implementation)</p>"""
 
 
 def svg_langgraph_arch() -> str:
@@ -372,7 +372,7 @@ def svg_langgraph_arch() -> str:
     </marker>
   </defs>
   <!-- State label -->
-  <text x="510" y="16" text-anchor="middle" font-size="11" class="muted-text">LangGraph State Machine — 4 nodes, expanding window walk-forward</text>
+  <text x="510" y="16" text-anchor="middle" font-size="11" class="muted-text">LangGraph State Machine - 4 nodes, expanding window walk-forward</text>
 
   <!-- Node 1: Feature Engineering -->
   <rect x="20" y="50" width="200" height="100" rx="6" class="box"/>
@@ -381,7 +381,7 @@ def svg_langgraph_arch() -> str:
     <tspan x="120" dy="1.4em" font-size="11">Feature Engineering</tspan>
     <tspan x="120" dy="1.3em" font-size="10" class="muted-text">MA5/10/20/50, RSI-14</tspan>
     <tspan x="120" dy="1.2em" font-size="10" class="muted-text">Bollinger, Momentum</tspan>
-    <tspan x="120" dy="1.2em" font-size="10" class="muted-text">Lags 1–5, Volatility</tspan>
+    <tspan x="120" dy="1.2em" font-size="10" class="muted-text">Lags 1-5, Volatility</tspan>
   </text>
   <line x1="220" y1="100" x2="258" y2="100" class="arrow" color="var(--fg)" marker-end="url(#arr-lg)"/>
 
@@ -422,7 +422,7 @@ def svg_langgraph_arch() -> str:
     <tspan x="995" y="105" font-size="10">Out</tspan>
   </text>
 </svg>
-<p class="diagram-caption">Figure — LangGraph 4-node state-machine pipeline (inspired by Diversifi backend architecture)</p>"""
+<p class="diagram-caption">Figure - LangGraph 4-node state-machine pipeline (inspired by Diversifi backend architecture)</p>"""
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -542,7 +542,7 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tesla Stock Prediction — Model Comparison</title>
+<title>Tesla Stock Prediction - Model Comparison</title>
 <style>
   /* ── Design tokens ─────────────────────────────────────── */
   :root {{
@@ -702,7 +702,7 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
   </div>
   <ol>
     <li><a href="#overview">Overview<span class="nav-summary">Rankings &amp; KPIs</span></a></li>
-    <li><a href="#dataset">Dataset<span class="nav-summary">TSLA 2019–2022</span></a></li>
+    <li><a href="#dataset">Dataset<span class="nav-summary">TSLA 2019-2022</span></a></li>
     <li><a href="#models">Model Architectures<span class="nav-summary">3 approaches</span></a></li>
     <li><a href="#results">Performance Results<span class="nav-summary">RMSE · MAE · MAPE</span></a></li>
     <li><a href="#predictions">Prediction Charts<span class="nav-summary">Actual vs Predicted</span></a></li>
@@ -715,7 +715,7 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
 <main>
 
 <header>
-  <h1>Tesla Stock Prediction — Model Comparison</h1>
+  <h1>Tesla Stock Prediction - Model Comparison</h1>
   <p class="subtitle">Three-way comparison: LangGraph Ensemble vs. ARIMA (Notebook) vs. LSTM (PDF Paper)</p>
   <p class="meta">Diversifi · {date_str} · data: <code>TSLA.CSV</code> · {data_rows} trading days · test window: 60 days</p>
 </header>
@@ -740,8 +740,8 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
 <p>
   This report presents an empirical comparison of three independent forecasting
   approaches applied to TSLA (Tesla Inc.) daily closing prices over a 60-day
-  out-of-sample test window (March–May 2022). Models are evaluated on four
-  quantitative criteria — RMSE, MAE, MAPE, and Directional Accuracy — each of
+  out-of-sample test window (March-May 2022). Models are evaluated on four
+  quantitative criteria - RMSE, MAE, MAPE and Directional Accuracy - each of
   which is defined in the <a href="#results">Performance Results</a> section.
 </p>
 
@@ -791,7 +791,7 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
 <div class="stat-row">
   <div class="stat-card stat-card-ok">
     <div class="stat-value">{lg['rmse']:.2f}</div>
-    <div class="stat-label">LangGraph RMSE — lowest error (USD)</div>
+    <div class="stat-label">LangGraph RMSE - lowest error (USD)</div>
   </div>
   <div class="stat-card">
     <div class="stat-value">{ar['rmse']:.2f}</div>
@@ -799,11 +799,11 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
   </div>
   <div class="stat-card stat-card-fail">
     <div class="stat-value">{ls['rmse']:.2f}</div>
-    <div class="stat-label">LSTM RMSE — highest error (USD)</div>
+    <div class="stat-label">LSTM RMSE - highest error (USD)</div>
   </div>
   <div class="stat-card stat-card-ok">
     <div class="stat-value">{lg['mape']:.2f}%</div>
-    <div class="stat-label">LangGraph MAPE — lowest percentage error</div>
+    <div class="stat-label">LangGraph MAPE - lowest percentage error</div>
   </div>
   <div class="stat-card stat-card-ok">
     <div class="stat-value">{lg['directional_accuracy']:.1f}%</div>
@@ -845,7 +845,7 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
 <thead><tr><th>Attribute</th><th>Value</th></tr></thead>
 <tbody>
   <tr><td>Ticker</td><td><code>TSLA</code> (Tesla Inc.)</td></tr>
-  <tr><td>Source</td><td>CSV — Tesla-Stock-Prediction/TSLA.CSV</td></tr>
+  <tr><td>Source</td><td>CSV - Tesla-Stock-Prediction/TSLA.CSV</td></tr>
   <tr><td>Date range</td><td>{date_range}</td></tr>
   <tr><td>Total rows</td><td class="num">{data_rows}</td></tr>
   <tr><td>Training rows</td><td class="num">{train_size}</td></tr>
@@ -861,8 +861,8 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
 {img_tag(charts['train_test'], 'Train test split')}
 
 <div class="callout">
-  The test period (March–May 2022) coincides with a significant TSLA price
-  correction — a deliberate choice to assess how each model handles an abrupt
+  The test period (March-May 2022) coincides with a significant TSLA price
+  correction - a deliberate choice to assess how each model handles an abrupt
   <strong>regime shift</strong> (a structural change in the statistical properties of
   the data, such as the transition from an uptrend to a downtrend). Models that
   overfit to the prior bull-market pattern are expected to underperform here.
@@ -875,7 +875,7 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
 <tbody>
   <tr>
     <td><strong>Univariate series</strong></td>
-    <td>A time series consisting of a single variable measured over time — in this
+    <td>A time series consisting of a single variable measured over time - in this
     case, the daily closing price. Contrasts with multivariate series which model
     multiple correlated variables simultaneously.</td>
   </tr>
@@ -894,7 +894,7 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
   </tr>
   <tr>
     <td><strong>Regime shift</strong></td>
-    <td>A structural change in the underlying data-generating process — for
+    <td>A structural change in the underlying data-generating process - for
     example, a sustained trend reversal. Models trained exclusively on one
     regime (e.g. a bull market) may not generalise to a different regime
     (e.g. a correction).</td>
@@ -909,14 +909,14 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
 <h2>3. Model Architectures</h2>
 
 <p>
-  Each model represents a distinct class of forecasting approach — classical statistical,
-  deep learning, and machine-learning ensemble — enabling a broad methodological
+  Each model represents a distinct class of forecasting approach - classical statistical,
+  deep learning and machine-learning ensemble - enabling a broad methodological
   comparison on the same dataset and evaluation protocol.
 </p>
 
 <details class="bucket" open>
   <summary>
-    <span class="bucket-name">{pill('LangGraph Ensemble', 'blue')} — 4-Node State Machine</span>
+    <span class="bucket-name">{pill('LangGraph Ensemble', 'blue')} - 4-Node State Machine</span>
     <span class="bucket-n">20 features · GBR + RF · walk-forward</span>
   </summary>
   <p class="bucket-desc">
@@ -929,14 +929,14 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
   <table class="dist compact">
   <thead><tr><th>Node</th><th>Role</th><th>Details</th></tr></thead>
   <tbody>
-    <tr><td>1 — Feature Engineering</td><td>Signal extraction</td><td>MA(5/10/20/50), RSI-14, Bollinger %B, Momentum(1/3/5/10d), Lags(1–5), Volatility(5/10d) — 20 features total</td></tr>
-    <tr><td>2 — Signal Generation</td><td>Parallel sub-agents</td><td>Agent-A: GradientBoostingRegressor (n=300, depth=5, lr=0.03); Agent-B: RandomForestRegressor (n=300, depth=10)</td></tr>
-    <tr><td>3 — Ensemble Voting</td><td>Weighted aggregation</td><td>Final = 0.65 × GBR + 0.35 × RF prediction</td></tr>
-    <tr><td>4 — Confidence Calibration</td><td>Drift suppression</td><td>Momentum anchor blended with ensemble; prevents overconfidence in high-momentum periods</td></tr>
+    <tr><td>1 - Feature Engineering</td><td>Signal extraction</td><td>MA(5/10/20/50), RSI-14, Bollinger %B, Momentum(1/3/5/10d), Lags(1-5), Volatility(5/10d) - 20 features total</td></tr>
+    <tr><td>2 - Signal Generation</td><td>Parallel sub-agents</td><td>Agent-A: GradientBoostingRegressor (n=300, depth=5, lr=0.03); Agent-B: RandomForestRegressor (n=300, depth=10)</td></tr>
+    <tr><td>3 - Ensemble Voting</td><td>Weighted aggregation</td><td>Final = 0.65 × GBR + 0.35 × RF prediction</td></tr>
+    <tr><td>4 - Confidence Calibration</td><td>Drift suppression</td><td>Momentum anchor blended with ensemble; prevents overconfidence in high-momentum periods</td></tr>
   </tbody>
   </table>
   </div>
-  <h3 style="margin-top:16px;">Technical Terms — LangGraph Ensemble</h3>
+  <h3 style="margin-top:16px;">Technical Terms - LangGraph Ensemble</h3>
   <div class="table-wrap">
   <table class="dist compact">
   <thead><tr><th>Term</th><th>Definition</th></tr></thead>
@@ -955,7 +955,7 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
 
 <details class="bucket" open>
   <summary>
-    <span class="bucket-name">{pill('ARIMA (Notebook)', 'amber')} — Classical Statistical</span>
+    <span class="bucket-name">{pill('ARIMA (Notebook)', 'amber')} - Classical Statistical</span>
     <span class="bucket-n">ARIMA(2,0,0) · walk-forward · grid-selected</span>
   </summary>
   <p class="bucket-desc">
@@ -974,17 +974,17 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
   </tbody>
   </table>
   </div>
-  <h3 style="margin-top:16px;">Technical Terms — ARIMA</h3>
+  <h3 style="margin-top:16px;">Technical Terms - ARIMA</h3>
   <div class="table-wrap">
   <table class="dist compact">
   <thead><tr><th>Term</th><th>Definition</th></tr></thead>
   <tbody>
-    <tr><td><strong>ARIMA(p, d, q)</strong></td><td>AutoRegressive Integrated Moving Average. A classical time-series model combining three components: AR (autoregressive — the influence of p past values), I (integrated — d rounds of differencing to achieve stationarity), and MA (moving average of q past forecast errors).</td></tr>
+    <tr><td><strong>ARIMA(p, d, q)</strong></td><td>AutoRegressive Integrated Moving Average. A classical time-series model combining three components: AR (autoregressive - the influence of p past values), I (integrated - d rounds of differencing to achieve stationarity) and MA (moving average of q past forecast errors).</td></tr>
     <tr><td><strong>Autoregressive (AR) order p</strong></td><td>The number of lagged price values used as predictors. AR(2) means the current price is modelled as a linear combination of the two most recent prices plus a noise term: X_t = c + φ₁X_(t-1) + φ₂X_(t-2) + ε_t.</td></tr>
     <tr><td><strong>Differencing order d</strong></td><td>The number of times the series is differenced (subtracted from its own lag) to remove trends and achieve <em>stationarity</em>. A stationary series has constant mean and variance over time, which ARIMA requires. d=0 means no differencing was needed.</td></tr>
     <tr><td><strong>Stationarity</strong></td><td>A time series is stationary when its statistical properties (mean, variance, autocorrelation) do not change over time. Required by ARIMA. Verified using the Augmented Dickey-Fuller (ADF) test, where a p-value below 0.05 rejects the null hypothesis of non-stationarity.</td></tr>
-    <tr><td><strong>ADF Test</strong></td><td>Augmented Dickey-Fuller test — a statistical hypothesis test for the presence of a unit root (a source of non-stationarity) in a time series. A low p-value indicates the series is stationary.</td></tr>
-    <tr><td><strong>Grid search</strong></td><td>Exhaustive evaluation of all combinations of hyperparameter values within a specified range. Here, all 27 combinations of (p,d,q) ∈ [0,2]³ were evaluated by walk-forward RMSE, and the combination yielding the lowest error was selected.</td></tr>
+    <tr><td><strong>ADF Test</strong></td><td>Augmented Dickey-Fuller test - a statistical hypothesis test for the presence of a unit root (a source of non-stationarity) in a time series. A low p-value indicates the series is stationary.</td></tr>
+    <tr><td><strong>Grid search</strong></td><td>Exhaustive evaluation of all combinations of hyperparameter values within a specified range. Here, all 27 combinations of (p,d,q) ∈ [0,2]³ were evaluated by walk-forward RMSE and the combination yielding the lowest error was selected.</td></tr>
   </tbody>
   </table>
   </div>
@@ -992,7 +992,7 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
 
 <details class="bucket" open>
   <summary>
-    <span class="bucket-name">{pill('LSTM (PDF Paper)', 'grey')} — Deep Learning</span>
+    <span class="bucket-name">{pill('LSTM (PDF Paper)', 'grey')} - Deep Learning</span>
     <span class="bucket-n">64→32 LSTM · 60-day window · PyTorch</span>
   </summary>
   <p class="bucket-desc">
@@ -1006,10 +1006,10 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
   <table class="dist compact">
   <thead><tr><th>Parameter</th><th>Value</th><th>Source</th></tr></thead>
   <tbody>
-    <tr><td>Layer 1</td><td>LSTM — 64 units, return_sequences=True</td><td>Paper spec (§VI-B)</td></tr>
+    <tr><td>Layer 1</td><td>LSTM - 64 units, return_sequences=True</td><td>Paper spec (§VI-B)</td></tr>
     <tr><td>Dropout</td><td>20%</td><td>Paper spec (§VI-B)</td></tr>
-    <tr><td>Layer 2</td><td>LSTM — 32 units</td><td>Paper spec (§VI-B)</td></tr>
-    <tr><td>Output</td><td>Dense(1) — linear activation</td><td>Paper spec (§VI-B)</td></tr>
+    <tr><td>Layer 2</td><td>LSTM - 32 units</td><td>Paper spec (§VI-B)</td></tr>
+    <tr><td>Output</td><td>Dense(1) - linear activation</td><td>Paper spec (§VI-B)</td></tr>
     <tr><td>Normalisation</td><td>Min-Max [0, 1]</td><td>Paper spec (§VI-A3)</td></tr>
     <tr><td>Lookback window</td><td>60 trading days</td><td>Paper spec (§VI-A4)</td></tr>
     <tr><td>Optimiser</td><td>Adam (lr=0.001)</td><td>Paper spec (§VI-B)</td></tr>
@@ -1019,28 +1019,28 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
   </tbody>
   </table>
   </div>
-  <h3 style="margin-top:16px;">Technical Terms — LSTM</h3>
+  <h3 style="margin-top:16px;">Technical Terms - LSTM</h3>
   <div class="table-wrap">
   <table class="dist compact">
   <thead><tr><th>Term</th><th>Definition</th></tr></thead>
   <tbody>
-    <tr><td><strong>LSTM (Long Short-Term Memory)</strong></td><td>A type of Recurrent Neural Network (RNN) designed to learn long-range temporal dependencies. Each cell contains three gates — input, forget, and output — which control what information is retained, discarded, or passed forward. This gated structure solves the vanishing gradient problem that limits standard RNNs.</td></tr>
+    <tr><td><strong>LSTM (Long Short-Term Memory)</strong></td><td>A type of Recurrent Neural Network (RNN) designed to learn long-range temporal dependencies. Each cell contains three gates - input, forget and output - which control what information is retained, discarded, or passed forward. This gated structure solves the vanishing gradient problem that limits standard RNNs.</td></tr>
     <tr><td><strong>Hidden units</strong></td><td>The dimensionality of the LSTM's internal state vector. More units allow the network to represent more complex patterns, but also increase the risk of overfitting on small datasets. Layer 1 uses 64 units; Layer 2 uses 32.</td></tr>
     <tr><td><strong>Lookback window (sequence length)</strong></td><td>The number of consecutive historical time steps fed as a single input to the LSTM. A window of 60 means the model sees the past 60 trading days (approximately three calendar months) before making a prediction.</td></tr>
     <tr><td><strong>Dropout</strong></td><td>A regularisation technique where a random fraction of neurons (here 20%) are temporarily deactivated during each training step. This prevents co-adaptation of neurons and reduces overfitting by forcing the network to learn redundant representations.</td></tr>
     <tr><td><strong>MinMax normalisation</strong></td><td>Scales all values to the range [0, 1] using x_norm = (x - x_min) / (x_max - x_min). Required for LSTM because the network is sensitive to the scale of inputs; unscaled prices can cause unstable gradients during training.</td></tr>
     <tr><td><strong>Epoch</strong></td><td>One complete pass through the entire training dataset. The model's weights are updated after each batch within an epoch. Training for 100 epochs means the model sees all training sequences 100 times.</td></tr>
     <tr><td><strong>Adam optimiser</strong></td><td>An adaptive learning-rate optimisation algorithm (Adaptive Moment Estimation) that maintains per-parameter learning rates based on first and second moment estimates of the gradients. Generally converges faster than standard stochastic gradient descent.</td></tr>
-    <tr><td><strong>MSE loss</strong></td><td>Mean Squared Error — the average squared difference between predicted and actual (normalised) values, used as the training objective. Minimising MSE during training is equivalent to minimising RMSE on the training set.</td></tr>
+    <tr><td><strong>MSE loss</strong></td><td>Mean Squared Error - the average squared difference between predicted and actual (normalised) values, used as the training objective. Minimising MSE during training is equivalent to minimising RMSE on the training set.</td></tr>
     <tr><td><strong>Overfitting</strong></td><td>When a model learns the specific patterns and noise of the training data so precisely that it loses the ability to generalise to new data. Signs include very low training error but high test error. Exacerbated here by a small dataset (698 sequences) and 100 training epochs without early stopping.</td></tr>
-    <tr><td><strong>VADER (Sentiment)</strong></td><td>Valence Aware Dictionary and sEntiment Reasoner — a lexicon-based sentiment analysis tool optimised for short financial texts. Used in the original paper (but not this implementation) to generate sentiment scores from news headlines, which are fed alongside price data into the LSTM.</td></tr>
+    <tr><td><strong>VADER (Sentiment)</strong></td><td>Valence Aware Dictionary and sEntiment Reasoner - a lexicon-based sentiment analysis tool optimised for short financial texts. Used in the original paper (but not this implementation) to generate sentiment scores from news headlines, which are fed alongside price data into the LSTM.</td></tr>
   </tbody>
   </table>
   </div>
   <div class="callout warn">
     The original paper reports 2.72% MAPE on NASDAQ stocks <em>with</em> VADER sentiment
     augmentation. This implementation omits sentiment (no live news feed), which represents
-    the baseline LSTM performance. The paper attributes an 8–12% MAPE improvement specifically
+    the baseline LSTM performance. The paper attributes an 8-12% MAPE improvement specifically
     to sentiment enrichment (§X). Additionally, the TSLA dataset (758 rows) is smaller than
     the NASDAQ dataset used in the paper, increasing the risk of overfitting.
   </div>
@@ -1066,7 +1066,7 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
       <td><code>sqrt( mean( (y - ŷ)² ) )</code></td>
       <td>USD</td>
       <td>The square root of the average squared difference between actual and predicted prices. Expressed in the same unit as the price, making it directly interpretable.</td>
-      <td>Sensitive to large errors — a single large deviation inflates RMSE disproportionately due to squaring.</td>
+      <td>Sensitive to large errors - a single large deviation inflates RMSE disproportionately due to squaring.</td>
     </tr>
     <tr>
       <td><strong>MAE</strong><br><span style="font-size:12px;color:var(--muted);">Mean Absolute Error</span></td>
@@ -1080,7 +1080,7 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
       <td><code>mean( |y - ŷ| / y ) × 100</code></td>
       <td>%</td>
       <td>The average prediction error expressed as a percentage of the actual price. Scale-independent, making it comparable across different stocks or price levels.</td>
-      <td>Can be unstable when actual prices approach zero; reliable for TSLA's price range ($35–$1,230).</td>
+      <td>Can be unstable when actual prices approach zero; reliable for TSLA's price range ($35-$1,230).</td>
     </tr>
     <tr>
       <td><strong>Directional Accuracy</strong></td>
@@ -1175,7 +1175,7 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
 
 <p>
   Beyond aggregate metrics, examining the distribution and pattern of prediction
-  errors reveals structural characteristics of each model — such as systematic
+  errors reveals structural characteristics of each model - such as systematic
   bias (consistent over- or under-estimation) and the handling of directional
   market signals.
 </p>
@@ -1183,7 +1183,7 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
 <h3>Residual Distributions</h3>
 <div class="callout">
   <strong>Residual:</strong> The difference between the actual price and the model's
-  predicted price at each time step — i.e., <em>residual = actual - predicted</em>.
+  predicted price at each time step - i.e., <em>residual = actual - predicted</em>.
   A residual of zero means a perfect prediction. Positive residuals indicate the model
   underestimated the price; negative residuals indicate overestimation.
   An ideal residual distribution is centred near zero (no systematic bias) with
@@ -1194,7 +1194,7 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
 <h3>Directional Accuracy</h3>
 <div class="callout">
   <strong>Directional Accuracy</strong> measures whether the model correctly predicted
-  the <em>sign</em> of the price change on each test day — that is, whether the price
+  the <em>sign</em> of the price change on each test day - that is, whether the price
   would be higher or lower than the previous day's close. A value of 50% corresponds
   to random chance (equivalent to a coin flip). Values above 50% indicate genuine
   directional predictive power, which is directly actionable for trading strategies.
@@ -1234,10 +1234,10 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
 <h2>7. Conclusion</h2>
 
 <div class="callout">
-  <strong>Final ranking by RMSE (ascending — lower RMSE denotes better accuracy):</strong><br>
-  <span class="rank-1">1st — LangGraph Ensemble</span> &nbsp;(RMSE: {lg['rmse']:.2f} USD, MAPE: {lg['mape']:.2f}%) &nbsp;&rsaquo;&nbsp;
-  <span class="rank-2">2nd — ARIMA (Notebook)</span> &nbsp;(RMSE: {ar['rmse']:.2f} USD, MAPE: {ar['mape']:.2f}%) &nbsp;&rsaquo;&nbsp;
-  <span class="rank-3">3rd — LSTM (PDF Paper)</span> &nbsp;(RMSE: {ls['rmse']:.2f} USD, MAPE: {ls['mape']:.2f}%)
+  <strong>Final ranking by RMSE (ascending - lower RMSE denotes better accuracy):</strong><br>
+  <span class="rank-1">1st - LangGraph Ensemble</span> &nbsp;(RMSE: {lg['rmse']:.2f} USD, MAPE: {lg['mape']:.2f}%) &nbsp;&rsaquo;&nbsp;
+  <span class="rank-2">2nd - ARIMA (Notebook)</span> &nbsp;(RMSE: {ar['rmse']:.2f} USD, MAPE: {ar['mape']:.2f}%) &nbsp;&rsaquo;&nbsp;
+  <span class="rank-3">3rd - LSTM (PDF Paper)</span> &nbsp;(RMSE: {ls['rmse']:.2f} USD, MAPE: {ls['mape']:.2f}%)
 </div>
 
 <h3>Key Insights</h3>
@@ -1264,13 +1264,13 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
     <td>LSTM regime generalisation</td>
     <td>Without sentiment augmentation, the LSTM trained on a bull market
     struggles to generalise to the sharp May 2022 correction.
-    The paper's reported 2.72% MAPE includes VADER sentiment — absent here.</td>
+    The paper's reported 2.72% MAPE includes VADER sentiment - absent here.</td>
   </tr>
   <tr>
     <td>LangGraph architecture advantage</td>
     <td>The 4-node pipeline (feature engineering → signal generation → ensemble →
     calibration) mirrors the Diversifi backend's modular node-based design,
-    making it maintainable, extensible, and interpretable.</td>
+    making it maintainable, extensible and interpretable.</td>
   </tr>
 </tbody>
 </table>
@@ -1278,7 +1278,7 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
 
 <h3>Improvement Opportunities</h3>
 <ul>
-  <li><strong>LangGraph:</strong> Add VADER sentiment from news headlines (like the paper) — expected 5–10% further MAPE reduction.</li>
+  <li><strong>LangGraph:</strong> Add VADER sentiment from news headlines (like the paper) - expected 5-10% further MAPE reduction.</li>
   <li><strong>ARIMA:</strong> Upgrade to SARIMAX with exogenous volume and macro indicators.</li>
   <li><strong>LSTM:</strong> Integrate VADER sentiment (paper's key contribution); use attention mechanism; retrain on more diverse price regimes.</li>
   <li><strong>All models:</strong> Ensemble all three together for meta-prediction to combine their complementary strengths.</li>
@@ -1321,7 +1321,7 @@ def build_html(results: list, charts: dict, date_str: str, data_rows: int) -> st
 # ─────────────────────────────────────────────────────────────────────────────
 
 def main():
-    print("=== Tesla Stock Prediction — Model Comparison ===\n")
+    print("=== Tesla Stock Prediction - Model Comparison ===\n")
     print(f"Data: {CSV_PATH}")
     print(f"Output: {OUT_HTML}\n")
 

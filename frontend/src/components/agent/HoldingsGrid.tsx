@@ -181,7 +181,7 @@ function StocksTab({ stocks }: { stocks: Stock[] }) {
         >
           {stocks.map(s => (
             <option key={s.symbol} value={s.symbol}>
-              {s.symbol} — {s.name || s.symbol}
+              {s.symbol} - {s.name || s.symbol}
             </option>
           ))}
         </select>
@@ -267,7 +267,7 @@ function MFTab({ mfs }: { mfs: MF[] }) {
         </span>
       </div>
 
-      {/* Gains bar — visual progress */}
+      {/* Gains bar - visual progress */}
       <div className="rounded-xl border border-border bg-card p-4">
         <MFGainsBar invested={inv} current={cv} />
       </div>

@@ -2,9 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import { Send, Bot, User } from "lucide-react";
 
 const QUESTIONS = [
-  "How do you typically invest — SIPs, lumpsum, or both? And roughly how much per month?",
-  "What are you investing for, and over what timeframe? (e.g., retirement in 20 years, a house in 5 years)",
-  "If your portfolio dropped 20% in a month, what would you do — buy more, hold, or sell?",
+  "How do you typically invest - SIPs, lumpsum, or both? And roughly how much per month?",
+  "What are you investing for and over what timeframe? (e.g., retirement in 20 years, a house in 5 years)",
+  "If your portfolio dropped 20% in a month, what would you do - buy more, hold, or sell?",
   "Are there any sectors or companies you specifically want to focus on or avoid?",
 ];
 
@@ -124,7 +124,7 @@ export default function OnboardingChat({ onComplete }: Props) {
     } else {
       await delay(1000 + Math.random() * 300);
       setShowTyping(false);
-      setMessages(m => [...m, { role: "bot", text: "Perfect — thanks for sharing! Setting up your personalised agent now…" }]);
+      setMessages(m => [...m, { role: "bot", text: "Perfect - thanks for sharing! Setting up your personalised agent now…" }]);
       setDone(true);
 
       const transcript = QUESTIONS.map((q, i) => `Q: ${q}\nA: ${answers.current[i] ?? ""}`).join("\n\n");

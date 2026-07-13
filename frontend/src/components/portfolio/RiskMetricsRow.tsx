@@ -45,7 +45,7 @@ export function RiskMetricsRow({ portfolioCagr, port6mReturn, bench6mReturn, alp
 
   return (
     <div className="space-y-3">
-      {/* Row 1: Returns comparison — same time basis */}
+      {/* Row 1: Returns comparison - same time basis */}
       {show6m && (
         <div className="grid grid-cols-2 gap-3">
           <Stat
@@ -57,7 +57,7 @@ export function RiskMetricsRow({ portfolioCagr, port6mReturn, bench6mReturn, alp
           <Stat
             label="Benchmark (6M)"
             value={fmtPct(bench6mReturn)}
-            sub={`Nifty — same period`}
+            sub={`Nifty - same period`}
             color={returnColor(bench6mReturn)}
           />
         </div>
@@ -93,7 +93,7 @@ export function RiskMetricsRow({ portfolioCagr, port6mReturn, bench6mReturn, alp
 
       {/* Note clarifying what CAGR vs 6M mean */}
       <p className="text-[10px] text-gray-400 dark:text-white/25 text-right">
-        6M returns are directly comparable. CAGR (since buy) is from your actual purchase dates — a different time horizon.
+        6M returns are directly comparable. CAGR (since buy) is from your actual purchase dates - a different time horizon.
       </p>
     </div>
   );

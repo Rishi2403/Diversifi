@@ -1,4 +1,4 @@
-# Architecture — Model Comparison Pipeline
+# Architecture - Model Comparison Pipeline
 
 This document describes the internal design of each model and the shared evaluation
 infrastructure used to produce the comparison report.
@@ -26,7 +26,7 @@ All three models share:
 
 ---
 
-## 2. Model A — ARIMA (Notebook)
+## 2. Model A - ARIMA (Notebook)
 
 **File**: `model_arima.py`  
 **Origin**: `Tesla-Stock-Prediction/Time_Series.ipynb`
@@ -56,7 +56,7 @@ Walk-forward loop (60 steps)
 
 ### Complexity
 
-- Time: O(T × p²) per refit — fast even for p=2 on 698–758 points.
+- Time: O(T × p²) per refit - fast even for p=2 on 698-758 points.
 - Space: O(T) for the growing history buffer.
 
 ### Key Parameters
@@ -69,7 +69,7 @@ Walk-forward loop (60 steps)
 
 ---
 
-## 3. Model B — LSTM (PDF Paper)
+## 3. Model B - LSTM (PDF Paper)
 
 **File**: `model_lstm.py`  
 **Origin**: arXiv:2505.05325v1, §VI-B
@@ -106,29 +106,29 @@ Walk-forward inference (60 steps)
 
 ### Complexity
 
-- Training: O(epochs × N_seq × hidden²) — dominant cost.
+- Training: O(epochs × N_seq × hidden²) - dominant cost.
 - Inference: O(lookback × hidden²) per step.
 
 ### Design Notes
 
 The original paper (§VI-C) augments the input with VADER sentiment scores derived
 from financial news. This implementation uses price-only features. The paper reports
-that sentiment contributes an 8–12% MAPE reduction; without it the model is less
+that sentiment contributes an 8-12% MAPE reduction; without it the model is less
 resilient to qualitative regime shifts (e.g. the May 2022 correction).
 
 Additionally, training 100 epochs on a 698-point uptrend dataset with no early
 stopping promotes regime-specific overfitting, which degrades out-of-sample
-generalisation on the subsequent downtrend test window — a known limitation
+generalisation on the subsequent downtrend test window - a known limitation
 acknowledged by the authors in §X.
 
 ---
 
-## 4. Model C — LangGraph Ensemble
+## 4. Model C - LangGraph Ensemble
 
 **File**: `model_langgraph.py`  
 **Origin**: Diversifi backend pattern (`trading_lang.py`, `agent.py`)
 
-### Design — State Machine
+### Design - State Machine
 
 The prediction pipeline is modelled as a four-node directed graph, directly
 analogous to the `StateGraph` pattern used in `trading_lang.py`.
@@ -188,7 +188,7 @@ price during high-momentum periods (both uptrend and downtrend).
 
 ### Complexity
 
-- Training: O(n_estimators × N × log(N)) for each sub-model — dominated by GBR.
+- Training: O(n_estimators × N × log(N)) for each sub-model - dominated by GBR.
 - Inference: O(n_estimators × depth) per step, plus feature computation O(T).
 
 ---
@@ -201,11 +201,11 @@ All models share the same evaluation harness defined in `run_comparison.py`.
 
 ```
 Total: 758 rows (2019-05-21 → 2022-05-20)
-Train: rows [0, 697]    — 698 days (92.1%)
-Test:  rows [698, 757]  — 60 days  (7.9%)
+Train: rows [0, 697]    - 698 days (92.1%)
+Test:  rows [698, 757]  - 60 days  (7.9%)
 ```
 
-The test window (approximately March–May 2022) coincides with a sharp TSLA
+The test window (approximately March-May 2022) coincides with a sharp TSLA
 price correction, making it a challenging out-of-sample evaluation period.
 
 ### Walk-Forward Inference

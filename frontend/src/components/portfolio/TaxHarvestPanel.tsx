@@ -87,7 +87,7 @@ export function TaxHarvestPanel({ tax }: Props) {
                 <div>
                   <p className="text-xs font-bold text-gray-800 dark:text-white">{opp.name || opp.symbol}</p>
                   <p className="text-[10px] text-gray-500 dark:text-white/40">
-                    {opp.is_ltcg ? "LTCG (>1yr)" : "STCG (≤1yr)"} — Loss: {formatINR(Math.abs(opp.unrealized_pnl))}
+                    {opp.is_ltcg ? "LTCG (>1yr)" : "STCG (≤1yr)"} - Loss: {formatINR(Math.abs(opp.unrealized_pnl))}
                   </p>
                 </div>
                 <div className="text-right">
@@ -102,7 +102,7 @@ export function TaxHarvestPanel({ tax }: Props) {
 
       {!hasTax && !hasHarvest && (
         <p className="text-xs text-gray-400 dark:text-white/30 text-center py-4">
-          No tax liability estimated — holdings may lack buy date or have no gains.
+          No tax liability estimated - holdings may lack buy date or have no gains.
         </p>
       )}
 

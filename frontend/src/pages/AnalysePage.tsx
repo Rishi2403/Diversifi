@@ -133,10 +133,10 @@ function StockAnalysisDisplay({ r }: { r: StockResult }) {
 
       <div className="bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-5 space-y-4">
         <p className="text-xs font-bold text-gray-400 dark:text-white/30 uppercase tracking-widest">Score Breakdown</p>
-        <ScoreBar label="Technical — RSI, MACD, DMA crossover"  value={r.breakdown.technical}   max={35} color="#6366f1" />
-        <ScoreBar label="Momentum — 5d & 30d returns, volume"   value={r.breakdown.momentum}    max={25} color="#00D09C" />
-        <ScoreBar label="Fundamental — PE ratio, EPS sign"      value={r.breakdown.fundamental} max={20} color="#F59E0B" />
-        <ScoreBar label="Sentiment — News headline polarity"    value={r.breakdown.sentiment}   max={20} color="#EC4899" />
+        <ScoreBar label="Technical - RSI, MACD, DMA crossover"  value={r.breakdown.technical}   max={35} color="#6366f1" />
+        <ScoreBar label="Momentum - 5d & 30d returns, volume"   value={r.breakdown.momentum}    max={25} color="#00D09C" />
+        <ScoreBar label="Fundamental - PE ratio, EPS sign"      value={r.breakdown.fundamental} max={20} color="#F59E0B" />
+        <ScoreBar label="Sentiment - News headline polarity"    value={r.breakdown.sentiment}   max={20} color="#EC4899" />
       </div>
 
       <div className="bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-5">
@@ -282,10 +282,10 @@ function MfAnalysisDisplay({ r }: { r: MfResult }) {
 
       <div className="bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-5 space-y-4">
         <p className="text-xs font-bold text-gray-400 dark:text-white/30 uppercase tracking-widest">Score Breakdown</p>
-        <ScoreBar label="1Y Returns — long-term performance"     value={r.breakdown.returns_1y}  max={40} color="#6366f1" />
-        <ScoreBar label="3M Returns — recent trend"              value={r.breakdown.returns_3m}  max={20} color="#00D09C" />
-        <ScoreBar label="1M Momentum — short-term direction"     value={r.breakdown.momentum_1m} max={15} color="#F59E0B" />
-        <ScoreBar label="Consistency — positive across horizons" value={r.breakdown.consistency} max={25} color="#EC4899" />
+        <ScoreBar label="1Y Returns - long-term performance"     value={r.breakdown.returns_1y}  max={40} color="#6366f1" />
+        <ScoreBar label="3M Returns - recent trend"              value={r.breakdown.returns_3m}  max={20} color="#00D09C" />
+        <ScoreBar label="1M Momentum - short-term direction"     value={r.breakdown.momentum_1m} max={15} color="#F59E0B" />
+        <ScoreBar label="Consistency - positive across horizons" value={r.breakdown.consistency} max={25} color="#EC4899" />
       </div>
 
       <div className="bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-5">
@@ -393,8 +393,8 @@ export default function AnalysePage() {
           </h1>
           <p className="text-xs text-gray-500 dark:text-white/40 mt-0.5">
             {mode === "stocks"
-              ? "Enter any NSE symbol — get a full AI signal breakdown with actionable verdict"
-              : "Search by fund name or scheme code — get a return-based signal analysis"}
+              ? "Enter any NSE symbol - get a full AI signal breakdown with actionable verdict"
+              : "Search by fund name or scheme code - get a return-based signal analysis"}
           </p>
         </div>
         <ModeToggle mode={mode} onChange={handleModeChange} />
@@ -436,8 +436,8 @@ export default function AnalysePage() {
           <Info className="w-4 h-4 text-[#00D09C] shrink-0 mt-0.5" />
           <p className="text-xs text-gray-600 dark:text-white/50 leading-relaxed">
             {mode === "stocks"
-              ? "We compute RSI, MACD, moving averages, price momentum, PE ratio, EPS, and news sentiment — then combine them into a transparent signal score with a Buy/Hold/Avoid verdict."
-              : "We fetch NAV history from mfapi.in and compute 1M, 3M, 6M, and 1Y returns, then score consistency and momentum into a transparent signal score with a Buy/Hold/Avoid verdict."}
+              ? "We compute RSI, MACD, moving averages, price momentum, PE ratio, EPS and news sentiment - then combine them into a transparent signal score with a Buy/Hold/Avoid verdict."
+              : "We fetch NAV history from mfapi.in and compute 1M, 3M, 6M and 1Y returns, then score consistency and momentum into a transparent signal score with a Buy/Hold/Avoid verdict."}
           </p>
         </div>
 

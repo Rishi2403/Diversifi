@@ -144,7 +144,7 @@ export default function AlertCards({ immediate, caution, topAlerts }: Props) {
       <AlertSection
         title="All Clear"
         icon={<CheckCircle2 className="w-4 h-4 text-emerald-500" />}
-        alerts={allGood ? [{ symbol: "Portfolio", issue: "All holdings within normal parameters.", action: "No action needed — keep investing systematically.", is_mf: false }] : []}
+        alerts={allGood ? [{ symbol: "Portfolio", issue: "All holdings within normal parameters.", action: "No action needed - keep investing systematically.", is_mf: false }] : []}
         defaultOpen={allGood}
         accentColor="emerald"
       />

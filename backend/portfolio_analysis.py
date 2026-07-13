@@ -1,5 +1,5 @@
 """
-portfolio_analysis.py — Deep portfolio analytics: CAGR, Alpha, Beta, Sharpe, tax harvesting.
+portfolio_analysis.py - Deep portfolio analytics: CAGR, Alpha, Beta, Sharpe, tax harvesting.
 
 All metrics use yfinance historical data (no mocked values).
 Risk-free rate: 6.5% (India 91-day T-bill proxy, FY2025-26)
@@ -215,7 +215,7 @@ def _compute_risk_and_chart(
         "bench_annual": round(bench_annual * 100, 2),
     }
 
-    # Chart data — cumulative returns, downsampled every 5 trading days
+    # Chart data - cumulative returns, downsampled every 5 trading days
     port_cum   = (1 + port_ret).cumprod() * 100
     bench_cum  = (1 + bench_ret).cumprod() * 100
 
@@ -287,7 +287,7 @@ def _compute_tax(holdings: list[dict]) -> dict:
                 stcg_holdings.append(record)
                 total_stcg_gain += upnl
         else:
-            # Loss — harvest opportunity
+            # Loss - harvest opportunity
             loss_abs = abs(upnl)
             applicable_rate = LTCG_RATE if h["is_ltcg"] else STCG_RATE
             potential_saving = round(loss_abs * applicable_rate, 2)

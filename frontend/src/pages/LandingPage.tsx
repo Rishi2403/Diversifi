@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { TrendingUp, TrendingDown, BarChart2, Shield, Zap, Cpu } from "lucide-react";
+import { TrendingUp, TrendingDown, BarChart2, Shield, Zap, Cpu, Bot } from "lucide-react";
 import { Header } from "@/components/Header";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 
@@ -108,7 +108,7 @@ export default function LandingPage() {
 
           <p className="text-base md:text-lg text-muted-foreground max-w-xl leading-relaxed">
             AI-driven portfolio health scoring, sector analysis, rebalancing
-            recommendations, and Monte Carlo simulations — built for Indian markets.
+            recommendations and Monte Carlo simulations - built for Indian markets.
           </p>
 
 
@@ -169,7 +169,7 @@ export default function LandingPage() {
           {[
             { label: "AI Agents", value: "8+", sub: "Collaborative intelligence" },
             { label: "Data Sources", value: "12+", sub: "Real-time market signals" },
-            { label: "Health Score", value: "0–100", sub: "Portfolio scoring system" },
+            { label: "Health Score", value: "0-100", sub: "Portfolio scoring system" },
             { label: "Simulations", value: "5,000", sub: "Monte Carlo runs" },
           ].map((s, i) => (
             <div key={i} className="bg-card border border-border rounded-xl p-5">
@@ -190,40 +190,47 @@ export default function LandingPage() {
               Why DiversiFi?
             </h2>
             <p className="text-muted-foreground mt-2 text-sm">
-              Built for serious investors who want data-driven clarity
+              Built for retail investors who want data-driven insights
             </p>
           </div>
 
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
             {[
               {
                 Icon: BarChart2,
                 title: "Portfolio Health Score",
                 description:
-                  "0–100 score measuring diversification, concentration risk, MF overlap, and benchmark alignment against Nifty 50 / 500.",
+                  "0-100 score measuring diversification, concentration risk, MF overlap and benchmark alignment against Nifty 50 / 500.",
                 link: null,
               },
               {
                 Icon: Zap,
                 title: "Multi-Agent AI",
                 description:
-                  "8+ specialized AI agents analyse sentiment, trends, and technicals to deliver comprehensive, explainable insights.",
+                  "8+ specialized AI agents analyse sentiment, trends and technicals to deliver comprehensive, explainable insights.",
                 link: null,
               },
-              {
-                Icon: Shield,
-                title: "Risk Analytics",
-                description:
-                  "Monte Carlo simulations with 5,000 runs model portfolio outcomes across bull, bear, and black-swan scenarios.",
-                link: null,
-              },
+              // {
+              //   Icon: Shield,
+              //   title: "Risk Analytics",
+              //   description:
+              //     "Monte Carlo simulations with 5,000 runs model portfolio outcomes across bull, bear and black-swan scenarios.",
+              //   link: null,
+              // },
               {
                 Icon: Cpu,
                 title: "Algo Trading Engine",
                 description:
                   "+18.4% simulated return · 1.84 Sharpe · 64.2% win rate. LangGraph multi-agent ensemble backtested on Nifty 50 H1 2025.",
                 link: "/algo-trading",
+              },
+              {
+                Icon: Bot,
+                title: "AlphaMind · Market Intel",
+                description:
+                  "Your dedicated real-time market scanner. Tracks live news, reads market emotions and surfaces risk signals for every holding.",
+                link: "/alphamind",
               },
             ].map(({ Icon, title, description, link }, i) => {
               const inner = (
@@ -280,7 +287,7 @@ export default function LandingPage() {
               Meet Our Team
             </h2>
             <p className="text-muted-foreground mt-2 text-sm">
-              Experts in AI, finance, and software engineering
+              Experts in AI, finance and software engineering
             </p>
           </div>
 
@@ -362,24 +369,44 @@ export default function LandingPage() {
               <Cpu className="w-3 h-3" />
               Algo Trading
             </Link>
-            <a
-              href="#"
+            {/* <Link
+              to="/alphamind"
+              className="text-xs font-semibold transition-colors flex items-center gap-1"
+              style={{ color: "#00D09C" }}
+            >
+              <Bot className="w-3 h-3" />
+              AlphaMind
+            </Link> */}
+            <Link
+              to="/features"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Features
+            </Link>
+            <Link
+              to="/reports"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Reports
+            </Link>
+            <Link
+              to="/privacy"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               Privacy
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              to="/terms"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               Terms
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              to="/contact"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               Contact
-            </a>
+            </Link>
           </div>
         </div>
         <p className="text-xs text-muted-foreground mt-4 max-w-7xl mx-auto">

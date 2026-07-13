@@ -116,7 +116,7 @@ const marketMockData: NewsArticle[] = [
   },
   {
     title: "Nifty 50 scales fresh all-time high on FII inflows and strong earnings season",
-    description: "Indian equities outperformed regional peers with broad-based buying in banking, IT, and consumer discretionary stocks.",
+    description: "Indian equities outperformed regional peers with broad-based buying in banking, IT and consumer discretionary stocks.",
     url: "#",
     image: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&q=80&w=400&h=250",
     publishedAt: new Date(Date.now() - 10800000).toISOString(),

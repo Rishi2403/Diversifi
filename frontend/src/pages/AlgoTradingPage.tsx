@@ -42,7 +42,7 @@ const STRATEGIES = [
     win: "61.5%",
     trades: 13,
     ret: "+4.8%",
-    desc: "LLM-scored news shock + mean reversion. 3–5 day hold.",
+    desc: "LLM-scored news shock + mean reversion. 3-5 day hold.",
     positive: true,
   },
   {
@@ -294,7 +294,7 @@ export default function AlgoTradingPage() {
             </h2>
             <p className="mt-3 text-sm max-w-lg mx-auto" style={{ color: "rgba(228,232,240,0.5)" }}>
               A LangGraph stateful graph where each node is a specialist LLM agent.
-              Signals flow left to right — no agent sees future data.
+              Signals flow left to right - no agent sees future data.
             </p>
           </div>
 
@@ -468,7 +468,7 @@ export default function AlgoTradingPage() {
             </h2>
             <p className="text-sm max-w-md mx-auto mb-8" style={{ color: "rgba(228,232,240,0.55)" }}>
               Equity curve, per-stock attribution, sector rotation timeline, signal quality analysis,
-              and full methodology — all in one report.
+              and full methodology - all in one report.
             </p>
             <a
               href="/algo-backtest-report.html"

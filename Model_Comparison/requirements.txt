@@ -1,4 +1,4 @@
-# ── Model_Comparison — Python dependencies ────────────────────────────────────
+# ── Model_Comparison - Python dependencies ────────────────────────────────────
 # Generated for: Python 3.10+
 # Install: pip install -r requirements.txt
 
@@ -13,7 +13,7 @@ statsmodels>=0.14.0
 scikit-learn>=1.3.0
 
 # ── Deep learning (LSTM paper model) ──────────────────────────────────────────
-torch>=2.0.0          # CPU build — use torch+cu118/cu121 for GPU
+torch>=2.0.0          # CPU build - use torch+cu118/cu121 for GPU
 
 # ── Visualisation ─────────────────────────────────────────────────────────────
 matplotlib>=3.7.0

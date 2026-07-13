@@ -353,7 +353,7 @@ function CategoryHeatmap({ categories, loading }: { categories: CategoryItem[]; 
 function Disclaimer({ mode }: { mode: Mode }) {
   return (
     <p className="text-[10px] text-gray-400 dark:text-white/25 text-center py-6 px-4 max-w-2xl mx-auto leading-relaxed">
-      ⚠ AI signals are based on {mode === "stocks" ? "technical, fundamental, and sentiment data" : "NAV history and return consistency"}.
+      ⚠ AI signals are based on {mode === "stocks" ? "technical, fundamental and sentiment data" : "NAV history and return consistency"}.
       They are <strong>not financial advice</strong>. Past performance does not guarantee future results.
       Always consult a SEBI-registered advisor before investing.
     </p>

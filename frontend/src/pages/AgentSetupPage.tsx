@@ -182,7 +182,7 @@ export default function AgentSetupPage() {
 
         <StepBar current={step} />
 
-        {/* Step 0 — CSV Upload */}
+        {/* Step 0 - CSV Upload */}
         {step === 0 && (
           <div className="space-y-4">
             <div
@@ -245,7 +245,7 @@ export default function AgentSetupPage() {
           </div>
         )}
 
-        {/* Step 1 — Chat */}
+        {/* Step 1 - Chat */}
         {step === 1 && (
           <div className="rounded-2xl border border-border bg-card overflow-hidden h-[480px] flex flex-col">
             {extracting ? (
@@ -259,7 +259,7 @@ export default function AgentSetupPage() {
           </div>
         )}
 
-        {/* Step 2 — Confirm */}
+        {/* Step 2 - Confirm */}
         {step === 2 && profile && holdings && (
           <ProfileConfirmation
             profile={profile}

@@ -28,7 +28,7 @@ interface MfSuggestion {
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
-const HORIZONS      = ["Short (< 1 yr)", "Medium (1–3 yrs)", "Long (3+ yrs)"];
+const HORIZONS      = ["Short (< 1 yr)", "Medium (1-3 yrs)", "Long (3+ yrs)"];
 const RISKS         = ["Conservative", "Moderate", "Aggressive"];
 const STOCK_SECTORS = ["Any", "Banking", "IT", "Pharma", "Auto", "FMCG", "Energy", "Metals", "Finance", "Power", "Telecom", "Infrastructure", "Consumer"];
 const MF_CATEGORIES = ["Any", "Large Cap", "Mid Cap", "Small Cap", "Flexi Cap", "ELSS", "Index", "Sectoral", "Value", "Hybrid"];
@@ -318,7 +318,7 @@ export default function SuggestPage() {
   const [amount,      setAmount]      = useState(100000);      // lumpsum total
   const [sipAmount,   setSipAmount]   = useState(10000);       // monthly SIP
   const [sipDuration, setSipDuration] = useState(10);          // years
-  const [horizon,     setHorizon]     = useState("Medium (1–3 yrs)");
+  const [horizon,     setHorizon]     = useState("Medium (1-3 yrs)");
   const [risk,        setRisk]        = useState("Moderate");
   const [sector,      setSector]      = useState("Any");
   const [category,    setCategory]    = useState("Any");
@@ -391,8 +391,8 @@ export default function SuggestPage() {
           </h1>
           <p className="text-xs text-gray-500 dark:text-white/40 mt-0.5">
             {mode === "stocks"
-              ? "Tell us your profile — our AI ranks the best-matching stocks from Nifty 50"
-              : "Tell us your profile — our AI ranks the best-matching funds from our MF watchlist"}
+              ? "Tell us your profile - our AI ranks the best-matching stocks from Nifty 50"
+              : "Tell us your profile - our AI ranks the best-matching funds from our MF watchlist"}
           </p>
         </div>
         <ModeToggle mode={mode} onChange={handleModeChange} />

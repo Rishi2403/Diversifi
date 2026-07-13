@@ -2,14 +2,14 @@
 
 **AI-Powered Financial Intelligence Platform**
 
-Diversifi is a comprehensive financial analysis platform leveraging LangGraph-based multi-agent architecture for stock market analysis, mutual fund research, and personalized financial advisory.
+Diversifi is a comprehensive financial analysis platform leveraging LangGraph-based multi-agent architecture for stock market analysis, mutual fund research and personalized financial advisory.
 
 ## Overview
 
 Diversifi provides intelligent financial analysis across three domains:
 
-1. **Stock Market Analysis** - Real-time news sentiment, bull/bear analysis, and trading recommendations
-2. **Mutual Fund Research** - Fund comparison, NAV tracking, and performance analysis
+1. **Stock Market Analysis** - Real-time news sentiment, bull/bear analysis and trading recommendations
+2. **Mutual Fund Research** - Fund comparison, NAV tracking and performance analysis
 3. **General Finance Advisory** - Personal finance guidance using RAG (Retrieval Augmented Generation)
 
 ## Architecture
@@ -25,7 +25,7 @@ The platform uses a multi-agent workflow where user queries are classified and r
 ## Features
 
 - Multi-agent intelligence powered by LangGraph and Google Gemini 2.5 Flash
-- Real-time news scraping from Finviz, Seeking Alpha, and MarketWatch
+- Real-time news scraping from Finviz, Seeking Alpha and MarketWatch
 - Sentiment analysis using TextBlob with financial keyword detection
 - Bull/bear analysis for balanced stock recommendations
 - 80+ mutual funds tracked with live data scraping

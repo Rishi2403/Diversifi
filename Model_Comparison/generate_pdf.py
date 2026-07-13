@@ -3,7 +3,7 @@ Generate a clean PDF from comparison_report.html using Playwright/Chromium.
 - Removes sidebar, fixes layout for A4 print
 - Forces light theme
 - Opens all accordion <details> sections
-- Properly renders SVG diagrams, tables, and embedded charts
+- Properly renders SVG diagrams, tables and embedded charts
 """
 
 import asyncio
@@ -299,7 +299,7 @@ async def generate_pdf():
             display_header_footer=True,
             header_template="""
                 <div style="font-size:9px;color:#888;width:100%;text-align:center;font-family:Arial,sans-serif;">
-                    Tesla Stock Prediction — Model Comparison Report
+                    Tesla Stock Prediction - Model Comparison Report
                 </div>""",
             footer_template="""
                 <div style="font-size:9px;color:#888;width:100%;text-align:center;font-family:Arial,sans-serif;">

@@ -1,6 +1,6 @@
 """
 ARIMA Model for Tesla Stock Price Prediction
-Based on Time_Series.ipynb notebook — ARIMA(2,0,0) walk-forward validation
+Based on Time_Series.ipynb notebook - ARIMA(2,0,0) walk-forward validation
 """
 import numpy as np
 import pandas as pd
@@ -11,7 +11,7 @@ warnings.filterwarnings("ignore")
 
 
 def run_arima(data_path: str) -> dict:
-    """Walk-forward ARIMA(2,0,0) — optimal order found via grid search in notebook."""
+    """Walk-forward ARIMA(2,0,0) - optimal order found via grid search in notebook."""
     data = pd.read_csv(data_path)
     stock = data[["Date", "Close"]].copy()
     stock["Date"] = pd.to_datetime(stock["Date"])

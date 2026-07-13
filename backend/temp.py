@@ -1,4 +1,4 @@
-"""AnthropicProvider — direct Anthropic API or Azure AI Foundry.
+"""AnthropicProvider - direct Anthropic API or Azure AI Foundry.
 
 Mode selection (checked in order):
     1. ``ANTHROPIC_FOUNDRY_RESOURCE`` is set → Azure AI Foundry via ``AnthropicFoundry``.
@@ -8,10 +8,10 @@ Mode selection (checked in order):
 Both modes are gated behind ``LLM_ALLOW_EXTERNAL=true`` (ADR-0009).
 
 Env vars (set in .env):
-    ANTHROPIC_FOUNDRY_RESOURCE   — Azure AI Foundry resource name; triggers Foundry mode
-    ANTHROPIC_API_KEY    — Foundry resource key (falls back to ANTHROPIC_API_KEY)
-    ANTHROPIC_API_KEY            — direct API key (also Foundry fallback)
-    LLM_ALLOW_EXTERNAL           — must be ``true``
+    ANTHROPIC_FOUNDRY_RESOURCE   - Azure AI Foundry resource name; triggers Foundry mode
+    ANTHROPIC_API_KEY    - Foundry resource key (falls back to ANTHROPIC_API_KEY)
+    ANTHROPIC_API_KEY            - direct API key (also Foundry fallback)
+    LLM_ALLOW_EXTERNAL           - must be ``true``
 Pass ``--llm-url anthropic --llm-model <model>`` on the CLI.
 """
 
@@ -59,7 +59,7 @@ def _build_client(api_key: str | None) -> Any:
     try:
         import anthropic  # noqa: PLC0415
     except ImportError as exc:
-        raise RuntimeError("anthropic package is not installed — run uv sync") from exc
+        raise RuntimeError("anthropic package is not installed - run uv sync") from exc
 
     resource = os.getenv("ANTHROPIC_FOUNDRY_RESOURCE", "")
     if resource:

@@ -277,7 +277,7 @@ export default function PortfolioPage() {
                       onMFLoaded={(m) => set("mutualFunds", m)}
                     />
                     <div className="text-center text-xs text-gray-500 dark:text-white/30">
-                      Already have data? Or using demo portfolio — just click Next to continue.
+                      Already have data? Or using demo portfolio - just click Next to continue.
                     </div>
                   </div>
                 )}
@@ -424,7 +424,7 @@ export default function PortfolioPage() {
             {/* ── DEEP ANALYSIS: Risk Metrics ── */}
             <Card
               title="Performance Metrics"
-              subtitle="CAGR, Alpha, Beta, Sharpe — based on live market data"
+              subtitle="CAGR, Alpha, Beta, Sharpe - based on live market data"
               badge={
                 deepLoading ? (
                   <span className="flex items-center gap-1.5 text-[10px] text-gray-400 dark:text-white/30 bg-gray-100 dark:bg-white/5 px-2 py-1 rounded-lg">
@@ -463,7 +463,7 @@ export default function PortfolioPage() {
             {/* ── DEEP ANALYSIS: Performance Chart ── */}
             <Card
               title="Portfolio vs Benchmark (6 months)"
-              subtitle={`Normalised to 100 — vs ${input.benchmark === "nifty50" ? "Nifty 50" : "Nifty 500"}`}
+              subtitle={`Normalised to 100 - vs ${input.benchmark === "nifty50" ? "Nifty 50" : "Nifty 500"}`}
               badge={deepLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400 dark:text-white/30" /> : undefined}
             >
               {deepLoading ? (
@@ -523,7 +523,7 @@ export default function PortfolioPage() {
             {/* ── DEEP ANALYSIS: Holdings Performance Table ── */}
             <Card
               title="Holdings Performance"
-              subtitle="Per-holding CAGR, P&L, holding period, and tax classification"
+              subtitle="Per-holding CAGR, P&L, holding period and tax classification"
               badge={deepLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400 dark:text-white/30" /> : undefined}
             >
               {deepLoading ? (
@@ -538,7 +538,7 @@ export default function PortfolioPage() {
             {/* ── DEEP ANALYSIS: Tax Harvest Panel ── */}
             <Card
               title="Tax Analysis & Loss Harvesting"
-              subtitle="FY2025-26 — LTCG 12.5% (above ₹1.25L exemption), STCG 20%"
+              subtitle="FY2025-26 - LTCG 12.5% (above ₹1.25L exemption), STCG 20%"
               badge={deepLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400 dark:text-white/30" /> : undefined}
             >
               {deepLoading ? (

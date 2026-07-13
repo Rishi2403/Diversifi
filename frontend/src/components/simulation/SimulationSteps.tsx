@@ -1,4 +1,4 @@
-import { Plus, Trash2, Calendar, Zap, AlertCircle, CheckCircle, Info, TrendingUp, TrendingDown, BarChart3 } from "lucide-react";
+import { Plus, Trash2, Calendar, Zap, AlertCircle, CheckCircle, Info, TrendingUp, TrendingDown, BarChart3, Copy, ChevronDown } from "lucide-react";
 import {
   Industry,
   Country,
@@ -8,6 +8,7 @@ import {
   GeopoliticalScenario,
   InflationScenario,
   YearlyInvestmentPlan,
+  SIPAllocation,
   HoldingImpact,
   AdvancedSimulationResult,
 } from "@/lib/advancedSimulation";
@@ -26,61 +27,125 @@ function formatPercent(n: number) {
 
 // ─── Step 2: Investment Plan ──────────────────────────────────────────────────
 
+const STEP_UP_OPTIONS = [
+  { label: "No step-up", value: 0 },
+  { label: "+5% / yr", value: 5 },
+  { label: "+10% / yr", value: 10 },
+  { label: "+15% / yr", value: 15 },
+  { label: "+20% / yr", value: 20 },
+];
+
 export function InvestmentPlanStep({
   timeHorizon,
   setTimeHorizon,
   investmentPlans,
   setInvestmentPlans,
   stocks,
+  mutualFunds,
+  cashBalance,
 }: {
   timeHorizon: number;
   setTimeHorizon: (h: number) => void;
   investmentPlans: YearlyInvestmentPlan[];
   setInvestmentPlans: (plans: YearlyInvestmentPlan[]) => void;
   stocks: StockHolding[];
+  mutualFunds: MFHolding[];
+  cashBalance: number;
 }) {
+  const totalPortfolioValue =
+    stocks.reduce((s, x) => s + x.currentValue, 0) +
+    mutualFunds.reduce((s, m) => s + m.currentValue, 0) +
+    cashBalance;
+
+  const allHoldings = [
+    ...stocks.map((s) => ({ name: s.name || s.symbol, value: s.currentValue })),
+    ...mutualFunds.map((m) => ({ name: m.fundName, value: m.currentValue })),
+  ];
+
   const updatePlan = (year: number, field: keyof YearlyInvestmentPlan, value: any) => {
     const newPlans = [...investmentPlans];
-    const planIndex = newPlans.findIndex((p) => p.year === year);
-    if (planIndex >= 0) {
-      (newPlans[planIndex] as any)[field] = value;
+    const idx = newPlans.findIndex((p) => p.year === year);
+    if (idx >= 0) {
+      (newPlans[idx] as any)[field] = value;
+      setInvestmentPlans(newPlans);
+    }
+  };
+
+  const updateSIPAllocation = (year: number, i: number, field: keyof SIPAllocation, value: any) => {
+    const newPlans = [...investmentPlans];
+    const idx = newPlans.findIndex((p) => p.year === year);
+    if (idx >= 0) {
+      const allocs = [...(newPlans[idx].sipAllocations || [])];
+      (allocs[i] as any)[field] = value;
+      newPlans[idx].sipAllocations = allocs;
+      setInvestmentPlans(newPlans);
+    }
+  };
+
+  const addSIPAllocation = (year: number) => {
+    const newPlans = [...investmentPlans];
+    const idx = newPlans.findIndex((p) => p.year === year);
+    if (idx >= 0) {
+      newPlans[idx].sipAllocations = [...(newPlans[idx].sipAllocations || []), { fundName: "", amount: 0 }];
+      setInvestmentPlans(newPlans);
+    }
+  };
+
+  const removeSIPAllocation = (year: number, i: number) => {
+    const newPlans = [...investmentPlans];
+    const idx = newPlans.findIndex((p) => p.year === year);
+    if (idx >= 0) {
+      newPlans[idx].sipAllocations = (newPlans[idx].sipAllocations || []).filter((_, j) => j !== i);
       setInvestmentPlans(newPlans);
     }
   };
 
   const addStockPurchase = (year: number) => {
     const newPlans = [...investmentPlans];
-    const planIndex = newPlans.findIndex((p) => p.year === year);
-    if (planIndex >= 0) {
-      const current = newPlans[planIndex].stockPurchases || [];
-      newPlans[planIndex].stockPurchases = [...current, { symbol: "", amount: 0 }];
+    const idx = newPlans.findIndex((p) => p.year === year);
+    if (idx >= 0) {
+      newPlans[idx].stockPurchases = [...(newPlans[idx].stockPurchases || []), { symbol: "", amount: 0 }];
       setInvestmentPlans(newPlans);
     }
   };
 
-  const updateStockPurchase = (
-    year: number,
-    purchaseIndex: number,
-    field: "symbol" | "amount",
-    value: any
-  ) => {
+  const updateStockPurchase = (year: number, i: number, field: "symbol" | "amount", value: any) => {
     const newPlans = [...investmentPlans];
-    const planIndex = newPlans.findIndex((p) => p.year === year);
-    if (planIndex >= 0 && newPlans[planIndex].stockPurchases) {
-      (newPlans[planIndex].stockPurchases![purchaseIndex] as any)[field] = value;
+    const idx = newPlans.findIndex((p) => p.year === year);
+    if (idx >= 0 && newPlans[idx].stockPurchases) {
+      (newPlans[idx].stockPurchases![i] as any)[field] = value;
       setInvestmentPlans(newPlans);
     }
   };
 
-  const removeStockPurchase = (year: number, purchaseIndex: number) => {
+  const removeStockPurchase = (year: number, i: number) => {
     const newPlans = [...investmentPlans];
-    const planIndex = newPlans.findIndex((p) => p.year === year);
-    if (planIndex >= 0 && newPlans[planIndex].stockPurchases) {
-      newPlans[planIndex].stockPurchases = newPlans[planIndex].stockPurchases!.filter(
-        (_, i) => i !== purchaseIndex
-      );
+    const idx = newPlans.findIndex((p) => p.year === year);
+    if (idx >= 0) {
+      newPlans[idx].stockPurchases = (newPlans[idx].stockPurchases || []).filter((_, j) => j !== i);
       setInvestmentPlans(newPlans);
     }
+  };
+
+  // Copy this year's config to all subsequent years with optional annual step-up
+  const copyToRemaining = (fromYear: number, stepUpPct: number) => {
+    const src = investmentPlans.find((p) => p.year === fromYear);
+    if (!src) return;
+    const newPlans = investmentPlans.map((plan) => {
+      if (plan.year <= fromYear) return plan;
+      const n = plan.year - fromYear;
+      const mult = Math.pow(1 + stepUpPct / 100, n);
+      return {
+        ...plan,
+        sipMode: src.sipMode,
+        sipAmount: Math.round(src.sipAmount * mult),
+        sipAllocations: src.sipAllocations.map((a) => ({ ...a, amount: Math.round(a.amount * mult) })),
+        swpAmount: Math.round(src.swpAmount * mult),
+        lumpsum: src.lumpsum, // lumpsum not stepped up
+        stockPurchases: src.stockPurchases,
+      };
+    });
+    setInvestmentPlans(newPlans);
   };
 
   return (
@@ -94,145 +159,264 @@ export function InvestmentPlanStep({
           type="number"
           value={timeHorizon}
           onChange={(e) => setTimeHorizon(Math.max(1, Math.min(30, parseInt(e.target.value) || 1)))}
-          min="1"
-          max="30"
+          min="1" max="30"
           className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
         />
         <p className="text-xs text-gray-500 dark:text-white/40 mt-2">
-          Configure investment plans for each year of your simulation (1-30 years)
+          Configure investment plans for each year (1–30 years). Use "Copy to remaining years" on any card to propagate it forward.
         </p>
       </div>
 
       {/* Year-wise Plans */}
       <div className="space-y-4">
         <h3 className="text-sm font-black text-gray-900 dark:text-white flex items-center gap-2">
-          <Calendar className="w-4 h-4" />
-          Year-wise Investment Plans
+          <Calendar className="w-4 h-4" /> Year-wise Investment Plans
         </h3>
 
-        {investmentPlans.map((plan) => (
-          <div
-            key={plan.year}
-            className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-bold text-gray-900 dark:text-white">
-                Year {plan.year + 1}
-              </h4>
-              <span className="text-xs text-gray-500 dark:text-white/40">
-                {new Date().getFullYear() + plan.year}
-              </span>
-            </div>
+        {investmentPlans.map((plan) => {
+          const currentYear = new Date().getFullYear();
+          const effectiveSIP =
+            plan.sipMode === "fundwise"
+              ? (plan.sipAllocations || []).reduce((s, a) => s + a.amount, 0)
+              : plan.sipAmount;
 
-            <div className="grid grid-cols-3 gap-3 mb-3">
-              <div>
-                <label className="block text-[10px] text-gray-500 dark:text-white/40 mb-1 uppercase">
-                  Monthly SIP ₹
-                </label>
-                <input
-                  type="number"
-                  value={plan.sipAmount || ""}
-                  onChange={(e) =>
-                    updatePlan(plan.year, "sipAmount", parseInt(e.target.value) || 0)
-                  }
-                  placeholder="0"
-                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] text-gray-500 dark:text-white/40 mb-1 uppercase">
-                  Monthly SWP ₹
-                </label>
-                <input
-                  type="number"
-                  value={plan.swpAmount || ""}
-                  onChange={(e) =>
-                    updatePlan(plan.year, "swpAmount", parseInt(e.target.value) || 0)
-                  }
-                  placeholder="0"
-                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] text-gray-500 dark:text-white/40 mb-1 uppercase">
-                  Lumpsum ₹
-                </label>
-                <input
-                  type="number"
-                  value={plan.lumpsum || ""}
-                  onChange={(e) =>
-                    updatePlan(plan.year, "lumpsum", parseInt(e.target.value) || 0)
-                  }
-                  placeholder="0"
-                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
-                />
-              </div>
-            </div>
-
-            {/* Stock Purchases */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-[10px] text-gray-500 dark:text-white/40 uppercase">
-                  Stock Purchases (one-time)
-                </label>
-                <button
-                  onClick={() => addStockPurchase(plan.year)}
-                  className="text-xs text-[#00D09C] hover:text-[#00D09C]/80 flex items-center gap-1"
-                >
-                  <Plus className="w-3 h-3" /> Add
-                </button>
+          return (
+            <div key={plan.year} className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">
+                  Year {plan.year + 1}
+                  {effectiveSIP > 0 && (
+                    <span className="ml-2 text-xs font-normal text-[#00D09C]">SIP ₹{effectiveSIP.toLocaleString("en-IN")}/mo</span>
+                  )}
+                </h4>
+                <span className="text-xs text-gray-500 dark:text-white/40">{currentYear + plan.year}</span>
               </div>
 
-              {plan.stockPurchases && plan.stockPurchases.length > 0 ? (
-                <div className="space-y-2">
-                  {plan.stockPurchases.map((purchase, i) => (
-                    <div key={i} className="flex gap-2 items-center">
-                      <select
-                        value={purchase.symbol}
-                        onChange={(e) =>
-                          updateStockPurchase(plan.year, i, "symbol", e.target.value)
-                        }
-                        className="flex-1 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
-                      >
-                        <option value="">Select stock...</option>
-                        {stocks.map((s) => (
-                          <option key={s.symbol} value={s.symbol}>
-                            {s.symbol} - {s.name || s.symbol}
-                          </option>
-                        ))}
-                      </select>
-                      <input
-                        type="number"
-                        value={purchase.amount || ""}
-                        onChange={(e) =>
-                          updateStockPurchase(
-                            plan.year,
-                            i,
-                            "amount",
-                            parseInt(e.target.value) || 0
-                          )
-                        }
-                        placeholder="Amount ₹"
-                        className="w-32 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
-                      />
-                      <button
-                        onClick={() => removeStockPurchase(plan.year, i)}
-                        className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
+              {/* ── SIP section ── */}
+              <div className="mb-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <label className="text-[10px] font-bold text-gray-500 dark:text-white/40 uppercase tracking-wider">Monthly SIP ₹</label>
+                  {/* Mode toggle */}
+                  <div className="flex rounded-md overflow-hidden border border-gray-200 dark:border-white/10 text-[10px] font-semibold ml-auto">
+                    <button
+                      onClick={() => updatePlan(plan.year, "sipMode", "total")}
+                      className={`px-2.5 py-1 transition-colors ${plan.sipMode !== "fundwise" ? "bg-[#00D09C] text-white" : "bg-white dark:bg-white/5 text-gray-500 dark:text-white/40 hover:bg-gray-50 dark:hover:bg-white/10"}`}
+                    >
+                      Total (auto-allocate)
+                    </button>
+                    <button
+                      onClick={() => updatePlan(plan.year, "sipMode", "fundwise")}
+                      className={`px-2.5 py-1 border-l border-gray-200 dark:border-white/10 transition-colors ${plan.sipMode === "fundwise" ? "bg-[#00D09C] text-white" : "bg-white dark:bg-white/5 text-gray-500 dark:text-white/40 hover:bg-gray-50 dark:hover:bg-white/10"}`}
+                    >
+                      Fund-wise
+                    </button>
+                  </div>
                 </div>
-              ) : (
-                <p className="text-xs text-gray-500 dark:text-white/40 italic">
-                  No stock purchases planned
-                </p>
+
+                {plan.sipMode !== "fundwise" ? (
+                  /* Total SIP with auto-allocate preview */
+                  <div>
+                    <input
+                      type="number"
+                      value={plan.sipAmount || ""}
+                      onChange={(e) => updatePlan(plan.year, "sipAmount", parseInt(e.target.value) || 0)}
+                      placeholder="₹ monthly total SIP"
+                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
+                    />
+                    {plan.sipAmount > 0 && totalPortfolioValue > 0 && allHoldings.length > 0 && (
+                      <div className="mt-2 rounded-lg bg-white dark:bg-black/20 border border-gray-100 dark:border-white/5 px-3 py-2">
+                        <p className="text-[10px] font-semibold text-gray-400 dark:text-white/30 uppercase mb-1.5">Auto-allocation preview</p>
+                        <div className="space-y-1">
+                          {allHoldings.map((h, i) => {
+                            const weight = totalPortfolioValue > 0 ? h.value / totalPortfolioValue : 0;
+                            const alloc = Math.round(plan.sipAmount * weight);
+                            if (alloc === 0) return null;
+                            return (
+                              <div key={i} className="flex justify-between text-[10px]">
+                                <span className="text-gray-600 dark:text-white/50 truncate max-w-[60%]">{h.name}</span>
+                                <span className="text-[#00D09C] font-semibold">₹{alloc.toLocaleString("en-IN")}/mo ({(weight * 100).toFixed(0)}%)</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  /* Fund-wise SIP */
+                  <div className="space-y-1.5">
+                    <datalist id={`funds-${plan.year}`}>
+                      {mutualFunds.map((m) => <option key={m.fundName} value={m.fundName} />)}
+                    </datalist>
+                    {(plan.sipAllocations || []).map((alloc, i) => (
+                      <div key={i} className="flex gap-2 items-center">
+                        <input
+                          type="text"
+                          list={`funds-${plan.year}`}
+                          value={alloc.fundName}
+                          onChange={(e) => updateSIPAllocation(plan.year, i, "fundName", e.target.value)}
+                          placeholder="Fund name"
+                          className="flex-1 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
+                        />
+                        <input
+                          type="number"
+                          value={alloc.amount || ""}
+                          onChange={(e) => updateSIPAllocation(plan.year, i, "amount", parseInt(e.target.value) || 0)}
+                          placeholder="₹/mo"
+                          className="w-28 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
+                        />
+                        <button onClick={() => removeSIPAllocation(plan.year, i)} className="text-red-600 dark:text-red-400 hover:text-red-700">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => addSIPAllocation(plan.year)}
+                      className="flex items-center gap-1 text-xs text-[#00D09C] hover:text-[#00D09C]/80"
+                    >
+                      <Plus className="w-3 h-3" /> Add fund SIP
+                    </button>
+                    {(plan.sipAllocations || []).length > 0 && (
+                      <p className="text-[10px] text-gray-500 dark:text-white/40">
+                        Total: ₹{(plan.sipAllocations || []).reduce((s, a) => s + a.amount, 0).toLocaleString("en-IN")}/mo
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* SWP + Lumpsum */}
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label className="block text-[10px] text-gray-500 dark:text-white/40 mb-1 uppercase">Monthly SWP ₹</label>
+                  <input
+                    type="number"
+                    value={plan.swpAmount || ""}
+                    onChange={(e) => updatePlan(plan.year, "swpAmount", parseInt(e.target.value) || 0)}
+                    placeholder="0"
+                    className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-500 dark:text-white/40 mb-1 uppercase">Annual Lumpsum ₹</label>
+                  <input
+                    type="number"
+                    value={plan.lumpsum || ""}
+                    onChange={(e) => updatePlan(plan.year, "lumpsum", parseInt(e.target.value) || 0)}
+                    placeholder="0"
+                    className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
+                  />
+                </div>
+              </div>
+
+              {/* Stock Purchases */}
+              <div className="mb-3">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-[10px] text-gray-500 dark:text-white/40 uppercase">Stock Purchases (one-time)</label>
+                  <button onClick={() => addStockPurchase(plan.year)} className="text-xs text-[#00D09C] hover:text-[#00D09C]/80 flex items-center gap-1">
+                    <Plus className="w-3 h-3" /> Add
+                  </button>
+                </div>
+                {(plan.stockPurchases || []).length > 0 ? (
+                  <div className="space-y-1.5">
+                    {plan.stockPurchases!.map((purchase, i) => (
+                      <div key={i} className="flex gap-2 items-center">
+                        <select
+                          value={purchase.symbol}
+                          onChange={(e) => updateStockPurchase(plan.year, i, "symbol", e.target.value)}
+                          className="flex-1 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
+                        >
+                          <option value="">Select stock...</option>
+                          {stocks.map((s) => <option key={s.symbol} value={s.symbol}>{s.symbol} — {s.name || s.symbol}</option>)}
+                        </select>
+                        <input
+                          type="number"
+                          value={purchase.amount || ""}
+                          onChange={(e) => updateStockPurchase(plan.year, i, "amount", parseInt(e.target.value) || 0)}
+                          placeholder="Amount ₹"
+                          className="w-28 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
+                        />
+                        <button onClick={() => removeStockPurchase(plan.year, i)} className="text-red-600 dark:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-500 dark:text-white/40 italic">No stock purchases planned</p>
+                )}
+              </div>
+
+              {/* Copy to remaining years */}
+              {plan.year < investmentPlans.length - 1 && (
+                <div className="pt-3 border-t border-gray-200 dark:border-white/10 flex items-center gap-2 flex-wrap">
+                  <Copy className="w-3.5 h-3.5 text-gray-400 dark:text-white/30 shrink-0" />
+                  <span className="text-[10px] text-gray-500 dark:text-white/40">Copy Year {plan.year + 1} to remaining years</span>
+                  <div className="flex gap-1.5 ml-auto flex-wrap">
+                    {STEP_UP_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => copyToRemaining(plan.year, opt.value)}
+                        className="px-2 py-0.5 rounded text-[10px] font-semibold border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-gray-600 dark:text-white/60 hover:border-[#00D09C]/50 hover:text-[#00D09C] transition-colors"
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               )}
             </div>
-          </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Country pill multi-select ────────────────────────────────────────────────
+
+function CountryPillSelect({
+  selected,
+  onChange,
+}: {
+  selected: Country[];
+  onChange: (countries: Country[]) => void;
+}) {
+  const toggle = (c: Country) => {
+    onChange(selected.includes(c) ? selected.filter((x) => x !== c) : [...selected, c]);
+  };
+  return (
+    <div className="space-y-2">
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {selected.map((c) => (
+            <span
+              key={c}
+              className="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#00D09C]/15 border border-[#00D09C]/35 text-[#00D09C]"
+            >
+              {c}
+              <button
+                onClick={() => toggle(c)}
+                className="hover:text-red-400 transition-colors leading-none font-bold text-base ml-0.5"
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+      <div className="flex flex-wrap gap-1.5">
+        {COUNTRIES.filter((c) => !selected.includes(c)).map((c) => (
+          <button
+            key={c}
+            onClick={() => toggle(c)}
+            className="px-2.5 py-0.5 rounded-full text-[11px] font-medium border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-gray-600 dark:text-white/60 hover:border-[#00D09C]/40 hover:text-[#00D09C] transition-colors"
+          >
+            + {c}
+          </button>
         ))}
       </div>
+      {selected.length === 0 && (
+        <p className="text-[10px] text-gray-400 dark:text-white/30">Click countries above to select them</p>
+      )}
     </div>
   );
 }
@@ -352,7 +536,7 @@ export function ScenarioBuilderStep({
             </h4>
             <p className="text-xs text-gray-700 dark:text-white/70 leading-relaxed">
               Our AI will analyze which of your holdings are affected by each scenario
-              based on their industry, geography, and business model. Each scenario's
+              based on their industry, geography and business model. Each scenario's
               impact is customized per holding.
             </p>
           </div>
@@ -560,31 +744,13 @@ export function ScenarioBuilderStep({
                   </div>
 
                   <div className="col-span-2">
-                    <label className="block text-[10px] text-gray-500 dark:text-white/40 mb-1 uppercase">
+                    <label className="block text-[10px] text-gray-500 dark:text-white/40 mb-1.5 uppercase">
                       Countries Involved
                     </label>
-                    <select
-                      multiple
-                      value={scenario.countries}
-                      onChange={(e) => {
-                        const selected = Array.from(
-                          e.target.selectedOptions,
-                          (option) => option.value as Country
-                        );
-                        updateGeoScenario(scenario.id, "countries", selected);
-                      }}
-                      className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
-                      size={4}
-                    >
-                      {COUNTRIES.map((country) => (
-                        <option key={country} value={country}>
-                          {country}
-                        </option>
-                      ))}
-                    </select>
-                    <p className="text-[10px] text-gray-500 dark:text-white/40 mt-1">
-                      Hold Ctrl/Cmd to select multiple
-                    </p>
+                    <CountryPillSelect
+                      selected={scenario.countries}
+                      onChange={(countries) => updateGeoScenario(scenario.id, "countries", countries)}
+                    />
                   </div>
 
                   <div>

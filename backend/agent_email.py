@@ -1,9 +1,9 @@
 """
-agent_email.py — Generates and sends the daily portfolio report email.
+agent_email.py - Generates and sends the daily portfolio report email.
 
 Uses SMTP (Gmail app password) via environment variables:
-  AGENT_SMTP_EMAIL    — sender Gmail address
-  AGENT_SMTP_PASSWORD — Gmail app password (not account password)
+  AGENT_SMTP_EMAIL    - sender Gmail address
+  AGENT_SMTP_PASSWORD - Gmail app password (not account password)
 """
 
 import os
@@ -201,7 +201,7 @@ def send_report(to_email: str, user: dict) -> None:
     today = datetime.date.today().strftime("%d %b %Y")
 
     msg = MIMEMultipart("alternative")
-    msg["Subject"] = f"📊 Your Portfolio Report — {today}"
+    msg["Subject"] = f"📊 Your Portfolio Report - {today}"
     msg["From"]    = f"Diversifi Agent <{SMTP_EMAIL}>"
     msg["To"]      = to_email
 

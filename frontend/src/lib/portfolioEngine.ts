@@ -170,7 +170,7 @@ const NIFTY500_WEIGHTS: Record<string, number> = {
 // ─── SEBI Category Overlap Matrix ────────────────────────────────────────────
 // Score = expected % portfolio duplication between two funds of these categories.
 // Driven primarily by market-cap universe overlap (SEBI mandates), not sector similarity.
-// E.g. Large Cap must invest ≥80% in top-100 stocks — any two such funds share the same universe.
+// E.g. Large Cap must invest ≥80% in top-100 stocks - any two such funds share the same universe.
 // Flexi Cap is ~55% large-cap by practice, so it overlaps Large Cap but not Small Cap.
 const CATEGORY_BASE_OVERLAP: Record<string, Record<string, number>> = {
   "Large Cap":       { "Large Cap": 85, "Index": 75, "Flexi Cap": 55, "ELSS": 50, "Multi Cap": 40, "Large & Mid Cap": 45, "Value": 40, "Hybrid": 35, "Mid Cap": 8,  "Small Cap": 3  },
@@ -242,7 +242,7 @@ function calcSectorAllocations(
 
 function calcConcentration(stocks: StockHolding[], totalValue: number): ConcentrationRisk {
   const sorted = [...stocks].sort((a, b) => b.currentValue - a.currentValue);
-  // Measure per-stock concentration against stock-only total — MF value diluting stock risk is misleading
+  // Measure per-stock concentration against stock-only total - MF value diluting stock risk is misleading
   const stockTotal = stocks.reduce((a, s) => a + s.currentValue, 0);
   const stockBase = stockTotal > 0 ? stockTotal : totalValue;
   const topHoldings = sorted.slice(0, 10).map((s) => {
@@ -254,7 +254,7 @@ function calcConcentration(stocks: StockHolding[], totalValue: number): Concentr
     const sec = getSector(s.symbol);
     sectorMap[sec] = (sectorMap[sec] ?? 0) + s.currentValue;
   }
-  // Sector risk measured vs total portfolio (correct — sector dominance is portfolio-level risk)
+  // Sector risk measured vs total portfolio (correct - sector dominance is portfolio-level risk)
   const sectorRisks = Object.entries(sectorMap).map(([sector, val]) => {
     const pct = totalValue > 0 ? (val / totalValue) * 100 : 0;
     return { sector, pct: +pct.toFixed(2), isRisk: pct > 25 };
@@ -293,7 +293,7 @@ function detectMFOverlap(funds: MFHolding[]): MFOverlap[] {
       const sameCategory = f1.category === f2.category;
       const catScore = categorySimilarityScore(f1.category, f2.category);
 
-      // 2. Holdings-based overlap (augments — not all funds have hardcoded holdings)
+      // 2. Holdings-based overlap (augments - not all funds have hardcoded holdings)
       const h1 = findMFHoldings(f1.fundName);
       const h2 = findMFHoldings(f2.fundName);
       const shared = h1.length > 0 && h2.length > 0 ? h1.filter((s) => h2.includes(s)) : [];
@@ -310,7 +310,7 @@ function detectMFOverlap(funds: MFHolding[]): MFOverlap[] {
       if (sameCategory || catScore >= 45) {
         let reason: string;
         if (sameCategory) {
-          reason = `Both are ${f1.category} funds — SEBI mandates near-identical investment universe`;
+          reason = `Both are ${f1.category} funds - SEBI mandates near-identical investment universe`;
         } else {
           reason = `${catScore}% sector overlap: ${f1.category} and ${f2.category} funds have similar mandates`;
         }
@@ -475,7 +475,7 @@ function buildRebalanceSuggestions(
   for (const s of sectorAllocations.filter((sec) => sec.status === "underweight" || sec.status === "missing")) {
     suggestions.push({
       type: "BUY", asset: s.sector, priority: "MEDIUM",
-      reason: `${Math.abs(s.delta).toFixed(1)}% underweight — improve diversification`,
+      reason: `${Math.abs(s.delta).toFixed(1)}% underweight - improve diversification`,
       currentPct: s.percentage, targetPct: s.benchmarkPct,
     });
   }

@@ -284,9 +284,9 @@ I apologize, but I cannot process your question because:
 ✅ Stock analysis and recommendations
 ✅ Mutual fund comparisons and suggestions
 ✅ Investment strategies and portfolio advice
-✅ Financial planning, budgeting, and taxation
+✅ Financial planning, budgeting and taxation
 
-Please ask a finance-related question, and I'll be happy to assist!"""
+Please ask a finance-related question and I'll be happy to assist!"""
     
     state["events"].append({
         "type": "result",
@@ -298,7 +298,7 @@ Please ask a finance-related question, and I'll be happy to assist!"""
 def general_finance_handler(state: AgentState) -> AgentState:
     prompt = f"""
     You are a financial advisor focused on personal finance topics like budgeting,
-    savings, insurance, tax planning, and general investment strategy.
+    savings, insurance, tax planning and general investment strategy.
     Provide a simplified and short explanation.
 
     Question: "{state['question']}"
@@ -638,7 +638,7 @@ def bull_handler(state: AgentState) -> dict:
     News Headlines: {headlines}
     Sentiment: {sentiment_summary}
 
-    Explain why the stock may rise, opportunities, catalysts, investor confidence, and upside targets.
+    Explain why the stock may rise, opportunities, catalysts, investor confidence and upside targets.
     Provide a bullish Buy recommendation if justified. Keep the output super concise under 100 words.
     """
 
@@ -664,7 +664,7 @@ def bear_handler(state: AgentState) -> dict:
     News Headlines: {headlines}
     Sentiment: {sentiment_summary}
 
-    Explain risks, weaknesses, uncertainty, red flags, and downside price levels.
+    Explain risks, weaknesses, uncertainty, red flags and downside price levels.
     Provide a Sell recommendation if justified. Keep the output super concise under 100 words.
     """
 

@@ -11,7 +11,7 @@ export function Header() {
     { name: "Simulate", path: "/portfolio-simulation" },
     { name: "Research", path: "/research" },
     { name: "News",     path: "/global-trade" },
-    { name: "Agent",    path: "/agent" },
+    { name: "AlphaMind", path: "/alphamind" },
   ];
 
   return (

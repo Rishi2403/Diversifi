@@ -25,6 +25,12 @@ import AnalysePage from "@/pages/AnalysePage";
 import AlgoTradingPage from "@/pages/AlgoTradingPage";
 import AgentPage from "@/pages/AgentPage";
 import AgentSetupPage from "@/pages/AgentSetupPage";
+import PulsePage from "@/pages/PulsePage";
+import PrivacyPage from "@/pages/PrivacyPage";
+import TermsPage from "@/pages/TermsPage";
+import ContactPage from "@/pages/ContactPage";
+import ReportsPage from "@/pages/ReportsPage";
+import FeaturesPage from "@/pages/FeaturesPage";
 
 const queryClient = new QueryClient();
 
@@ -154,6 +160,12 @@ const App = () => (
               }
             />
             <Route path="/algo-trading" element={<AlgoTradingPage />} />
+            <Route path="/alphamind" element={<PulsePage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/features" element={<FeaturesPage />} />
             <Route
               path="/agent"
               element={

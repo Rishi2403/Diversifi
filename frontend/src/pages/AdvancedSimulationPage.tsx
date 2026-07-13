@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, ReferenceLine,
+} from "recharts";
+import {
   ArrowLeft,
   ArrowRight,
   Upload,
@@ -70,7 +74,9 @@ export default function AdvancedSimulationPage() {
   const [investmentPlans, setInvestmentPlans] = useState<YearlyInvestmentPlan[]>(
     Array.from({ length: 10 }, (_, i) => ({
       year: i,
+      sipMode: "total" as const,
       sipAmount: 0,
+      sipAllocations: [],
       swpAmount: 0,
       lumpsum: 0,
       stockPurchases: [],
@@ -89,6 +95,8 @@ export default function AdvancedSimulationPage() {
   // Simulation
   const [simulating, setSimulating] = useState(false);
   const [result, setResult] = useState<AdvancedSimulationResult | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [progressLabel, setProgressLabel] = useState("");
 
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme-mode");
@@ -107,7 +115,9 @@ export default function AdvancedSimulationPage() {
     setInvestmentPlans(
       Array.from({ length: timeHorizon }, (_, i) => ({
         year: i,
+        sipMode: investmentPlans[i]?.sipMode || "total",
         sipAmount: investmentPlans[i]?.sipAmount || 0,
+        sipAllocations: investmentPlans[i]?.sipAllocations || [],
         swpAmount: investmentPlans[i]?.swpAmount || 0,
         lumpsum: investmentPlans[i]?.lumpsum || 0,
         stockPurchases: investmentPlans[i]?.stockPurchases || [],
@@ -180,6 +190,8 @@ export default function AdvancedSimulationPage() {
 
   const runSimulation = async () => {
     setSimulating(true);
+    setProgress(0);
+    setProgressLabel("Starting...");
 
     const input: AdvancedSimulationInput = {
       stocks,
@@ -192,11 +204,14 @@ export default function AdvancedSimulationPage() {
       inflationScenarios,
       baseExpectedReturn,
       baseVolatility,
-      simulations: 5000, // Reduced for faster LLM processing
+      simulations: 5000,
     };
 
     try {
-      const simulationResult = await runAdvancedSimulation(input);
+      const simulationResult = await runAdvancedSimulation(input, (pct, label) => {
+        setProgress(pct);
+        setProgressLabel(label);
+      });
       setResult(simulationResult);
       setStep(4);
     } catch (error) {
@@ -216,6 +231,30 @@ export default function AdvancedSimulationPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+
+      {/* Progress overlay */}
+      {simulating && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-sm mx-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 shadow-2xl p-8">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-14 h-14 rounded-full bg-[#00D09C]/10 flex items-center justify-center mb-4">
+                <Loader2 className="w-7 h-7 text-[#00D09C] animate-spin" />
+              </div>
+              <h3 className="font-black text-gray-900 dark:text-white text-base mb-1">Running Simulation</h3>
+              <p className="text-xs text-gray-500 dark:text-white/40 mb-6 min-h-[2.5rem] leading-relaxed">{progressLabel}</p>
+              {/* Progress bar */}
+              <div className="w-full bg-gray-100 dark:bg-white/10 rounded-full h-2.5 mb-2">
+                <div
+                  className="h-2.5 rounded-full transition-all duration-500"
+                  style={{ width: `${progress}%`, background: "linear-gradient(90deg, #00D09C, #00b8ff)" }}
+                />
+              </div>
+              <p className="text-sm font-bold text-[#00D09C]">{Math.round(progress)}%</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Background */}
       <div
         className="fixed inset-0 pointer-events-none"
@@ -322,6 +361,8 @@ export default function AdvancedSimulationPage() {
                     investmentPlans={investmentPlans}
                     setInvestmentPlans={setInvestmentPlans}
                     stocks={stocks}
+                    mutualFunds={mutualFunds}
+                    cashBalance={cashBalance}
                   />
                 )}
 
@@ -396,7 +437,7 @@ export default function AdvancedSimulationPage() {
             </div>
           </>
         ) : (
-          <ResultsStep result={result} onReset={() => setResult(null)} />
+          <ResultsStep result={result} onReset={() => setResult(null)} initialValue={totalValue} />
         )}
       </div>
     </div>
@@ -712,9 +753,12 @@ function ReviewStep({
         </h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs text-gray-500 dark:text-white/50 mb-2">
-              Expected Return (% p.a.)
+            <label className="block text-xs text-gray-500 dark:text-white/50 mb-1">
+              Expected Return (% p.a., nominal)
             </label>
+            <p className="text-[10px] text-gray-400 dark:text-white/30 mb-2">
+              Enter as a nominal return (before inflation). Inflation scenarios add a separate real-value adjustment on top.
+            </p>
             <input
               type="number"
               value={baseExpectedReturn}
@@ -727,6 +771,9 @@ function ReviewStep({
             <label className="block text-xs text-gray-500 dark:text-white/50 mb-2">
               Volatility (% p.a.)
             </label>
+            <p className="text-[10px] text-gray-400 dark:text-white/30 mb-1">
+              <br />
+            </p>
             <input
               type="number"
               value={baseVolatility}
@@ -796,7 +843,7 @@ function ReviewStep({
             <span className="font-bold text-gray-900 dark:text-white">{timeHorizon} years</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600 dark:text-white/60">Expected Return</span>
+            <span className="text-gray-600 dark:text-white/60">Expected Return (nominal)</span>
             <span className="font-bold text-gray-900 dark:text-white">{baseExpectedReturn}%</span>
           </div>
           <div className="flex justify-between">
@@ -810,6 +857,53 @@ function ReviewStep({
         </div>
       </div>
 
+      {/* Scenario detail list */}
+      {(industryScenarios.length + geopoliticalScenarios.length + inflationScenarios.length) > 0 && (
+        <div className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-6">
+          <h3 className="text-sm font-black text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <Zap className="w-4 h-4 text-purple-500" /> Configured Scenarios
+          </h3>
+          <div className="space-y-2">
+            {industryScenarios.map((s) => (
+              <div key={s.id} className="flex items-center gap-3 text-xs py-2 border-b border-gray-100 dark:border-white/5 last:border-0">
+                <span className={`px-2 py-0.5 rounded-full font-semibold shrink-0 ${s.type === "CRASH" ? "bg-red-100 dark:bg-red-500/15 text-red-700 dark:text-red-400" : "bg-green-100 dark:bg-green-500/15 text-green-700 dark:text-green-400"}`}>
+                  {s.type}
+                </span>
+                <span className="font-semibold text-gray-900 dark:text-white">{s.industry}</span>
+                <span className="text-gray-500 dark:text-white/40">
+                  Impact <strong className={s.impact < 0 ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}>{s.impact > 0 ? "+" : ""}{(s.impact * 100).toFixed(0)}%</strong>
+                  {" · "}Yr {s.startYear + 1}–{s.startYear + s.duration}
+                  {" · "}{(s.probability * 100).toFixed(0)}% annual prob.
+                </span>
+              </div>
+            ))}
+            {geopoliticalScenarios.map((s) => (
+              <div key={s.id} className="flex items-start gap-3 text-xs py-2 border-b border-gray-100 dark:border-white/5 last:border-0">
+                <span className="px-2 py-0.5 rounded-full font-semibold shrink-0 bg-orange-100 dark:bg-orange-500/15 text-orange-700 dark:text-orange-400">GEO</span>
+                <div>
+                  <span className="font-semibold text-gray-900 dark:text-white">{s.name}</span>
+                  <span className="text-gray-500 dark:text-white/40 ml-2">
+                    {s.countries.join(", ")}
+                    {" · "}Impact <strong className={s.impact < 0 ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}>{s.impact > 0 ? "+" : ""}{(s.impact * 100).toFixed(0)}%</strong>
+                    {" · "}Yr {s.startYear + 1}–{s.startYear + s.duration}
+                    {" · "}{(s.probability * 100).toFixed(0)}% annual prob.
+                  </span>
+                </div>
+              </div>
+            ))}
+            {inflationScenarios.map((s) => (
+              <div key={s.id} className="flex items-center gap-3 text-xs py-2 border-b border-gray-100 dark:border-white/5 last:border-0">
+                <span className="px-2 py-0.5 rounded-full font-semibold shrink-0 bg-yellow-100 dark:bg-yellow-500/15 text-yellow-700 dark:text-yellow-400">INFL</span>
+                <span className="font-semibold text-gray-900 dark:text-white">{s.country}</span>
+                <span className="text-gray-500 dark:text-white/40">
+                  {s.rate}% p.a. · Yr {s.startYear + 1}–{s.startYear + s.duration}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="bg-gradient-to-br from-[#00D09C]/10 to-emerald-500/10 border border-[#00D09C]/30 rounded-2xl p-6">
         <div className="flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-[#00D09C] flex-shrink-0" />
@@ -818,8 +912,7 @@ function ReviewStep({
               Ready to Simulate
             </h4>
             <p className="text-xs text-gray-700 dark:text-white/70 leading-relaxed">
-              Our AI will analyze each of your {stocks.length + mutualFunds.length} holdings to
-              determine which scenarios affect them and by how much. This may take 30-60 seconds.
+              AI will analyse each of your {stocks.length + mutualFunds.length} holdings against every scenario, then run 5,000 Monte Carlo paths. Takes 30–90 seconds.
             </p>
           </div>
         </div>
@@ -833,13 +926,42 @@ function ReviewStep({
 function ResultsStep({
   result,
   onReset,
+  initialValue,
 }: {
   result: AdvancedSimulationResult;
   onReset: () => void;
+  initialValue: number;
 }) {
-  const meanReturn =
-    ((result.statistics.mean / (result.statistics.median || 1) - 1) * 100).toFixed(1);
-  const isProfit = result.statistics.mean > result.statistics.median;
+  const totalReturn = initialValue > 0
+    ? ((result.statistics.mean / initialValue - 1) * 100)
+    : 0;
+  const isProfit = result.statistics.mean > initialValue;
+
+  // Fan chart data: prepend year 0 = initial value, then yearly breakdown
+  const chartData = [
+    { year: 0, floor: initialValue, band: 0, mean: initialValue },
+    ...result.yearlyBreakdown.map((y) => ({
+      year: y.year,
+      floor: Math.max(0, y.p10),
+      band: Math.max(0, y.p90 - y.p10),
+      mean: y.meanValue,
+    })),
+  ];
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (!active || !payload?.length) return null;
+    const floor = payload.find((p: any) => p.dataKey === "floor")?.value ?? 0;
+    const band = payload.find((p: any) => p.dataKey === "band")?.value ?? 0;
+    const mean = payload.find((p: any) => p.dataKey === "mean")?.value ?? 0;
+    return (
+      <div className="bg-gray-900 border border-white/10 rounded-lg px-3 py-2 text-xs shadow-xl">
+        <p className="text-white/50 mb-1">Year {label}</p>
+        <p className="text-[#00D09C] font-bold">Mean: {formatINR(mean)}</p>
+        <p className="text-green-400">P90: {formatINR(floor + band)}</p>
+        <p className="text-red-400">P10: {formatINR(floor)}</p>
+      </div>
+    );
+  };
 
   return (
     <motion.div
@@ -856,19 +978,9 @@ function ResultsStep({
           <p className="text-2xl font-black text-gray-900 dark:text-white">
             {formatINR(result.statistics.mean)}
           </p>
-          <p
-            className={`text-sm mt-1 ${
-              isProfit
-                ? "text-green-600 dark:text-green-400"
-                : "text-red-600 dark:text-red-400"
-            }`}
-          >
-            {isProfit ? (
-              <TrendingUp className="w-4 h-4 inline" />
-            ) : (
-              <TrendingDown className="w-4 h-4 inline" />
-            )}{" "}
-            {meanReturn}%
+          <p className={`text-sm mt-1 font-semibold ${isProfit ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+            {isProfit ? <TrendingUp className="w-4 h-4 inline mr-0.5" /> : <TrendingDown className="w-4 h-4 inline mr-0.5" />}
+            {isProfit ? "+" : ""}{totalReturn.toFixed(1)}% total return
           </p>
         </div>
 
@@ -879,7 +991,7 @@ function ResultsStep({
           <p className="text-2xl font-black text-green-600 dark:text-green-400">
             {formatINR(result.statistics.p90)}
           </p>
-          <p className="text-xs text-gray-600 dark:text-white/50 mt-1">Top 10% outcome</p>
+          <p className="text-xs text-gray-600 dark:text-white/50 mt-1">Top 10% of outcomes</p>
         </div>
 
         <div className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-5">
@@ -889,7 +1001,7 @@ function ResultsStep({
           <p className="text-2xl font-black text-red-600 dark:text-red-400">
             {formatINR(result.statistics.p10)}
           </p>
-          <p className="text-xs text-gray-600 dark:text-white/50 mt-1">Bottom 10% outcome</p>
+          <p className="text-xs text-gray-600 dark:text-white/50 mt-1">Bottom 10% of outcomes</p>
         </div>
 
         <div className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-5">
@@ -900,9 +1012,60 @@ function ResultsStep({
             {formatPercent(result.probabilityOfLoss)}
           </p>
           <p className="text-xs text-gray-600 dark:text-white/50 mt-1">
-            Below initial value
+            Paths ending below initial value
           </p>
         </div>
+      </div>
+
+      {/* Fan Chart */}
+      <div className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-6">
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h3 className="text-sm font-black text-gray-900 dark:text-white">
+              Portfolio Value Projection — 5,000 Monte Carlo Paths
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-white/40 mt-0.5">
+              Shaded band = P10 to P90 range. Line = mean outcome.
+            </p>
+          </div>
+          <div className="flex items-center gap-4 text-xs shrink-0 mt-0.5">
+            <span className="flex items-center gap-1.5 text-gray-500 dark:text-white/40">
+              <span className="w-3 h-3 rounded-sm bg-[#00D09C]/25 border border-[#00D09C]/40 inline-block" />
+              P10–P90 band
+            </span>
+            <span className="flex items-center gap-1.5 text-gray-500 dark:text-white/40">
+              <span className="w-5 h-0.5 bg-[#00D09C] inline-block rounded" />
+              Mean
+            </span>
+          </div>
+        </div>
+        <ResponsiveContainer width="100%" height={260}>
+          <ComposedChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.12)" />
+            <XAxis
+              dataKey="year"
+              tickFormatter={(v) => `Yr ${v}`}
+              tick={{ fontSize: 10, fill: "currentColor" }}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              tickFormatter={(v) => formatINR(v)}
+              tick={{ fontSize: 10, fill: "currentColor" }}
+              tickLine={false}
+              axisLine={false}
+              width={78}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            {initialValue > 0 && (
+              <ReferenceLine y={initialValue} stroke="rgba(128,128,128,0.4)" strokeDasharray="4 4" />
+            )}
+            {/* Stacked areas create P10–P90 band */}
+            <Area type="monotone" dataKey="floor" stackId="band" stroke="transparent" fill="transparent" legendType="none" />
+            <Area type="monotone" dataKey="band" stackId="band" stroke="none" fill="#00D09C" fillOpacity={0.18} legendType="none" />
+            <Line type="monotone" dataKey="mean" stroke="#00D09C" strokeWidth={2} dot={false} legendType="none" />
+          </ComposedChart>
+        </ResponsiveContainer>
       </div>
 
       {/* Holding Impacts */}
@@ -1026,6 +1189,23 @@ function ResultsStep({
             {formatINR(result.riskMetrics.valueAtRisk95)}
           </p>
           <p className="text-xs text-gray-600 dark:text-white/50 mt-1">95% confidence floor</p>
+        </div>
+      </div>
+
+      {/* Methodology note */}
+      <div className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-5">
+        <div className="flex items-start gap-3">
+          <Info className="w-4 h-4 text-gray-400 dark:text-white/30 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-xs font-bold text-gray-600 dark:text-white/50 mb-1.5">Model Assumptions</p>
+            <ul className="space-y-1 text-xs text-gray-500 dark:text-white/40 leading-relaxed">
+              <li>· <strong className="text-gray-600 dark:text-white/60">GBM random walk</strong> — monthly log-normal returns with constant annualised volatility (Geometric Brownian Motion baseline)</li>
+              <li>· <strong className="text-gray-600 dark:text-white/60">5,000 Monte Carlo paths</strong> — each path simulates a unique sequence of monthly returns across the full horizon</li>
+              <li>· <strong className="text-gray-600 dark:text-white/60">AI scenario mapping</strong> — Claude Sonnet analyses each holding against each scenario independently; impacts applied as probability-weighted monthly shocks</li>
+              <li>· <strong className="text-gray-600 dark:text-white/60">Sharpe ratio</strong> — annualised excess return over India 10-yr G-sec (6.5%) divided by input annual volatility</li>
+              <li>· <strong className="text-gray-600 dark:text-white/60">Expected return treated as nominal</strong> — inflation scenarios apply an additional real-purchasing-power adjustment on top</li>
+            </ul>
+          </div>
         </div>
       </div>
 
