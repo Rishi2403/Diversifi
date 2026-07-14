@@ -8,27 +8,27 @@ const sections = [
   {
     title: "1. Information We Collect",
     content: [
-      "**Portfolio data** — When you use DiversiFi, you may upload a CSV containing stock and mutual fund holdings. This data is stored locally on our servers per your account and is used solely to power the analysis and monitoring features.",
-      "**Account information** — We use Clerk for authentication. Your name, email address, and profile details are managed by Clerk. We receive only your primary email address to link your portfolio data.",
-      "**Usage data** — We may collect anonymised, aggregated usage metrics (page views, feature interactions) to improve the product. No personally identifiable information is included.",
+      "**Portfolio data** - When you use DiversiFi, you may upload a CSV containing stock and mutual fund holdings. This data is stored locally on our servers per your account and is used solely to power the analysis and monitoring features.",
+      "**Account information** - We use Clerk for authentication. Your name, email address, and profile details are managed by Clerk. We receive only your primary email address to link your portfolio data.",
+      "**Usage data** - We may collect anonymised, aggregated usage metrics (page views, feature interactions) to improve the product. No personally identifiable information is included.",
     ],
   },
   {
     title: "2. How We Use Your Data",
     content: [
-      "**Portfolio analysis** — Your holdings data is used to compute health scores, generate AI-powered insights, run Monte Carlo simulations, and power the AlphaMind real-time monitoring agent.",
-      "**Email communications** — If you enable AlphaMind, your email address (from Clerk) is used to send automated daily market intelligence reports. You can disable this at any time from the AlphaMind dashboard.",
-      "**Improvement** — Aggregated, anonymised patterns may be used to improve model accuracy and feature design. Individual data is never shared.",
+      "**Portfolio analysis** - Your holdings data is used to compute health scores, generate AI-powered insights, run Monte Carlo simulations, and power the AlphaMind real-time monitoring agent.",
+      "**Email communications** - If you enable AlphaMind, your email address (from Clerk) is used to send automated daily market intelligence reports. You can disable this at any time from the AlphaMind dashboard.",
+      "**Improvement** - Aggregated, anonymised patterns may be used to improve model accuracy and feature design. Individual data is never shared.",
     ],
   },
   {
     title: "3. Third-Party Services",
     content: [
-      "**Clerk** — Authentication and user management. Clerk's own privacy policy governs data handled by them.",
-      "**Anthropic (Claude)** — AI analysis and verdict generation. Portfolio context is sent to the Claude API per analysis cycle. Anthropic's usage policies apply.",
-      "**yfinance / Yahoo Finance** — Live price and news data fetched from Yahoo Finance APIs. No personal data is transmitted.",
-      "**CoinGecko** — Cryptocurrency market data. No personal data is transmitted.",
-      "**Frankfurter** — Foreign exchange rates. No personal data is transmitted.",
+      "**Clerk** - Authentication and user management. Clerk's own privacy policy governs data handled by them.",
+      "**Anthropic (Claude)** - AI analysis and verdict generation. Portfolio context is sent to the Claude API per analysis cycle. Anthropic's usage policies apply.",
+      "**yfinance / Yahoo Finance** - Live price and news data fetched from Yahoo Finance APIs. No personal data is transmitted.",
+      "**CoinGecko** - Cryptocurrency market data. No personal data is transmitted.",
+      "**Frankfurter** - Foreign exchange rates. No personal data is transmitted.",
     ],
   },
   {

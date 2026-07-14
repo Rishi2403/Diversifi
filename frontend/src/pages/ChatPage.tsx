@@ -1,588 +1,328 @@
-import { useState, useRef, useEffect } from "react";
-import {
-  ArrowUpRight,
-  Send,
-  CheckCircle2,
-  X,
-  Info,
-  AlertCircle,
-} from "lucide-react";
-import ReactMarkdown from "react-markdown";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Send, TrendingUp, BarChart2, BookOpen, Sparkles, X } from "lucide-react";
 import { ChatMarkdown } from "@/components/ChatMarkdown";
 
-
-// --- Interfaces ---
+// ── Types ─────────────────────────────────────────────────────────────────────
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
+  streaming?: boolean;
 }
 
-
-interface ReasoningStep {
-  name: string;
-  status: "pending" | "active" | "complete" | "error";
-  message?: string;
+export interface ChatContext {
+  source: "analyse" | "simulate" | "research" | "suggest";
+  label: string;
+  summary: string;
+  suggestedPrompts: string[];
 }
 
+const CONTEXT_STORAGE_KEY = "diversifi_chat_context";
 
-interface BackendEvent {
-  type: "result" | "clarifier" | "error";
-  title: string;
-  message: string;
+// ── Default suggested prompts ──────────────────────────────────────────────────
+const DEFAULT_PROMPTS = [
+  "Best SIP amount for ₹10,000/month over 15 years?",
+  "Is Nifty 50 index a good long-term bet?",
+  "Explain LTCG vs STCG tax rules in India",
+  "How much gold should be in my portfolio?",
+];
+
+const SOURCE_META: Record<NonNullable<ChatContext["source"]>, { icon: typeof BarChart2; color: string; dim: string }> = {
+  analyse:  { icon: BarChart2, color: "#00D09C", dim: "rgba(0,208,156,0.12)" },
+  simulate: { icon: TrendingUp, color: "#a855f7", dim: "rgba(168,85,247,0.12)" },
+  research: { icon: BookOpen,   color: "#00b8ff", dim: "rgba(0,184,255,0.12)" },
+  suggest:  { icon: Sparkles,   color: "#f59e0b", dim: "rgba(245,158,11,0.12)" },
+};
+
+// ── Typing cursor ──────────────────────────────────────────────────────────────
+function Cursor() {
+  return (
+    <span
+      className="inline-block w-[2px] h-[1em] ml-0.5 align-middle rounded-sm animate-pulse"
+      style={{ background: "#00D09C", verticalAlign: "middle" }}
+    />
+  );
 }
 
+// ── Message bubble ─────────────────────────────────────────────────────────────
+function Bubble({ msg }: { msg: Message }) {
+  const isUser = msg.role === "user";
+  return (
+    <div className={`flex ${isUser ? "justify-end" : "justify-start"} group`}>
+      {!isUser && (
+        <div
+          className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mr-2.5 mt-0.5"
+          style={{ background: "rgba(0,208,156,0.15)", border: "1px solid rgba(0,208,156,0.3)" }}
+        >
+          <TrendingUp className="w-3.5 h-3.5" style={{ color: "#00D09C" }} />
+        </div>
+      )}
+      <div
+        className={`max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
+          isUser
+            ? "rounded-br-sm text-white"
+            : "rounded-bl-sm bg-muted border border-border text-foreground"
+        }`}
+        style={isUser ? { background: "#00D09C", color: "#080b10" } : undefined}
+      >
+        {isUser ? (
+          <p className="font-medium">{msg.content}</p>
+        ) : (
+          <>
+            <ChatMarkdown content={msg.content} invert={false} />
+            {msg.streaming && msg.content.length > 0 && <Cursor />}
+          </>
+        )}
+        {msg.streaming && msg.content.length === 0 && (
+          <span className="flex gap-1 items-center h-4">
+            {[0, 1, 2].map((i) => (
+              <span
+                key={i}
+                className="w-1.5 h-1.5 rounded-full animate-bounce"
+                style={{ background: "#00D09C", animationDelay: `${i * 0.15}s` }}
+              />
+            ))}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
 
-const API_BASE = "";
+// ── Suggested prompt chip ──────────────────────────────────────────────────────
+function PromptChip({ text, onClick }: { text: string; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="text-left text-xs px-3.5 py-2.5 rounded-xl border border-border bg-card text-muted-foreground transition-all hover:border-[#00D09C]/40 hover:text-foreground"
+    >
+      {text}
+    </button>
+  );
+}
 
+// ── Main page ──────────────────────────────────────────────────────────────────
+export default function ChatPage() {
+  const [ctx, setCtx] = useState<ChatContext | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [streaming, setStreaming] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
-// --- Modal Component ---
-function StepModal({
-  step,
-  onClose,
-}: {
-  step: ReasoningStep | null;
-  onClose: () => void;
-}) {
-  if (!step) return null;
+  // Load context from sessionStorage
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(CONTEXT_STORAGE_KEY);
+      if (raw) {
+        const parsed: ChatContext = JSON.parse(raw);
+        setCtx(parsed);
+        // Inject context as silent assistant opener
+        setMessages([{
+          id: "welcome",
+          role: "assistant",
+          content: `I've loaded your **${parsed.label}** context. Ask me anything about it, or bring up any other investment question - I'm here to help.`,
+        }]);
+      } else {
+        setMessages([{
+          id: "welcome",
+          role: "assistant",
+          content: "Hello! I'm your **AI Investment Advisor**, powered by Claude.\n\nI can help you with stocks, mutual funds, portfolio strategy, market analysis, and anything finance-related for Indian markets.\n\nWhat would you like to explore today?",
+        }]);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
-  const isError = step.status === "error";
+  const dismissContext = () => {
+    sessionStorage.removeItem(CONTEXT_STORAGE_KEY);
+    setCtx(null);
+  };
 
+  const sendMessage = useCallback(async (text: string) => {
+    if (!text.trim() || streaming) return;
+
+    const userMsg: Message = { id: `u-${Date.now()}`, role: "user", content: text.trim() };
+    setMessages((prev) => [...prev, userMsg]);
+    setInput("");
+    setStreaming(true);
+
+    const apiMessages = [...messages, userMsg]
+      .filter((m) => !m.streaming)
+      .map((m) => ({ role: m.role, content: m.content }));
+
+    const assistantId = `a-${Date.now()}`;
+    setMessages((prev) => [...prev, { id: assistantId, role: "assistant", content: "", streaming: true }]);
+
+    try {
+      abortRef.current = new AbortController();
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: apiMessages, context: ctx?.summary ?? "" }),
+        signal: abortRef.current.signal,
+      });
+
+      if (!res.ok || !res.body) throw new Error("Stream unavailable");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split("\n");
+        buf = lines.pop() ?? "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const payload = line.slice(6).trim();
+          if (payload === "[DONE]") break;
+          try {
+            const { text: chunk, error } = JSON.parse(payload);
+            if (error) throw new Error(error);
+            if (chunk) {
+              setMessages((prev) =>
+                prev.map((m) => m.id === assistantId ? { ...m, content: m.content + chunk } : m)
+              );
+            }
+          } catch { /* parse error - skip line */ }
+        }
+      }
+    } catch (err: any) {
+      if (err?.name !== "AbortError") {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId
+              ? { ...m, content: "I couldn't connect to the server. Please check your connection and try again.", streaming: false }
+              : m
+          )
+        );
+      }
+    } finally {
+      setMessages((prev) =>
+        prev.map((m) => m.id === assistantId ? { ...m, streaming: false } : m)
+      );
+      setStreaming(false);
+    }
+  }, [messages, streaming, ctx]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    sendMessage(input);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage(input);
+    }
+  };
+
+  const prompts = ctx?.suggestedPrompts ?? DEFAULT_PROMPTS;
+  const showPrompts = messages.length <= 1;
+  const sourceMeta = ctx ? SOURCE_META[ctx.source] : null;
+  const SourceIcon = sourceMeta?.icon;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div
-        className={`w-full max-w-lg bg-white dark:bg-background rounded-2xl shadow-2xl border overflow-hidden transform transition-all scale-100 ${isError ? "border-red-500/30" : "border-white/10"}`}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-white/5">
-          <div className="flex items-center gap-3">
-            <div
-              className={`p-2 rounded-lg ${isError ? "bg-red-50 dark:bg-red-500/20" : "bg-indigo-50 dark:bg-indigo-500/20"}`}
-            >
-              {isError ? (
-                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
-              ) : (
-                <Info className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-              )}
+    <div className="flex flex-col bg-background text-foreground" style={{ height: "calc(100vh - 3.5rem)" }}>
+
+      {/* Context banner */}
+      {ctx && sourceMeta && SourceIcon && (
+        <div
+          className="shrink-0 mx-4 md:mx-8 mt-4 flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-sm"
+          style={{ background: sourceMeta.dim, border: `1px solid ${sourceMeta.color}30` }}
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <SourceIcon className="w-4 h-4 shrink-0" style={{ color: sourceMeta.color }} />
+            <div className="min-w-0">
+              <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: sourceMeta.color }}>
+                {ctx.label}
+              </span>
+              <p className="text-xs text-muted-foreground mt-0.5 truncate">{ctx.summary}</p>
             </div>
-            <h3 className="text-lg font-semibold text-foreground">
-              {step.name} {isError ? "Error Log" : "Output"}
-            </h3>
           </div>
           <button
-            onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+            onClick={dismissContext}
+            className="shrink-0 p-1 rounded-lg hover:bg-muted transition-colors text-muted-foreground"
           >
-            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
+      )}
 
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6">
+        <div className="max-w-2xl mx-auto space-y-5">
+          {messages.map((msg) => (
+            <Bubble key={msg.id} msg={msg} />
+          ))}
 
-        {/* Content */}
-        <div className="p-6 max-h-[60vh] overflow-y-auto">
-          <div
-            className={`prose dark:prose-invert max-w-none text-sm leading-relaxed ${isError ? "text-red-800 dark:text-red-300" : "text-gray-600 dark:text-gray-300"}`}
+          {/* Suggested prompts */}
+          {showPrompts && (
+            <div className="pt-2">
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-3">
+                {ctx ? "Suggested questions about your context" : "Try asking"}
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {prompts.map((p) => (
+                  <PromptChip key={p} text={p} onClick={() => sendMessage(p)} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
+
+      {/* Input */}
+      <div className="shrink-0 px-4 md:px-8 pb-6 pt-3 border-t border-border bg-background">
+        <div className="max-w-2xl mx-auto">
+          {/* Model badge */}
+          {/* <div5 */}
+          <form
+            onSubmit={handleSubmit}
+            className="flex items-end gap-2 rounded-2xl p-2 bg-muted border border-border"
           >
-            <ReactMarkdown
-              components={{
-                code({ node, className, children, ...props }) {
-                  return (
-                    <code
-                      className={`${className} bg-gray-100 dark:bg-white/10 rounded px-1 py-0.5 text-xs font-mono`}
-                      {...props}
-                    >
-                      {children}
-                    </code>
-                  );
-                },
-                pre({ children }) {
-                  return (
-                    <pre className="bg-gray-100 dark:bg-black/30 p-3 rounded-lg overflow-x-auto border border-gray-200 dark:border-white/10 my-2">
-                      {children}
-                    </pre>
-                  );
-                },
-              }}
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask about stocks, portfolio strategy, mutual funds…"
+              rows={1}
+              disabled={streaming}
+              className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none px-3 py-2 max-h-32 leading-relaxed"
+              style={{ minHeight: "36px" }}
+            />
+            <button
+              type="submit"
+              disabled={streaming || !input.trim()}
+              className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all disabled:opacity-40"
+              style={{ background: "#00D09C" }}
             >
-              {step.message || "No detailed output provided."}
-            </ReactMarkdown>
-          </div>
-        </div>
-
-
-        {/* Footer */}
-        <div className="p-6 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/5 flex justify-end">
-          <button
-            onClick={onClose}
-            className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors ${isError ? "bg-red-600 hover:bg-red-700" : "bg-indigo-600 hover:bg-indigo-700"}`}
-          >
-            Close
-          </button>
+              <Send className="w-4 h-4 text-white" />
+            </button>
+          </form>
+          <p className="text-[10px] text-muted-foreground mt-2 text-center">
+            Investment queries only · Educational analysis, not financial advice
+          </p>
         </div>
       </div>
     </div>
   );
 }
 
-
-export default function ChatPage() {
-  // --- UI State ---
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "init",
-      role: "assistant",
-      content:
-        "Hello! I amm your **AI finance assistant**. Ask me about *stocks*, *mutual funds*, *market trends*, or *general financial insights*",
-    },
-  ]);
-  const [input, setInput] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-
-  // --- Modal State ---
-  const [selectedStep, setSelectedStep] = useState<ReasoningStep | null>(null);
-
-
-  // --- Backend Logic State ---
-  const [taskId, setTaskId] = useState<string | null>(null);
-  const [waitingClarification, setWaitingClarification] = useState(false);
-  const [reasoningSteps, setReasoningSteps] = useState<ReasoningStep[]>([]);
-
-
-  const processedCountRef = useRef(0);
-  const isPollingRef = useRef(false);
-  const pollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-
-  useEffect(() => {
-    return () => stopPolling();
-  }, []);
-
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, reasoningSteps]);
-
-
-  // --- Backend Interaction Logic ---
-
-
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim()) return;
-
-
-    const userText = input;
-    setMessages((prev) => [
-      ...prev,
-      { id: Date.now().toString(), role: "user", content: userText },
-    ]);
-    setInput("");
-    setIsProcessing(true);
-
-
-    if (waitingClarification && taskId) {
-      try {
-        await fetch(`${API_BASE}/clarify`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ task_id: taskId, answer: userText }),
-        });
-
-
-        setWaitingClarification(false);
-        startPolling(taskId);
-      } catch (err) {
-        console.error("Clarify Error:", err);
-        setIsProcessing(false);
-      }
-    } else {
-      processedCountRef.current = 0;
-      setReasoningSteps([{ name: "Initializing Agent...", status: "active" }]);
-
-
-      try {
-        const res = await fetch(`${API_BASE}/ask`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question: userText }),
-        });
-
-
-        if (!res.ok) throw new Error("Backend connection failed");
-
-
-        const data = await res.json();
-        if (data.task_id) {
-          setTaskId(data.task_id);
-          startPolling(data.task_id);
-        }
-      } catch (error) {
-        console.error(error);
-        setIsProcessing(false);
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: Date.now().toString(),
-            role: "assistant",
-            content: "Error: Connection failed.",
-          },
-        ]);
-        setReasoningSteps((prev) =>
-          prev.map((s) => ({ ...s, status: "complete" })),
-        );
-      }
-    }
-  };
-
-
-  const startPolling = (id: string) => {
-    stopPolling();
-    isPollingRef.current = true;
-
-
-    const poll = async () => {
-      if (!isPollingRef.current) return;
-
-
-      try {
-        const res = await fetch(`${API_BASE}/get/${id}`);
-        if (!res.ok) throw new Error("Poll failed");
-
-
-        const data = await res.json();
-        const allEvents = data.events || [];
-
-
-        // 1. Update UI
-        if (Array.isArray(allEvents)) {
-          const mappedSteps: ReasoningStep[] = allEvents.map(
-            (e: BackendEvent) => ({
-              name: e.title,
-              status: e.type === "error" ? "error" : "complete",
-              message: e.message,
-            }),
-          );
-
-
-          const hasClarifier = allEvents.some((e) => e.title === "Clarifier");
-          const hasError = allEvents.some((e) => e.type === "error");
-
-
-          if (data.status === "RUNNING" && !hasClarifier && !hasError) {
-            mappedSteps.push({ name: "Processing...", status: "active" });
-          }
-          setReasoningSteps(mappedSteps);
-        }
-
-
-        // 2. Logic Control
-        const newEvents = allEvents.slice(processedCountRef.current);
-        processedCountRef.current = allEvents.length;
-
-
-        // Check for Error
-        const errorEvent = newEvents.find(
-          (e: BackendEvent) => e.type === "error",
-        );
-        if (errorEvent) {
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: Date.now().toString(),
-              role: "assistant",
-              content:
-                "❌ **Error**: An error occurred. Check the *System Reasoning* panel for details.",
-            },
-          ]);
-          setIsProcessing(false);
-          stopPolling();
-          return;
-        }
-
-
-        // Check for Clarifier
-        const newClarifier = newEvents.find(
-          (e: BackendEvent) => e.title === "Clarifier",
-        );
-        if (newClarifier) {
-          setMessages((prev) => {
-            const lastMsg = prev[prev.length - 1];
-            if (
-              lastMsg.role === "assistant" &&
-              lastMsg.content === newClarifier.message
-            ) {
-              return prev;
-            }
-            return [
-              ...prev,
-              {
-                id: Date.now().toString(),
-                role: "assistant",
-                content: newClarifier.message,
-              },
-            ];
-          });
-
-
-          setIsProcessing(false);
-          setWaitingClarification(true);
-          stopPolling();
-          return;
-        }
-
-
-        // Check for Completion
-        if (data.status === "COMPLETED") {
-          stopPolling();
-          setIsProcessing(false);
-
-
-          if (data.answer) {
-            const cleanedAnswer = data.answer
-              .split("\n")
-              .filter((line) => !/^\|\s*:?-{2,}/.test(line.trim()))
-              .join("\n");
-
-
-            setMessages((prev) => {
-              const lastMsg = prev[prev.length - 1];
-              if (lastMsg.content === cleanedAnswer) return prev;
-              return [
-                ...prev,
-                {
-                  id: Date.now().toString(),
-                  role: "assistant",
-                  content: cleanedAnswer,
-                },
-              ];
-            });
-          }
-        } else if (data.status === "FAILED") {
-          stopPolling();
-          setIsProcessing(false);
-        } else {
-          pollTimeoutRef.current = setTimeout(poll, 1500);
-        }
-      } catch (err) {
-        console.error("Polling error", err);
-        pollTimeoutRef.current = setTimeout(poll, 2000);
-      }
-    };
-
-
-    poll();
-  };
-
-
-  const stopPolling = () => {
-    isPollingRef.current = false;
-    if (pollTimeoutRef.current) clearTimeout(pollTimeoutRef.current);
-  };
-
-
-  // --- RENDER ---
-  return (
-    <main className="min-h-screen w-full bg-background overflow-hidden">
-      {/* Modal */}
-      {selectedStep && (
-        <StepModal step={selectedStep} onClose={() => setSelectedStep(null)} />
-      )}
-
-
-      {/* Stats Cards */}
-      <div className="relative z-10 px-6 md:px-12 py-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 max-w-7xl mx-auto">
-          {(() => {
-            const randomDataSources = 3;
-            const randomConfidence = 100;
-
-
-            return [
-              { value: "8", label: "Active Agents" },
-              {
-                value: randomDataSources.toString(),
-                label: "Data Sources",
-                featured: true,
-              },
-              { value: `${randomConfidence}%`, label: "Confidence" },
-              { value: "100%", label: "Model Status" },
-            ].map((metric, idx) => (
-              <div
-                key={idx}
-                className={`rounded-xl p-4 md:p-5 border transition-all ${
-                  metric.featured
-                    ? "border-[#00D09C]/40 text-white"
-                    : "border-border bg-card text-foreground"
-                }`}
-                style={metric.featured ? { backgroundColor: "#00D09C" } : undefined}
-              >
-                <p className="text-2xl font-bold tracking-tight">{metric.value}</p>
-                <p className={`text-xs font-medium mt-1 ${metric.featured ? "text-white/80" : "text-muted-foreground"}`}>
-                  {metric.label}
-                </p>
-              </div>
-            ));
-          })()}
-        </div>
-      </div>
-
-
-      {/* Main Chat Area */}
-      <div className="relative z-10 px-6 md:px-12 py-8">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Chat Panel */}
-          <div
-            className="lg:col-span-2 rounded-xl border border-border overflow-hidden bg-card"
-          >
-            <div className="h-96 md:h-[500px] overflow-y-auto p-6 space-y-4">
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-xl px-4 py-3 rounded-xl ${
-                      msg.role === "user"
-                        ? "text-white"
-                        : "bg-muted text-foreground"
-                    }`}
-                    style={msg.role === "user" ? { backgroundColor: "#00D09C" } : undefined}
-                  >
-                    <ChatMarkdown
-                      content={msg.content}
-                      invert={msg.role === "user"}
-                    />
-                  </div>
-                </div>
-              ))}
-              {isProcessing && (
-                <div className="flex justify-start">
-                  <div
-                    className="px-4 py-2 rounded-lg text-sm flex items-center gap-2 bg-muted text-muted-foreground"
-                  >
-                    <div className="w-2 h-2 rounded-full bg-current animate-pulse" />
-                    Processing...
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-
-
-            {/* Input */}
-            <div className="border-t border-border p-4">
-              <form onSubmit={handleSendMessage} className="flex gap-2">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder={
-                    waitingClarification
-                      ? "Please provide the required clarification..."
-                      : "Ask about a stock, market trend, or sentiment…"
-                  }
-                  className="flex-1 px-4 py-2 rounded-lg text-sm border border-border bg-muted text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#00D09C]/40 focus:ring-offset-0 transition-all"
-                  disabled={isProcessing}
-                />
-                <button
-                  type="submit"
-                  disabled={isProcessing || !input.trim()}
-                  className="p-2 rounded-lg transition-all disabled:opacity-50"
-                  style={{ backgroundColor: "#00D09C", color: "#fff" }}
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </form>
-            </div>
-          </div>
-
-
-          {/* Reasoning Panel */}
-          <div
-            className="rounded-xl border border-border p-6 overflow-hidden bg-card"
-          >
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-sm md:text-base text-foreground">
-                System Reasoning
-              </h3>
-            </div>
-
-
-            <div className="space-y-4">
-              {reasoningSteps.length === 0 && !isProcessing && (
-                <p className="text-sm opacity-50 italic">
-                  Waiting for query...
-                </p>
-              )}
-
-
-              {reasoningSteps.map((step, idx) => (
-                <div
-                  key={idx}
-                  className={`relative flex items-start gap-3 p-3 rounded-lg transition-all duration-200 group
-                    ${step.status === "complete" || step.status === "error" ? "hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer" : ""}`}
-                  onClick={() =>
-                    (step.status === "complete" || step.status === "error") &&
-                    setSelectedStep(step)
-                  }
-                >
-                  {/* Status Icon */}
-                  <div className="mt-0.5 flex-shrink-0">
-                    {step.status === "complete" ? (
-                      <CheckCircle2 className="w-5 h-5 text-indigo-500" />
-                    ) : step.status === "error" ? (
-                      <AlertCircle className="w-5 h-5 text-red-500" />
-                    ) : step.status === "active" ? (
-                      <div className="w-5 h-5 rounded-full border-2 border-indigo-200 border-t-indigo-500 animate-spin" />
-                    ) : (
-                      <div className="w-5 h-5 rounded-full border-2 border-gray-300 dark:border-white/20" />
-                    )}
-                  </div>
-
-
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <p
-                      className={`text-sm font-medium ${step.status === "pending" ? "opacity-50" : step.status === "error" ? "text-red-600 dark:text-red-400" : "text-foreground"}`}
-                    >
-                      {step.name}
-                    </p>
-
-
-                    {/* Markdown Preview Box */}
-                    {step.message && (
-                      <div
-                        className={`text-xs mt-1 line-clamp-2 prose prose-sm dark:prose-invert max-w-none ${step.status === "error" ? "text-red-400 dark:text-red-300/70" : "text-gray-500 dark:text-gray-700"}`}
-                      >
-                        <ReactMarkdown
-                          allowedElements={["p", "strong", "em", "code"]}
-                          unwrapDisallowed={true}
-                        >
-                          {step.message}
-                        </ReactMarkdown>
-                      </div>
-                    )}
-                  </div>
-
-
-                  {(step.status === "complete" || step.status === "error") && (
-                    <ArrowUpRight className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity absolute top-3 right-3" />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
-  );
+// ── Helper: navigate to chat with context ─────────────────────────────────────
+export function openChatWithContext(context: ChatContext) {
+  sessionStorage.setItem(CONTEXT_STORAGE_KEY, JSON.stringify(context));
 }

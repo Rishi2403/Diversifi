@@ -579,7 +579,7 @@ function runSingleAdvancedSimulation(
     // Apply investment plan for current year
     const plan = input.investmentPlans.find((p) => p.year === currentYear);
     if (plan) {
-      // Monthly SIP — resolved from sipMode
+      // Monthly SIP - resolved from sipMode
       const effectiveSip = plan.sipMode === "fundwise"
         ? (plan.sipAllocations || []).reduce((s, a) => s + a.amount, 0)
         : (plan.sipAmount || 0);
@@ -625,7 +625,7 @@ export async function runAdvancedSimulation(
     onProgress?.(Math.round(pct * 0.55), `Analysing ${label}`);
   });
 
-  // Step 2: Run Monte Carlo simulations (55–95%) — chunked for UI responsiveness
+  // Step 2: Run Monte Carlo simulations (55–95%) - chunked for UI responsiveness
   const numSimulations = input.simulations || 5000;
   const allPaths: any[] = [];
   const finalValues: number[] = [];
@@ -686,7 +686,7 @@ export async function runAdvancedSimulation(
   const lossCount = finalValues.filter((v) => v < initialValue).length;
   const probabilityOfLoss = lossCount / numSimulations;
 
-  // Risk metrics — annualised Sharpe using input volatility as the return vol estimator
+  // Risk metrics - annualised Sharpe using input volatility as the return vol estimator
   const annualisedReturn = Math.pow(mean / initialValue, 1 / input.timeHorizon) - 1;
   const riskFreeRate = 0.065; // India 10-yr G-sec proxy
   const sharpeRatio = (annualisedReturn - riskFreeRate) / (input.baseVolatility / 100);

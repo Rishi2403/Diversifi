@@ -336,6 +336,32 @@ export default function AlphaMindPage() {
         </div>
       </section>
 
+      {/* ── Data Sources ─────────────────────────────────────────────────────── */}
+      <section className="py-20 px-6 md:px-12 border-t" style={{ borderColor: "rgba(0,208,156,0.08)" }}>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: "#00D09C" }}>Transparency</p>
+            <h2 className="text-2xl md:text-3xl font-black text-white">Data Sources</h2>
+            <p className="text-sm mt-3 max-w-lg mx-auto" style={{ color: "rgba(228,232,240,0.45)" }}>Every signal AlphaMind surfaces is grounded in real, traceable data</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {([
+              { name: "yfinance", type: "Live Feed", typeColor: "#00D09C", desc: "NSE stock prices (last traded price + previous close) and per-ticker news headlines - fetched live for every holding on each 2-minute scan cycle" },
+              { name: "TextBlob", type: "Local NLP", typeColor: "#f59e0b", desc: "Sentiment polarity scoring applied to every news headline collected by yfinance - runs fully in-process, no external API call or added latency" },
+              { name: "Claude Sonnet", type: "LLM", typeColor: "#a855f7", desc: "Anthropic claude-sonnet-4-6 synthesises price moves, sentiment scores and your portfolio profile into a plain-English verdict and risk signal per holding" },
+            ] as const).map((s) => (
+              <div key={s.name} className="rounded-xl p-5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <div className="flex items-start justify-between mb-3">
+                  <span className="text-base font-black text-white">{s.name}</span>
+                  <span className="text-[9px] font-bold px-2 py-1 rounded shrink-0 ml-2" style={{ background: `${s.typeColor}18`, color: s.typeColor }}>{s.type}</span>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: "rgba(228,232,240,0.45)" }}>{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── CTA Banner ───────────────────────────────────────────────────────── */}
       <section className="py-20 px-6 md:px-12 border-t" style={{ borderColor: "rgba(0,208,156,0.08)" }}>
         <div className="max-w-7xl mx-auto">

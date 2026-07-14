@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Play, RotateCcw, ChevronRight, ChevronLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Play, RotateCcw, ChevronRight, ChevronLeft, Loader2, MessageSquare } from "lucide-react";
+import { openChatWithContext } from "@/pages/ChatPage";
 import { analyzePortfolio, DEMO_PORTFOLIO } from "@/lib/portfolioEngine";
 import type { PortfolioInput, StockHolding, MFHolding, PortfolioAnalysis } from "@/lib/portfolioEngine";
 import { HealthScoreCard } from "@/components/portfolio/HealthScoreCard";
@@ -54,6 +55,8 @@ function Card({ title, subtitle, children, className = "", badge }: {
 
 // ─── Stock Holdings Table ─────────────────────────────────────────────────────
 function StockTable({ stocks, onChange }: { stocks: StockHolding[]; onChange: (s: StockHolding[]) => void }) {
+  const [fetchingIdx, setFetchingIdx] = useState<number | null>(null);
+
   const update = (i: number, field: keyof StockHolding, val: string) => {
     const next = stocks.map((s, idx) => {
       if (idx !== i) return s;
@@ -66,8 +69,31 @@ function StockTable({ stocks, onChange }: { stocks: StockHolding[]; onChange: (s
     }
     onChange(next);
   };
+
+  const fetchLivePrice = async (i: number, symbol: string) => {
+    if (!symbol.trim() || symbol.trim().length < 2) return;
+    setFetchingIdx(i);
+    try {
+      const res = await fetch(`/portfolio/price/${symbol.trim().toUpperCase()}`);
+      const data = await res.json();
+      if (data.success && data.price) {
+        const next = stocks.map((s, idx) => {
+          if (idx !== i) return s;
+          return { ...s, currentPrice: data.price, currentValue: s.qty * data.price };
+        });
+        onChange(next);
+      }
+    } catch {
+      // silently ignore; user can enter manually
+    } finally {
+      setFetchingIdx(null);
+    }
+  };
+
   const addRow = () => onChange([...stocks, { symbol: "", qty: 0, avgBuyPrice: 0, currentPrice: 0, currentValue: 0 }]);
   const removeRow = (i: number) => onChange(stocks.filter((_, idx) => idx !== i));
+
+  const inputCls = "w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]/50 transition-colors";
 
   return (
     <div className="space-y-2">
@@ -76,13 +102,40 @@ function StockTable({ stocks, onChange }: { stocks: StockHolding[]; onChange: (s
       </div>
       {stocks.map((s, i) => (
         <div key={i} className="grid grid-cols-6 gap-2 items-center group">
-          {(["symbol", "qty", "avgBuyPrice", "currentPrice"] as const).map((f) => (
-            <input key={f} value={(s as any)[f]} onChange={(e) => update(i, f, e.target.value)}
-              className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white
-                focus:outline-none focus:border-[#00D09C]/50 transition-colors"
-              placeholder={f === "symbol" ? "RELIANCE" : "0"}
+          <input
+            value={s.symbol}
+            onChange={(e) => update(i, "symbol", e.target.value)}
+            onBlur={(e) => fetchLivePrice(i, e.target.value)}
+            placeholder="RELIANCE"
+            className={inputCls}
+          />
+          <input
+            value={s.qty || ""}
+            type="number"
+            onChange={(e) => update(i, "qty", e.target.value)}
+            placeholder="0"
+            className={inputCls}
+          />
+          <input
+            value={s.avgBuyPrice || ""}
+            type="number"
+            onChange={(e) => update(i, "avgBuyPrice", e.target.value)}
+            placeholder="0"
+            className={inputCls}
+          />
+          <div className="relative">
+            <input
+              value={s.currentPrice || ""}
+              type="number"
+              onChange={(e) => update(i, "currentPrice", e.target.value)}
+              placeholder={fetchingIdx === i ? "Fetching…" : "0"}
+              disabled={fetchingIdx === i}
+              className={`${inputCls} pr-6 ${fetchingIdx === i ? "opacity-50" : ""}`}
             />
-          ))}
+            {fetchingIdx === i && (
+              <Loader2 className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00D09C] animate-spin" />
+            )}
+          </div>
           <div className="text-xs text-gray-600 dark:text-white/60">{formatINR(s.currentValue)}</div>
           <div className="flex items-center gap-1">
             <input value={s.buyDate ?? ""} onChange={(e) => update(i, "buyDate", e.target.value)}
@@ -163,6 +216,7 @@ interface DeepAnalysis {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function PortfolioPage() {
+  const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [input, setInput] = useState<PortfolioInput>(() => {
     try {
@@ -420,6 +474,30 @@ export default function PortfolioPage() {
                 ))}
               </div>
             </div>
+
+            {/* Chat with AI */}
+            <button
+              onClick={() => {
+                openChatWithContext({
+                  source: "analyse",
+                  label: "Portfolio Analysis",
+                  summary: `Health score: ${analysis.healthScore}/100. Diversification: ${analysis.diversificationScore}/100. Total value: ${formatINR(analysis.totalValue)}. Stocks: ${input.stocks.length}, Mutual Funds: ${input.mutualFunds.length}. Risk profile: ${input.riskProfile}. Top sector concentrations: ${analysis.sectorAllocations?.slice(0, 3).map(s => `${s.sector} ${s.percentage?.toFixed(0)}%`).join(", ") || "N/A"}.`,
+                  suggestedPrompts: [
+                    "What is my biggest portfolio risk right now?",
+                    "Should I rebalance my portfolio?",
+                    "How can I reduce mutual fund overlap?",
+                    "Which sector am I over-concentrated in?",
+                  ],
+                });
+                navigate("/chat");
+              }}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold transition-all hover:opacity-85 border"
+              style={{ background: "rgba(0,208,156,0.08)", borderColor: "rgba(0,208,156,0.3)", color: "#00D09C" }}
+            >
+              <MessageSquare className="w-4 h-4" />
+              Chat with AI about this analysis
+              <ChevronRight className="w-4 h-4" />
+            </button>
 
             {/* ── DEEP ANALYSIS: Risk Metrics ── */}
             <Card

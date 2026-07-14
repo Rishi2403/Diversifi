@@ -58,7 +58,7 @@ export default function ProfileConfirmation({ profile, stockCount, mfCount, onCo
       {/* Stat cards grid */}
       <div className="grid grid-cols-2 gap-3">
         <StatCard icon={<TrendingUp className="w-4 h-4 text-blue-500" />} label="Investment Style">
-          <p className="text-foreground font-semibold">{profile.investmentStyle || "—"}</p>
+          <p className="text-foreground font-semibold">{profile.investmentStyle || "-"}</p>
           {profile.monthlyInvestment && (
             <p className="text-muted-foreground text-xs mt-0.5">
               ₹{profile.monthlyInvestment.toLocaleString("en-IN")}/month
@@ -74,13 +74,13 @@ export default function ProfileConfirmation({ profile, stockCount, mfCount, onCo
           <div className="flex flex-wrap gap-1 mt-1">
             {(profile.goals || []).map(g => <Chip key={g} label={g} />)}
             {(!profile.goals || profile.goals.length === 0) && (
-              <span className="text-muted-foreground text-sm">—</span>
+              <span className="text-muted-foreground text-sm">-</span>
             )}
           </div>
         </StatCard>
 
         <StatCard icon={<Clock className="w-4 h-4 text-purple-500" />} label="Horizon">
-          <p className="text-foreground font-semibold">{profile.horizon || "—"}</p>
+          <p className="text-foreground font-semibold">{profile.horizon || "-"}</p>
         </StatCard>
       </div>
 

@@ -21,7 +21,7 @@ function formatINR(n: number) {
 }
 
 function holdingPeriod(days: number | null) {
-  if (!days) return "—";
+  if (!days) return "-";
   if (days >= 365) return `${(days / 365).toFixed(1)}y`;
   return `${Math.round(days / 30)}m`;
 }
@@ -71,13 +71,13 @@ export function HoldingsPerformanceTable({ holdings }: Props) {
                     </div>
                   </div>
                 </td>
-                <td className="text-right py-2.5 text-gray-600 dark:text-white/60">{h.cost > 0 ? formatINR(h.cost) : "—"}</td>
+                <td className="text-right py-2.5 text-gray-600 dark:text-white/60">{h.cost > 0 ? formatINR(h.cost) : "-"}</td>
                 <td className="text-right py-2.5 font-medium text-gray-800 dark:text-white">{formatINR(h.current_value)}</td>
                 <td className={`text-right py-2.5 font-bold ${pnlColor}`}>
-                  {h.unrealized_pnl !== null ? `${pnl >= 0 ? "+" : ""}${formatINR(pnl)}` : "—"}
+                  {h.unrealized_pnl !== null ? `${pnl >= 0 ? "+" : ""}${formatINR(pnl)}` : "-"}
                 </td>
                 <td className={`text-right py-2.5 font-bold ${cagrColor}`}>
-                  {h.cagr !== null ? `${h.cagr >= 0 ? "+" : ""}${h.cagr.toFixed(1)}%` : "—"}
+                  {h.cagr !== null ? `${h.cagr >= 0 ? "+" : ""}${h.cagr.toFixed(1)}%` : "-"}
                 </td>
                 <td className="text-right py-2.5 text-gray-500 dark:text-white/40">{holdingPeriod(h.holding_days)}</td>
                 <td className="text-right py-2.5">
@@ -85,7 +85,7 @@ export function HoldingsPerformanceTable({ holdings }: Props) {
                     <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${h.is_ltcg ? "bg-emerald-500/15 text-emerald-400" : "bg-yellow-500/15 text-yellow-500"}`}>
                       {h.is_ltcg ? "LTCG" : "STCG"}
                     </span>
-                  ) : <span className="text-gray-300 dark:text-white/20">—</span>}
+                  ) : <span className="text-gray-300 dark:text-white/20">-</span>}
                 </td>
               </tr>
             );

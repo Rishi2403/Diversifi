@@ -7,7 +7,7 @@ import threading
 import time
 import datetime
 import concurrent.futures
-
+import os
 
 from trading_lang import build_graph, AgentState
 
@@ -627,6 +627,67 @@ def agent_price_history():
         return jsonify({"success": True, "symbol": symbol, "data": data})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+@flask_app.route("/api/chat", methods=["POST"])
+def investment_chat():
+    import json as _json
+    from flask import stream_with_context, Response as FlaskResponse
+
+    data         = request.get_json() or {}
+    messages     = data.get("messages", [])
+    context_text = data.get("context", "")
+
+    if not messages:
+        return jsonify({"error": "messages required"}), 400
+
+    api_key  = os.getenv("ANTHROPIC_API_KEY", "")
+    resource = os.getenv("ANTHROPIC_FOUNDRY_RESOURCE", "")
+
+    system_lines = [
+        "You are an expert AI investment advisor specializing in Indian equity markets (NSE/BSE), mutual funds, bonds, ETFs, SIPs/SWPs, portfolio management, and global financial markets.",
+        "",
+        "STRICT RULES:",
+        "1. ONLY answer questions about: stocks, mutual funds, bonds, portfolio analysis, asset allocation, financial planning, market trends, company fundamentals, technical analysis, IPOs, SIPs, SWPs, LTCG/STCG tax, economic indicators, and financial instruments.",
+        "2. For ANY off-topic question respond exactly: \"I'm your dedicated investment assistant. I can only help with investment and finance-related queries. What would you like to know about your portfolio or the markets?\"",
+        "3. Always note that responses are educational analysis, not personalized financial advice.",
+        "4. Use Indian market context when relevant - INR, SEBI regulations, NSE/BSE conventions, Indian tax rules (LTCG 12.5% above ₹1.25L, STCG 20%).",
+        "5. Be concise and structured. Use bullet points for complex answers. Lead with the most actionable insight.",
+    ]
+    if context_text:
+        system_lines += [
+            "",
+            "PORTFOLIO CONTEXT (use this for personalized, relevant answers):",
+            context_text,
+        ]
+
+    system = "\n".join(system_lines)
+
+    def generate():
+        try:
+            import anthropic as _anthropic
+            client = (
+                _anthropic.AnthropicFoundry(api_key=api_key, resource=resource)
+                if resource else _anthropic.Anthropic(api_key=api_key)
+            )
+            with client.messages.stream(
+                model="claude-sonnet-4-6",
+                max_tokens=1024,
+                system=system,
+                messages=messages,
+            ) as stream:
+                for text in stream.text_stream:
+                    yield f"data: {_json.dumps({'text': text})}\n\n"
+            yield "data: [DONE]\n\n"
+        except Exception as exc:
+            yield f"data: {_json.dumps({'error': str(exc)})}\n\n"
+            yield "data: [DONE]\n\n"
+
+    return FlaskResponse(
+        stream_with_context(generate()),
+        content_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 @flask_app.route("/api/agent/reset", methods=["PUT"])

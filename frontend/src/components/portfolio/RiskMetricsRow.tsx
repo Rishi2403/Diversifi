@@ -19,7 +19,7 @@ function Stat({ label, value, sub, color }: { label: string; value: string; sub?
 }
 
 function fmtPct(n: number | null | undefined, decimals = 1): string {
-  if (n === null || n === undefined) return "—";
+  if (n === null || n === undefined) return "-";
   return `${n >= 0 ? "+" : ""}${n.toFixed(decimals)}%`;
 }
 
@@ -67,7 +67,7 @@ export function RiskMetricsRow({ portfolioCagr, port6mReturn, bench6mReturn, alp
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <Stat
           label="CAGR (since buy)"
-          value={portfolioCagr !== null && portfolioCagr !== undefined ? fmtPct(portfolioCagr) : "—"}
+          value={portfolioCagr !== null && portfolioCagr !== undefined ? fmtPct(portfolioCagr) : "-"}
           sub="from purchase dates"
           color={returnColor(portfolioCagr)}
         />
@@ -79,13 +79,13 @@ export function RiskMetricsRow({ portfolioCagr, port6mReturn, bench6mReturn, alp
         />
         <Stat
           label="Beta"
-          value={beta !== null ? beta.toFixed(2) : "—"}
+          value={beta !== null ? beta.toFixed(2) : "-"}
           sub={betaLabel}
           color={beta !== null && beta > 1.2 ? "text-orange-400" : undefined}
         />
         <Stat
           label="Sharpe Ratio"
-          value={sharpe !== null ? sharpe.toFixed(2) : "—"}
+          value={sharpe !== null ? sharpe.toFixed(2) : "-"}
           sub={sharpeLabel}
           color={sharpeColor(sharpe)}
         />

@@ -1,7 +1,7 @@
 import { ThemeToggle } from "./ThemeToggle";
 import { Link, useLocation } from "react-router-dom";
 import { UserButton, SignedIn, SignedOut } from "@clerk/clerk-react";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, MessageSquare } from "lucide-react";
 
 export function Header() {
   const location = useLocation();
@@ -53,6 +53,19 @@ export function Header() {
       </div>
 
       <div className="flex items-center gap-3">
+        <SignedIn>
+          <Link
+            to="/chat"
+            title="Chat"
+            className={`w-8 h-8 flex items-center justify-center rounded-md transition-colors ${
+              location.pathname === "/chat"
+                ? "text-[#00D09C] bg-[#00D09C]/10"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+            }`}
+          >
+            <MessageSquare className="w-4 h-4" />
+          </Link>
+        </SignedIn>
         <ThemeToggle />
         <SignedOut>
           <Link

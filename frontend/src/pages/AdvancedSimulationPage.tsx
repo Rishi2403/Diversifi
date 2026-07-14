@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { openChatWithContext } from "@/pages/ChatPage";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -463,6 +464,8 @@ function PortfolioInputStep({
   setCashBalance: (c: number) => void;
   onCSVUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
+  const [fetchingStockIdx, setFetchingStockIdx] = useState<number | null>(null);
+
   const addStock = () => {
     setStocks([
       ...stocks,
@@ -487,6 +490,28 @@ function PortfolioInputStep({
     }
 
     setStocks(newStocks);
+  };
+
+  const fetchLivePrice = async (index: number, symbol: string) => {
+    if (!symbol.trim() || symbol.trim().length < 2) return;
+    setFetchingStockIdx(index);
+    try {
+      const res = await fetch(`/portfolio/price/${symbol.trim().toUpperCase()}`);
+      const data = await res.json();
+      if (data.success && data.price) {
+        const newStocks = [...stocks];
+        newStocks[index] = {
+          ...newStocks[index],
+          currentPrice: data.price,
+          currentValue: newStocks[index].qty * data.price,
+        };
+        setStocks(newStocks);
+      }
+    } catch {
+      // silently ignore
+    } finally {
+      setFetchingStockIdx(null);
+    }
   };
 
   const removeStock = (index: number) => {
@@ -578,6 +603,7 @@ function PortfolioInputStep({
                 <input
                   value={stock.symbol}
                   onChange={(e) => updateStock(i, "symbol", e.target.value.toUpperCase())}
+                  onBlur={(e) => fetchLivePrice(i, e.target.value)}
                   placeholder="RELIANCE"
                   className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                 />
@@ -597,15 +623,21 @@ function PortfolioInputStep({
                   placeholder="0"
                   className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                 />
-                <input
-                  type="number"
-                  value={stock.currentPrice || ""}
-                  onChange={(e) =>
-                    updateStock(i, "currentPrice", parseFloat(e.target.value) || 0)
-                  }
-                  placeholder="0"
-                  className="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
-                />
+                <div className="relative">
+                  <input
+                    type="number"
+                    value={stock.currentPrice || ""}
+                    onChange={(e) =>
+                      updateStock(i, "currentPrice", parseFloat(e.target.value) || 0)
+                    }
+                    placeholder={fetchingStockIdx === i ? "Fetching…" : "0"}
+                    disabled={fetchingStockIdx === i}
+                    className={`w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 pr-6 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C] ${fetchingStockIdx === i ? "opacity-50" : ""}`}
+                  />
+                  {fetchingStockIdx === i && (
+                    <Loader2 className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00D09C] animate-spin" />
+                  )}
+                </div>
                 <span className="text-xs text-gray-700 dark:text-white/70 font-medium">
                   {formatINR(stock.currentValue)}
                 </span>
@@ -932,6 +964,7 @@ function ResultsStep({
   onReset: () => void;
   initialValue: number;
 }) {
+  const navigate = useNavigate();
   const totalReturn = initialValue > 0
     ? ((result.statistics.mean / initialValue - 1) * 100)
     : 0;
@@ -1022,7 +1055,7 @@ function ResultsStep({
         <div className="flex items-start justify-between mb-4">
           <div>
             <h3 className="text-sm font-black text-gray-900 dark:text-white">
-              Portfolio Value Projection — 5,000 Monte Carlo Paths
+              Portfolio Value Projection - 5,000 Monte Carlo Paths
             </h3>
             <p className="text-xs text-gray-500 dark:text-white/40 mt-0.5">
               Shaded band = P10 to P90 range. Line = mean outcome.
@@ -1199,20 +1232,41 @@ function ResultsStep({
           <div>
             <p className="text-xs font-bold text-gray-600 dark:text-white/50 mb-1.5">Model Assumptions</p>
             <ul className="space-y-1 text-xs text-gray-500 dark:text-white/40 leading-relaxed">
-              <li>· <strong className="text-gray-600 dark:text-white/60">GBM random walk</strong> — monthly log-normal returns with constant annualised volatility (Geometric Brownian Motion baseline)</li>
-              <li>· <strong className="text-gray-600 dark:text-white/60">5,000 Monte Carlo paths</strong> — each path simulates a unique sequence of monthly returns across the full horizon</li>
-              <li>· <strong className="text-gray-600 dark:text-white/60">AI scenario mapping</strong> — Claude Sonnet analyses each holding against each scenario independently; impacts applied as probability-weighted monthly shocks</li>
-              <li>· <strong className="text-gray-600 dark:text-white/60">Sharpe ratio</strong> — annualised excess return over India 10-yr G-sec (6.5%) divided by input annual volatility</li>
-              <li>· <strong className="text-gray-600 dark:text-white/60">Expected return treated as nominal</strong> — inflation scenarios apply an additional real-purchasing-power adjustment on top</li>
+              <li>· <strong className="text-gray-600 dark:text-white/60">GBM random walk</strong> - monthly log-normal returns with constant annualised volatility (Geometric Brownian Motion baseline)</li>
+              <li>· <strong className="text-gray-600 dark:text-white/60">5,000 Monte Carlo paths</strong> - each path simulates a unique sequence of monthly returns across the full horizon</li>
+              <li>· <strong className="text-gray-600 dark:text-white/60">AI scenario mapping</strong> - Claude Sonnet analyses each holding against each scenario independently; impacts applied as probability-weighted monthly shocks</li>
+              <li>· <strong className="text-gray-600 dark:text-white/60">Sharpe ratio</strong> - annualised excess return over India 10-yr G-sec (6.5%) divided by input annual volatility</li>
+              <li>· <strong className="text-gray-600 dark:text-white/60">Expected return treated as nominal</strong> - inflation scenarios apply an additional real-purchasing-power adjustment on top</li>
             </ul>
           </div>
         </div>
       </div>
 
-      <div className="flex justify-center">
+      <div className="flex flex-col sm:flex-row justify-center gap-3">
+        <button
+          onClick={() => {
+            openChatWithContext({
+              source: "simulate",
+              label: "Monte Carlo Simulation",
+              summary: `${result.yearlyBreakdown.length}-year simulation. Mean outcome: ₹${(result.statistics.mean / 1e5).toFixed(1)}L. P10 (pessimistic): ₹${(result.statistics.p10 / 1e5).toFixed(1)}L. P90 (optimistic): ₹${(result.statistics.p90 / 1e5).toFixed(1)}L. Sharpe ratio: ${result.riskMetrics.sharpeRatio.toFixed(2)}. Max drawdown: ${(result.riskMetrics.maxDrawdown * 100).toFixed(1)}%. Expected return: ${totalReturn.toFixed(1)}%.`,
+              suggestedPrompts: [
+                "How can I improve my Sharpe ratio?",
+                "What happens if markets fall 40% in year 3?",
+                "Is my SIP amount sufficient for my goal?",
+                "Explain the P10/P90 outcome range",
+              ],
+            });
+            navigate("/chat");
+          }}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm transition-all hover:opacity-85 border"
+          style={{ background: "rgba(168,85,247,0.08)", borderColor: "rgba(168,85,247,0.3)", color: "#a855f7" }}
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Chat with AI about results
+        </button>
         <button
           onClick={onReset}
-          className="px-6 py-3 bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-white/15 transition border border-gray-300 dark:border-white/20"
+          className="px-6 py-2.5 bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-white/15 transition border border-gray-300 dark:border-white/20 text-sm font-semibold"
         >
           Run New Simulation
         </button>

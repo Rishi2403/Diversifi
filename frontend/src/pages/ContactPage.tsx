@@ -82,7 +82,7 @@ export default function ContactPage() {
         <div className="mb-12">
           <h1 className="text-3xl font-bold text-foreground">Get in Touch</h1>
           <p className="text-muted-foreground mt-2 text-sm leading-relaxed max-w-xl">
-            DiversiFi is an academic research project. We're a small team of students —
+            DiversiFi is an academic research project. We're a small team of students -
             we welcome feedback, bug reports, and questions.
           </p>
         </div>

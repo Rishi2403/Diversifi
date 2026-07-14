@@ -117,7 +117,7 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--border);color
 <header>
   <h1>Algorithmic Trading Backtest Report</h1>
   <p class="subtitle">LangGraph Multi-Agent Ensemble Strategy - Paper Trading Simulation H1 2025</p>
-  <p class="meta">Diversifi · January 2025 - June 2025 · Universe: <code>Nifty 50 constituents</code> · Capital: <code>₹10,00,000</code> · Benchmark: <code>Nifty 50 TRI (^NSEI)</code></p>
+  <p class="meta">Diversifi · January 2025 – June 2025 · Universe: <code>Nifty 50 constituents</code> · Capital: <code>₹10,00,000</code> · Benchmark: <code>Nifty 50 TRI (^NSEI)</code> · Backtesting engine: <code>QuantConnect LEAN</code></p>
 </header>
 
 <nav class="toc" aria-label="Table of contents">
@@ -140,7 +140,7 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--border);color
 <section id="exec-summary">
 <h2>1. Executive Summary</h2>
 
-<p>Over the six-month paper-trading window (1 Jan - 30 Jun 2025), the <strong>Diversifi LangGraph Ensemble</strong> delivered a simulated return of <strong>+18.4%</strong> against a Nifty 50 benchmark return of <strong>+11.2%</strong>, generating an annualised alpha of approximately <strong>+14.4%</strong>. The system ran 47 round-trip trades across 18 Nifty 50 constituents, maintaining a win rate of 64.2% with a maximum intra-period drawdown of −8.3%.</p>
+<p>Over the six-month paper-trading window (1 Jan – 30 Jun 2025), the <strong>Diversifi LangGraph Ensemble</strong> recorded a simulated return of <strong>+18.4%</strong> against a Nifty 50 benchmark return of <strong>+11.2%</strong>, implying an annualised alpha of approximately <strong>+14.4%</strong>. The simulation ran 47 round-trip trades across 18 Nifty 50 constituents, with a reported win rate of 64.2% and a maximum intra-period drawdown of −8.3%.</p>
 
 <div class="stat-row">
   <div class="stat-card stat-card-ok">
@@ -179,7 +179,7 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--border);color
 <section id="system-arch">
 <h2>2. System Architecture</h2>
 
-<p>Diversifi's trading intelligence is powered by a <strong>LangGraph stateful agent graph</strong> - a directed acyclic workflow of specialised LLM agents, each responsible for a distinct analytical step. The ensemble combines three signal types before producing a final trade recommendation.</p>
+<p>The simulation is built on a <strong>LangGraph stateful agent graph</strong> - a directed acyclic workflow of specialised LLM agents, each responsible for a distinct analytical step. The ensemble combines three signal types before producing a trade recommendation.</p>
 
 <!-- Pipeline diagram -->
 <svg viewBox="0 0 900 200" overflow="visible" class="diagram" role="img" aria-label="LangGraph agent pipeline flow">
@@ -335,6 +335,24 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--border);color
 <div class="callout warn">
   <strong>Survivorship bias note:</strong> The universe was fixed at the Nifty 50 composition as of 1 Jan 2025. Stocks that were added or removed during the period were not traded to avoid survivorship bias. This slightly understates real-world performance since index additions typically outperform.
 </div>
+
+<h3>Backtesting Infrastructure - QuantConnect LEAN</h3>
+<p>Trade execution simulation and portfolio accounting were run through the <strong>QuantConnect LEAN</strong> open-source backtesting engine. LEAN provides an event-driven simulation environment that replays historical price data in strict time order, eliminating look-ahead bias. Signal generation remains in Diversifi's LangGraph pipeline; LEAN receives the signal output and simulates order routing, fill prices, margin, and P&amp;L.</p>
+<div class="table-wrap">
+<table class="dist compact">
+  <thead><tr><th>Responsibility</th><th>Component</th></tr></thead>
+  <tbody>
+    <tr><td>Signal generation (NLP + sentiment + FII overlay)</td><td>Diversifi LangGraph multi-agent pipeline</td></tr>
+    <tr><td>Historical price data (OHLCV, NSE)</td><td>Yahoo Finance via <code>yfinance</code></td></tr>
+    <tr><td>Trade execution simulation &amp; portfolio accounting</td><td>QuantConnect LEAN engine (paper trading mode)</td></tr>
+    <tr><td>Institutional flow data</td><td>NSE FII/DII daily bulk deal feed</td></tr>
+    <tr><td>News feed</td><td>GNews API (24 h rolling)</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="callout">
+  QuantConnect LEAN is used exclusively for <strong>execution simulation</strong> - it does not influence which stocks are selected or when signals are generated. The LangGraph ensemble remains the sole intelligence layer.
+</div>
 </section>
 
 <!-- ═══════════════════════════════════════════════════ -->
@@ -432,7 +450,7 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--border);color
 <!-- ═══════════════════════════════════════════════════ -->
 <section id="strategies">
 <h2>5. Strategy Breakdown</h2>
-<p>The ensemble combines three independently backtested sub-strategies. Each was run standalone before weighting, enabling attribution of alpha to individual signal sources.</p>
+<p>The ensemble combines three independently backtested sub-strategies. Each was run standalone before weighting to allow rough attribution of simulated returns to individual signal sources.</p>
 
 <details class="bucket" open>
   <summary>
@@ -546,7 +564,7 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--border);color
     <tr><td><span class="pill pill-green">Strong Buy (0.85-1.00)</span></td><td class="num">12</td><td class="num">12</td><td class="num pos">83.3%</td><td class="num pos">+9.4%</td></tr>
     <tr><td><span class="pill pill-blue">Buy (0.70-0.84)</span></td><td class="num">22</td><td class="num">22</td><td class="num pos">63.6%</td><td class="num pos">+4.8%</td></tr>
     <tr><td><span class="pill pill-amber">Marginal (0.65-0.69)</span></td><td class="num">13</td><td class="num">13</td><td class="num">53.8%</td><td class="num pos">+1.2%</td></tr>
-    <tr><td><span class="pill pill-grey">Below threshold (&lt;0.65)</span></td><td class="num">44</td><td class="num muted">0 (filtered)</td><td class="num muted">—</td><td class="num muted">—</td></tr>
+    <tr><td><span class="pill pill-grey">Below threshold (&lt;0.65)</span></td><td class="num">44</td><td class="num muted">0 (filtered)</td><td class="num muted">-</td><td class="num muted">-</td></tr>
   </tbody>
 </table>
 </div>
@@ -582,8 +600,8 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--border);color
     <tr><td>Energy &amp; Oil</td><td class="num">12</td><td class="num">7</td><td class="num">57.1%</td><td class="num pos">+2.0%</td></tr>
     <tr><td>FMCG &amp; Consumer</td><td class="num">10</td><td class="num">6</td><td class="num">50.0%</td><td class="num pos">+1.1%</td></tr>
     <tr><td>Auto &amp; Capital Goods</td><td class="num">9</td><td class="num">5</td><td class="num pos">60%</td><td class="num pos">+1.4%</td></tr>
-    <tr><td>Metals &amp; Mining</td><td class="num">7</td><td class="num">0 (filtered)</td><td class="num muted">—</td><td class="num muted">—</td></tr>
-    <tr><td>Telecom</td><td class="num">5</td><td class="num">0 (filtered)</td><td class="num muted">—</td><td class="num muted">—</td></tr>
+    <tr><td>Metals &amp; Mining</td><td class="num">7</td><td class="num">0 (filtered)</td><td class="num muted">-</td><td class="num muted">-</td></tr>
+    <tr><td>Telecom</td><td class="num">5</td><td class="num">0 (filtered)</td><td class="num muted">-</td><td class="num muted">-</td></tr>
   </tbody>
 </table>
 </div>
@@ -705,7 +723,7 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--border);color
     <tr><td>Energy &amp; Oil</td><td class="num">15%</td><td class="num">7</td><td class="num pos">+8.2%</td><td class="num pos">+1.2%</td></tr>
     <tr><td>FMCG &amp; Consumer</td><td class="num">12%</td><td class="num">6</td><td class="num neg">−1.8%</td><td class="num neg">−0.2%</td></tr>
     <tr><td>Auto &amp; Capital Goods</td><td class="num">7%</td><td class="num">5</td><td class="num pos">+6.4%</td><td class="num pos">+0.4%</td></tr>
-    <tr><td>Cash (uninvested)</td><td class="num">~10%</td><td class="num">—</td><td class="num">0%</td><td class="num muted">—</td></tr>
+    <tr><td>Cash (uninvested)</td><td class="num">~10%</td><td class="num">-</td><td class="num">0%</td><td class="num muted">-</td></tr>
   </tbody>
 </table>
 </div>
@@ -834,7 +852,7 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--border);color
 </div>
 
 <footer>
-  <p>Generated by Diversifi - LangGraph Multi-Agent Finance Platform &nbsp;|&nbsp; Backtest period: 1 Jan 2025 - 30 Jun 2025 &nbsp;|&nbsp; Data sources: <code>GNews API</code>, <code>Yahoo Finance (yfinance)</code>, <code>NSE FII/DII API</code> &nbsp;|&nbsp; Related: <a href="/comparison_report.html">Model Comparison Report</a></p>
+  <p>Generated by Diversifi - LangGraph Multi-Agent Finance Platform &nbsp;|&nbsp; Backtest period: 1 Jan 2025 - 30 Jun 2025 &nbsp;|&nbsp; Data sources: <code>GNews API</code>, <code>Yahoo Finance (yfinance)</code>, <code>NSE FII/DII API</code> &nbsp;|&nbsp; Execution simulation: <code>QuantConnect LEAN</code> &nbsp;|&nbsp; Related: <a href="algo-backtest-report-h1-2026.html">H1+Jul 2026 Backtest Report</a></p>
   <p style="margin-top:6px;color:var(--warn);">⚠ For academic and demonstration purposes only. Not investment advice. SEBI regulations prohibit algorithmic trading without valid registration.</p>
 </footer>
 </section>

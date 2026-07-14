@@ -93,7 +93,7 @@ def _build_html(email: str, user: dict) -> str:
           </td>
           <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right;">₹{cv:,.0f}</td>
           <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right;color:{_color_pnl(mpnl)};">{_sign(mpnl)}</td>
-          <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right;">—</td>
+          <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right;">-</td>
         </tr>"""
 
     # Alert rows

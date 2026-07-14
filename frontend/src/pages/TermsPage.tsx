@@ -15,25 +15,25 @@ const sections = [
   {
     title: "2. Nature of the Service",
     content: [
-      "**Academic research project** — DiversiFi is developed as a final-year academic project. It is provided for educational and research demonstration purposes only.",
-      "**Not financial advice** — Nothing on DiversiFi constitutes financial, investment, tax, or legal advice. Portfolio scores, AI verdicts, simulations, and all other outputs are for informational and demonstration purposes only.",
-      "**Not a registered advisor** — DiversiFi is not a SEBI-registered investment advisor, stockbroker, or any other regulated financial entity.",
+      "**Academic research project** - DiversiFi is developed as a final-year academic project. It is provided for educational and research demonstration purposes only.",
+      "**Not financial advice** - Nothing on DiversiFi constitutes financial, investment, tax, or legal advice. Portfolio scores, AI verdicts, simulations, and all other outputs are for informational and demonstration purposes only.",
+      "**Not a registered advisor** - DiversiFi is not a SEBI-registered investment advisor, stockbroker, or any other regulated financial entity.",
     ],
   },
   {
     title: "3. No Liability for Investment Decisions",
     content: [
       "Any investment decision you make based on information presented on DiversiFi is entirely your own responsibility.",
-      "The DiversiFi team, contributors, and affiliated institutions expressly disclaim all liability for any losses, damages, or consequences — direct or indirect — arising from reliance on this platform.",
+      "The DiversiFi team, contributors, and affiliated institutions expressly disclaim all liability for any losses, damages, or consequences - direct or indirect - arising from reliance on this platform.",
       "Past simulated performance shown (including the Algo Trading Engine backtest results) does not guarantee future returns.",
     ],
   },
   {
     title: "4. User Responsibilities",
     content: [
-      "**Accurate data** — You are responsible for the accuracy of any portfolio data you upload. DiversiFi processes data as-is and cannot validate the correctness of your inputs.",
-      "**Appropriate use** — You agree not to use DiversiFi for any unlawful purpose, to distribute malicious code, to attempt unauthorised access to our systems, or to violate any applicable law.",
-      "**Account security** — You are responsible for maintaining the confidentiality of your account credentials managed through Clerk.",
+      "**Accurate data** - You are responsible for the accuracy of any portfolio data you upload. DiversiFi processes data as-is and cannot validate the correctness of your inputs.",
+      "**Appropriate use** - You agree not to use DiversiFi for any unlawful purpose, to distribute malicious code, to attempt unauthorised access to our systems, or to violate any applicable law.",
+      "**Account security** - You are responsible for maintaining the confidentiality of your account credentials managed through Clerk.",
     ],
   },
   {

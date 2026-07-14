@@ -6,6 +6,17 @@ import {
 } from "lucide-react";
 
 // ── Feature definitions ────────────────────────────────────────────────────────
+type SourceType = "Live Feed" | "LLM" | "Local NLP" | "Scraped" | "Client Math";
+interface DataSource { name: string; type: SourceType; }
+
+const SOURCE_COLORS: Record<SourceType, string> = {
+  "Live Feed":   "#00D09C",
+  "LLM":        "#a855f7",
+  "Local NLP":  "#f59e0b",
+  "Scraped":    "#00b8ff",
+  "Client Math":"#6366f1",
+};
+
 const FEATURES = [
   {
     id: "analyse",
@@ -16,7 +27,7 @@ const FEATURES = [
     accentBorder: "rgba(0,208,156,0.22)",
     badge: "Portfolio Intelligence",
     headline: "Know exactly where\nyour portfolio stands",
-    sub: "AI-powered health scoring breaks down diversification, overlap, concentration risk, and benchmark alignment — then tells you what to do about it.",
+    sub: "AI-powered health scoring breaks down diversification, overlap, concentration risk, and benchmark alignment - then tells you what to do about it.",
     capabilities: [
       "0-100 health score across 6 sub-dimensions",
       "Mutual fund overlap detection across holdings",
@@ -25,6 +36,11 @@ const FEATURES = [
       "Tax harvesting opportunity detection",
       "Actionable rebalancing recommendations",
     ],
+    sources: [
+      { name: "yfinance", type: "Live Feed" },
+      { name: "Groww API", type: "Live Feed" },
+      { name: "NumPy / Pandas", type: "Client Math" },
+    ] as DataSource[],
     stats: [
       { label: "AI Agents", value: "8+" },
       { label: "Sub-scores", value: "6" },
@@ -50,6 +66,10 @@ const FEATURES = [
       "AI per-holding scenario impact analysis",
       "P10 / P90 fan chart, VaR, Sharpe ratio",
     ],
+    sources: [
+      { name: "Claude Sonnet", type: "LLM" },
+      { name: "GBM Math (client-side)", type: "Client Math" },
+    ] as DataSource[],
     stats: [
       { label: "MC Paths", value: "5,000" },
       { label: "Scenario Types", value: "3" },
@@ -75,8 +95,14 @@ const FEATURES = [
       "Peer & sector comparison",
       "Investment thesis generation",
     ],
+    sources: [
+      { name: "yfinance", type: "Live Feed" },
+      { name: "mfapi.in", type: "Live Feed" },
+      { name: "TextBlob", type: "Local NLP" },
+      { name: "Claude Sonnet", type: "LLM" },
+    ] as DataSource[],
     stats: [
-      { label: "Data Sources", value: "12+" },
+      { label: "Data Sources", value: "4" },
       { label: "Coverage", value: "NSE/BSE" },
       { label: "AI Agents", value: "Multi" },
     ],
@@ -90,16 +116,20 @@ const FEATURES = [
     accentDim: "rgba(245,158,11,0.10)",
     accentBorder: "rgba(245,158,11,0.22)",
     badge: "Live Market Intelligence",
-    headline: "Global markets, indices,\ncommodities — in INR",
-    sub: "Real-time prices for 10+ global equity indices, gold, silver, crude oil, and crypto — all converted to INR for instant context.",
+    headline: "Global markets, indices,\ncommodities - in INR",
+    sub: "Real-time prices for 10+ global equity indices, gold, silver, crude oil, and crypto - all converted to INR for instant context.",
     capabilities: [
       "10+ global index prices (Nifty, S&P, Nasdaq…)",
       "Commodities in INR: Gold, Silver, Oil, Gas",
       "Crypto in INR: BTC, ETH and more",
       "Live % change and directional colour coding",
       "Market open / closed status per exchange",
-      "Cross-market correlation at a glance",
+      "FII / DII institutional flow data",
     ],
+    sources: [
+      { name: "yfinance", type: "Live Feed" },
+      { name: "NSE India API", type: "Scraped" },
+    ] as DataSource[],
     stats: [
       { label: "Indices", value: "10+" },
       { label: "Commodities", value: "4" },
@@ -369,7 +399,7 @@ export default function FeaturesPage() {
             <span style={{ color: "#00D09C" }}>smarter investing</span>
           </h1>
           <p className="text-base md:text-lg text-white/50 max-w-xl mx-auto leading-relaxed">
-            From portfolio health analysis to global market intelligence — built for Indian retail investors, powered by AI.
+            From portfolio health analysis to global market intelligence - built for Indian retail investors, powered by AI.
           </p>
         </div>
       </div>
@@ -448,6 +478,27 @@ export default function FeaturesPage() {
                     </li>
                   ))}
                 </ul>
+              </div>
+
+              {/* Data Sources */}
+              <div>
+                <p className="text-[10px] font-bold tracking-widest text-white/25 uppercase mb-2.5">Data Sources</p>
+                <div className="flex flex-wrap gap-2">
+                  {feat.sources.map((src) => {
+                    const color = SOURCE_COLORS[src.type as SourceType];
+                    return (
+                      <span
+                        key={src.name}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold"
+                        style={{ background: `${color}12`, border: `1px solid ${color}28`, color }}
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: color }} />
+                        {src.name}
+                        <span className="text-[9px] opacity-60 font-normal">{src.type}</span>
+                      </span>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Stats */}

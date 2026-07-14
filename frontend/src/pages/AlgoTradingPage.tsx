@@ -444,6 +444,37 @@ export default function AlgoTradingPage() {
         </div>
       </section>
 
+      {/* Data Sources */}
+      <section className="py-20 px-6 md:px-12 border-t" style={{ borderColor: "rgba(0,208,156,0.08)" }}>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: "#00D09C" }}>Transparency</p>
+            <h2 className="text-2xl md:text-3xl font-black text-white">Data Sources</h2>
+            <p className="text-sm mt-3 max-w-lg mx-auto" style={{ color: "rgba(228,232,240,0.45)" }}>Every trade signal is fully traceable - no black boxes</p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {([
+              { name: "Groww API", type: "Live Feed", typeColor: "#00D09C", desc: "Real-time NSE LTP and OHLC quotes; order placement and status via brokerage API" },
+              { name: "Finviz.com", type: "Scraped", typeColor: "#00b8ff", desc: "Stock news headlines scraped directly from Finviz quote pages - no API key needed" },
+              { name: "Seeking Alpha", type: "Scraped", typeColor: "#00b8ff", desc: "News fallback scraped from the public per-ticker XML feed" },
+              { name: "Tickertape.in", type: "Scraped", typeColor: "#00b8ff", desc: "Mutual fund NAV, AUM and category metadata via HTML parsing" },
+              { name: "ChromaDB", type: "Local KB", typeColor: "#a855f7", desc: "Vector knowledge base with all-MiniLM-L6-v2 embeddings for financial domain RAG" },
+              { name: "TextBlob", type: "Local NLP", typeColor: "#f59e0b", desc: "Sentiment polarity scoring applied to news headlines - fully local, zero latency" },
+              { name: "mf_data.json", type: "Static", typeColor: "#6366f1", desc: "Local fund-name → Tickertape URL map that defines the MF universe" },
+              { name: "Claude Sonnet", type: "LLM", typeColor: "#00D09C", desc: "claude-sonnet-4-6 for trade classification, bull/bear analysis and signal decisions via LangGraph" },
+            ] as const).map((s) => (
+              <div key={s.name} className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <div className="flex items-start justify-between mb-2.5">
+                  <span className="text-sm font-black text-white">{s.name}</span>
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0 ml-1.5" style={{ background: `${s.typeColor}18`, color: s.typeColor }}>{s.type}</span>
+                </div>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(228,232,240,0.4)" }}>{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Report CTA banner */}
       <section className="py-20 px-6 md:px-12 border-t" style={{ borderColor: "rgba(0,208,156,0.08)" }}>
         <div className="max-w-7xl mx-auto">

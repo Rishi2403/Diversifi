@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lightbulb, Loader2, TrendingUp, ChevronDown, Info, Calculator } from "lucide-react";
+import { Lightbulb, Loader2, TrendingUp, ChevronDown, Info, Calculator, MessageSquare } from "lucide-react";
 import { ResearchNav } from "@/components/ResearchNav";
+import { openChatWithContext } from "@/pages/ChatPage";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -313,6 +315,7 @@ function Disclaimer({ mode }: { mode: Mode }) {
 // ── Main page ──────────────────────────────────────────────────────────────────
 
 export default function SuggestPage() {
+  const navigate = useNavigate();
   const [mode,        setMode]        = useState<Mode>("stocks");
   const [investType,  setInvestType]  = useState<InvestType>("lumpsum");
   const [amount,      setAmount]      = useState(100000);      // lumpsum total
@@ -516,11 +519,37 @@ export default function SuggestPage() {
         {/* Results */}
         {results && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-[#00D09C]" />
-              <h2 className="text-sm font-bold text-gray-900 dark:text-white">
-                Top Picks for {risk} · {horizonKey}-term · {investType === "sip" ? `${fmtAmt(sipAmount)}/mo SIP` : totalInvested}
-              </h2>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-[#00D09C]" />
+                <h2 className="text-sm font-bold text-gray-900 dark:text-white">
+                  Top Picks for {risk} · {horizonKey}-term · {investType === "sip" ? `${fmtAmt(sipAmount)}/mo SIP` : totalInvested}
+                </h2>
+              </div>
+              <button
+                onClick={() => {
+                  const topNames = mode === "stocks"
+                    ? (stockResults ?? []).slice(0, 3).map(s => s.symbol).join(", ")
+                    : (mfResults ?? []).slice(0, 3).map(s => s.name).join(", ");
+                  openChatWithContext({
+                    source: "suggest",
+                    label: `${mode === "stocks" ? "Stock" : "Mutual Fund"} Suggestions`,
+                    summary: `Suggested ${mode} for ${risk} risk, ${horizon} horizon, ${investType === "sip" ? `₹${sipAmount}/mo SIP` : totalInvested} lumpsum. Top picks: ${topNames}.`,
+                    suggestedPrompts: [
+                      "Should I buy these at current levels?",
+                      "What are the key risks in these picks?",
+                      "How do I diversify across these suggestions?",
+                      "Compare these with index funds",
+                    ],
+                  });
+                  navigate("/chat");
+                }}
+                className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all hover:opacity-80"
+                style={{ background: "rgba(0,208,156,0.08)", borderColor: "rgba(0,208,156,0.3)", color: "#00D09C" }}
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                Chat with AI
+              </button>
             </div>
             {mode === "stocks"
               ? (stockResults ?? []).map((s, i) => (

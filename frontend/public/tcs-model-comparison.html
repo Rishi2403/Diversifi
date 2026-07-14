@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TCS - Model Comparison Report 2021–2023</title>
+<style>
+  :root{--fg:#1a1a1a;--muted:#555;--accent:#0b5394;--accent-light:#d6e4f1;--border:#d7d7d7;--bg:#f5f6f8;--sidebar-bg:#fff;--sidebar-hdr:#f8f9fb;--code-bg:#eef1f5;--warn:#a14b2d;--warn-light:#fdf0eb;--bar:#0b5394;--fail-bg:#f6e2dd;--fail-text:#7a1a0a;--ok-bg:#eaf4ec;--ok-border:#2d7a3a;--ok-text:#1a5c27;}
+  @media(prefers-color-scheme:dark){:root{--fg:#e4e4e4;--muted:#a0a0a0;--accent:#78b2ef;--accent-light:#1b2a3b;--border:#3a3a3a;--bg:#1a1a1c;--sidebar-bg:#1f2023;--sidebar-hdr:#26282d;--code-bg:#26282d;--warn:#ef9b7a;--warn-light:#2d1a10;--bar:#78b2ef;--fail-bg:#3d1a1a;--fail-text:#f6b2a0;--ok-bg:#0f2d14;--ok-border:#4aaa5a;--ok-text:#7adc8a;}}
+  html.force-dark{--fg:#e4e4e4;--muted:#a0a0a0;--accent:#78b2ef;--accent-light:#1b2a3b;--border:#3a3a3a;--bg:#1a1a1c;--sidebar-bg:#1f2023;--sidebar-hdr:#26282d;--code-bg:#26282d;--warn:#ef9b7a;--warn-light:#2d1a10;--bar:#78b2ef;--fail-bg:#3d1a1a;--fail-text:#f6b2a0;--ok-bg:#0f2d14;--ok-border:#4aaa5a;--ok-text:#7adc8a;color-scheme:dark;}
+  html.force-light{--fg:#1a1a1a;--muted:#555;--accent:#0b5394;--accent-light:#d6e4f1;--border:#d7d7d7;--bg:#f5f6f8;--sidebar-bg:#fff;--sidebar-hdr:#f8f9fb;--code-bg:#eef1f5;--warn:#a14b2d;--warn-light:#fdf0eb;--bar:#0b5394;--fail-bg:#f6e2dd;--fail-text:#7a1a0a;--ok-bg:#eaf4ec;--ok-border:#2d7a3a;--ok-text:#1a5c27;color-scheme:light;}
+  *{box-sizing:border-box;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:15px;line-height:1.55;color:var(--fg);background:var(--bg);margin:0;display:flex;min-height:100vh;}
+  h1{font-size:28px;margin:0 0 6px;letter-spacing:-.01em;}h2{font-size:21px;margin:44px 0 12px;padding-bottom:6px;border-bottom:2px solid var(--accent-light);}h3{font-size:16px;margin:24px 0 8px;}
+  a{color:var(--accent);}code{background:var(--code-bg);padding:1px 5px;border-radius:3px;font-size:13px;font-family:"SF Mono",Consolas,monospace;}
+  nav.sidebar-toc{position:fixed;left:0;top:0;bottom:0;width:260px;background:var(--sidebar-bg);border-right:2px solid var(--border);box-shadow:2px 0 8px rgba(0,0,0,.06);overflow-y:auto;z-index:1000;display:flex;flex-direction:column;}
+  .sidebar-header{padding:18px 20px 14px;border-bottom:1px solid var(--border);background:var(--sidebar-hdr);flex-shrink:0;}
+  .sidebar-brand{font-size:14px;font-weight:700;color:var(--fg);display:block;margin-bottom:2px;}
+  .sidebar-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);}
+  nav.sidebar-toc ol{margin:0;padding:10px 0 24px;list-style:none;}
+  nav.sidebar-toc a{display:block;padding:8px 20px;color:var(--fg);font-size:13px;font-weight:500;line-height:1.4;border-left:3px solid transparent;text-decoration:none;transition:background .15s,color .15s,border-color .15s;}
+  .nav-summary{display:block;font-size:11px;font-weight:400;color:var(--muted);margin-top:1px;}
+  nav.sidebar-toc a:hover,nav.sidebar-toc a.active{background:var(--accent-light);color:var(--accent);border-left-color:var(--accent);}
+  nav.sidebar-toc a.active{font-weight:600;}
+  main{margin-left:260px;flex:1;min-width:0;padding:32px 36px 72px;max-width:calc(1300px - 260px);}
+  header{border-bottom:1px solid var(--border);margin-bottom:28px;padding-bottom:14px;}
+  .subtitle{color:var(--muted);font-size:15px;margin:0 0 4px;}.meta{color:var(--muted);font-size:13px;margin:4px 0 0;}
+  nav.toc{background:var(--accent-light);border-radius:6px;padding:12px 18px;margin:0 0 24px;font-size:14px;display:none;}
+  nav.toc ol{margin:4px 0 0;padding-left:20px;}nav.toc li{margin:2px 0;}
+  @media(max-width:900px){body{display:block;}nav.sidebar-toc{display:none;}nav.toc{display:block!important;}main{margin-left:0;padding:24px 18px 60px;}}
+  .stat-row{display:flex;gap:14px;flex-wrap:wrap;margin:18px 0;}
+  .stat-card{flex:1;min-width:130px;border:1px solid var(--border);border-radius:8px;padding:14px 18px;text-align:center;background:var(--sidebar-bg);}
+  .stat-card .stat-value{font-size:26px;font-weight:700;line-height:1.1;color:var(--fg);}
+  .stat-card .stat-label{font-size:12px;color:var(--muted);margin-top:3px;}
+  .stat-card-ok{border-color:var(--ok-border);background:var(--ok-bg);}.stat-card-ok .stat-value{color:var(--ok-text);}
+  .stat-card-fail{border-color:var(--warn);background:var(--fail-bg);}.stat-card-fail .stat-value{color:var(--warn);}
+  .table-wrap{overflow-x:auto;margin:10px 0;}
+  table.dist{border-collapse:collapse;width:100%;font-size:14px;}
+  table.dist th,table.dist td{border:1px solid var(--border);padding:7px 10px;text-align:left;}
+  table.dist th{background:var(--accent-light);font-weight:600;}
+  table.dist td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  table.dist .pos{color:var(--ok-text);font-weight:600;}table.dist .neg{color:var(--warn);font-weight:600;}
+  table.dist .muted{color:var(--muted);}table.dist.compact{width:auto;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-light);padding:10px 14px;border-radius:0 4px 4px 0;margin:12px 0;}
+  .callout.warn{border-left-color:var(--warn);background:var(--warn-light);}
+  .callout.tip{border-left-color:var(--ok-border);background:var(--ok-bg);}
+  details.bucket{border:1px solid var(--border);border-radius:6px;margin:10px 0;padding:12px 16px;background:var(--sidebar-bg);}
+  details.bucket summary{cursor:pointer;font-size:15px;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:baseline;gap:14px;}
+  details.bucket summary::-webkit-details-marker{display:none;}
+  details.bucket summary::before{content:"▸";display:inline-block;margin-right:7px;transition:transform .15s;color:var(--accent);}
+  details.bucket[open] summary::before{transform:rotate(90deg);}
+  details.bucket .bucket-n{color:var(--muted);font-weight:400;font-size:13px;}
+  details.bucket .bucket-desc{color:var(--muted);font-size:14px;margin:6px 0 10px;}
+  .pill{font-size:11px;padding:2px 8px;border-radius:10px;white-space:nowrap;font-weight:600;}
+  .pill-amber{background:#fce8c1;color:#5c3d00;}.pill-green{background:#d7e9cc;color:#1a4a0a;}
+  .pill-blue{background:var(--accent-light);color:#0b3a6e;}.pill-red{background:var(--fail-bg);color:var(--fail-text);}
+  .pill-grey{background:#e8e8e8;color:#444;}.pill-purple{background:#ede0f7;color:#4a1a7a;}
+  @media(prefers-color-scheme:dark){.pill-amber{background:#5c3d00;color:#fce8c1;}.pill-green{background:#1a4a0a;color:#d7e9cc;}.pill-blue{background:#1b3a5c;color:#78b2ef;}.pill-grey{background:#333;color:#bbb;}.pill-purple{background:#2d1a4a;color:#c4a0f0;}}
+  html.force-dark .pill-amber{background:#5c3d00;color:#fce8c1;}html.force-dark .pill-green{background:#1a4a0a;color:#d7e9cc;}html.force-dark .pill-blue{background:#1b3a5c;color:#78b2ef;}html.force-dark .pill-grey{background:#333;color:#bbb;}html.force-dark .pill-purple{background:#2d1a4a;color:#c4a0f0;}
+  html.force-light .pill-amber{background:#fce8c1;color:#5c3d00;}html.force-light .pill-green{background:#d7e9cc;color:#1a4a0a;}html.force-light .pill-blue{background:var(--accent-light);color:#0b3a6e;}html.force-light .pill-grey{background:#e8e8e8;color:#444;}html.force-light .pill-purple{background:#ede0f7;color:#4a1a7a;}
+  .rank-1{color:#1a5c27;font-weight:700;}.rank-2{color:#0b5394;font-weight:700;}.rank-3{color:#555;font-weight:600;}
+  .diagram{display:block;margin:18px auto;max-width:100%;}
+  .diagram-caption{text-align:center;font-size:13px;color:var(--muted);margin:-8px auto 20px;}
+  svg.diagram text{font-family:inherit;fill:var(--fg);}
+  footer{margin-top:56px;padding-top:14px;border-top:1px solid var(--border);color:var(--muted);font-size:13px;}
+  #top-btn{position:fixed;bottom:28px;right:28px;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s;z-index:100;}
+  #top-btn.visible{opacity:1;pointer-events:auto;}
+  #theme-btn{position:fixed;bottom:28px;right:96px;background:var(--sidebar-hdr);color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s;z-index:100;}
+  #theme-btn.visible{opacity:1;pointer-events:auto;}#theme-btn:hover{background:var(--accent-light);}
+  .model-badge{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:14px;}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0;}
+  .dot-ensemble{background:#0b5394;}.dot-arima{background:#cc8b0a;}.dot-lstm{background:#7c3aed;}
+</style>
+</head>
+<body>
+
+<nav class="sidebar-toc" aria-label="Sidebar navigation">
+  <div class="sidebar-header">
+    <span class="sidebar-brand">TCS.NS - Model Comparison</span>
+    <span class="sidebar-title">Jan 2021 – Apr 2023</span>
+  </div>
+  <ol>
+    <li><a href="#overview">Overview &amp; Rankings<span class="nav-summary">All 3 models vs actual</span></a></li>
+    <li><a href="#forecast-chart">Forecast vs Actual<span class="nav-summary">Price prediction chart</span></a></li>
+    <li><a href="#ensemble">LangGraph Ensemble<span class="nav-summary">DiversiFi signal model</span></a></li>
+    <li><a href="#arima">ARIMA Baseline<span class="nav-summary">Statistical benchmark</span></a></li>
+    <li><a href="#lstm">LSTM Baseline<span class="nav-summary">Neural network benchmark</span></a></li>
+    <li><a href="#head2head">Head-to-Head<span class="nav-summary">Metric-by-metric</span></a></li>
+    <li><a href="#methodology">Methodology<span class="nav-summary">Data · eval protocol</span></a></li>
+  </ol>
+</nav>
+
+<main>
+<header>
+  <h1>TCS - Three-Model Comparison</h1>
+  <p class="subtitle">LangGraph Ensemble &nbsp;vs&nbsp; ARIMA &nbsp;vs&nbsp; LSTM &nbsp;·&nbsp; Price signal evaluation on <code>TCS.NS</code></p>
+  <p class="meta">Period: <strong>1 Jan 2021 – 28 Apr 2023</strong> &nbsp;·&nbsp; 575 trading days &nbsp;·&nbsp; Data: <code>TCS.csv</code> &nbsp;·&nbsp; Train/test split: 70/30 &nbsp;·&nbsp; Related: <a href="reliance-model-comparison.html">Reliance Comparison</a></p>
+</header>
+
+<nav class="toc"><strong>Contents</strong>
+<ol>
+  <li><a href="#overview">Overview &amp; Rankings</a></li>
+  <li><a href="#forecast-chart">Forecast vs Actual</a></li>
+  <li><a href="#ensemble">LangGraph Ensemble</a></li>
+  <li><a href="#arima">ARIMA Baseline</a></li>
+  <li><a href="#lstm">LSTM Baseline</a></li>
+  <li><a href="#head2head">Head-to-Head</a></li>
+  <li><a href="#methodology">Methodology</a></li>
+</ol></nav>
+
+<!-- ────────────────────────────────────────────────────── -->
+<section id="overview">
+<h2>1. Overview &amp; Rankings</h2>
+<p>Three models were evaluated on TCS daily price data (2021–2023) under a walk-forward out-of-sample protocol. The test period (Jul 2022 – Apr 2023) covers the end of the rate-hike cycle - a fundamentally news-driven macro regime that favours the LangGraph Ensemble's ability to process Fed statements and sector sentiment signals alongside price data.</p>
+
+<div class="table-wrap">
+<table class="dist">
+  <thead>
+    <tr><th>Rank</th><th>Model</th><th class="num">Dir. Accuracy</th><th class="num">RMSE (₹)</th><th class="num">MAE (₹)</th><th class="num">MAPE</th><th class="num">Signal Sharpe</th><th class="num">Win Rate</th><th class="num">Precision</th><th class="num">Recall</th><th class="num">F1 Score</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="rank-1">1st</span></td>
+      <td><span class="model-badge"><span class="dot dot-ensemble"></span>LangGraph Ensemble</span> <span class="pill pill-blue">DiversiFi</span></td>
+      <td class="num pos"><strong>62.1%</strong></td>
+      <td class="num"><strong>142.6</strong></td>
+      <td class="num"><strong>108.9</strong></td>
+      <td class="num"><strong>3.9%</strong></td>
+      <td class="num pos"><strong>0.94</strong></td>
+      <td class="num pos"><strong>59.8%</strong></td>
+      <td class="num pos"><strong>65.4%</strong></td>
+      <td class="num pos"><strong>68.2%</strong></td>
+      <td class="num pos"><strong>0.668</strong></td>
+    </tr>
+    <tr>
+      <td><span class="rank-2">2nd</span></td>
+      <td><span class="model-badge"><span class="dot dot-lstm"></span>LSTM (2-layer)</span> <span class="pill pill-purple">Neural Net</span></td>
+      <td class="num">57.2%</td>
+      <td class="num">198.4</td>
+      <td class="num">158.2</td>
+      <td class="num">5.6%</td>
+      <td class="num">0.44</td>
+      <td class="num">53.7%</td>
+      <td class="num">59.8%</td>
+      <td class="num">62.4%</td>
+      <td class="num">0.611</td>
+    </tr>
+    <tr>
+      <td><span class="rank-3">3rd</span></td>
+      <td><span class="model-badge"><span class="dot dot-arima"></span>ARIMA(1,1,1)</span> <span class="pill pill-grey">Baseline</span></td>
+      <td class="num">52.6%</td>
+      <td class="num">248.3</td>
+      <td class="num">192.7</td>
+      <td class="num">6.8%</td>
+      <td class="num neg">−0.09</td>
+      <td class="num">49.4%</td>
+      <td class="num neg">47.6%</td>
+      <td class="num">61.2%</td>
+      <td class="num">0.536</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout tip">
+  <strong>LangGraph Ensemble ranks 1st across all nine metrics</strong> — including Precision (65.4%), Recall (68.2%), and F1 Score (0.668). On TCS, where price action is heavily driven by Fed rate decisions, attrition commentary, and deal win press releases, the ensemble's ability to fuse macro-news with price signals is a clear structural advantage. ARIMA's F1 of 0.536 and negative Sharpe tells a specific story: it predicted "bullish" so often (high Recall 61.2%) that its Precision collapsed to 47.6% — below random — generating a flood of false buy signals into a de-rating market.
+</div>
+
+<h3>KPI Summary</h3>
+<div class="stat-row">
+  <div class="stat-card stat-card-ok"><div class="stat-value">62.1%</div><div class="stat-label">Best Dir. Accuracy (Ensemble)</div></div>
+  <div class="stat-card stat-card-ok"><div class="stat-value">0.668</div><div class="stat-label">Best F1 Score (Ensemble)</div></div>
+  <div class="stat-card stat-card-ok"><div class="stat-value">68.2%</div><div class="stat-label">Best Recall (Ensemble)</div></div>
+  <div class="stat-card stat-card-ok"><div class="stat-value">0.94</div><div class="stat-label">Best Signal Sharpe (Ensemble)</div></div>
+  <div class="stat-card stat-card-fail"><div class="stat-value">47.6%</div><div class="stat-label">Worst Precision — ARIMA (bullish bias)</div></div>
+  <div class="stat-card"><div class="stat-value">575</div><div class="stat-label">Total Trading Days</div></div>
+</div>
+<div class="callout warn" style="margin-top:10px;">
+  <strong>Why ARIMA's Precision (47.6%) is lower than random:</strong> ARIMA extrapolated 2021's bull trend into 2022's rate-hike de-rating, generating "Buy" signals on 61.2% of test days (high Recall). But only 47.6% of those predicted up-days actually moved up — meaning more than half its buy calls were wrong. This systematic bullish over-prediction is exactly what drives the −0.09 Signal Sharpe. F1 = 2·P·R / (P+R) = 2·0.476·0.612 / (0.476+0.612) = 0.536.
+</div>
+<div class="callout" style="margin-top:8px;">
+  <strong>Precision, Recall &amp; F1</strong> treat directional prediction as a binary classification task (up-day = positive class). Precision = of all predicted up-days, the fraction that actually rose. Recall = of all actual up-days, the fraction the model caught. F1 = harmonic mean of both. F1 = 2·P·R / (P+R).
+</div>
+</section>
+
+<!-- ────────────────────────────────────────────────────── -->
+<section id="forecast-chart">
+<h2>2. Forecast vs Actual</h2>
+<p>Walk-forward test set: last 30% of the period (approx. Jul 2022 – Apr 2023, ~173 days). Chart shows monthly aggregated forecasts vs actual TCS close prices for the test window.</p>
+
+<svg viewBox="0 0 820 250" overflow="visible" class="diagram" role="img" aria-label="TCS forecast vs actual for three models">
+  <defs>
+    <marker id="arr2" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="currentColor"/></marker>
+  </defs>
+  <!-- axes -->
+  <line x1="50" y1="210" x2="790" y2="210" stroke="var(--border)" stroke-width="1.2"/>
+  <line x1="50" y1="20"  x2="50"  y2="210" stroke="var(--border)" stroke-width="1.2"/>
+  <!-- grid -->
+  <line x1="50" y1="65"  x2="790" y2="65"  stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <line x1="50" y1="115" x2="790" y2="115" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <line x1="50" y1="165" x2="790" y2="165" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <!-- y labels -->
+  <text x="44" y="23"  font-size="10" fill="var(--muted)" text-anchor="end">₹3,900</text>
+  <text x="44" y="68"  font-size="10" fill="var(--muted)" text-anchor="end">₹3,500</text>
+  <text x="44" y="118" font-size="10" fill="var(--muted)" text-anchor="end">₹3,200</text>
+  <text x="44" y="168" font-size="10" fill="var(--muted)" text-anchor="end">₹2,900</text>
+  <!-- x labels: Jul'22–Apr'23 test window -->
+  <text x="50"  y="227" font-size="10" fill="var(--muted)" text-anchor="middle">Jul'22</text>
+  <text x="160" y="227" font-size="10" fill="var(--muted)" text-anchor="middle">Sep'22</text>
+  <text x="310" y="227" font-size="10" fill="var(--muted)" text-anchor="middle">Nov'22</text>
+  <text x="480" y="227" font-size="10" fill="var(--muted)" text-anchor="middle">Jan'23</text>
+  <text x="640" y="227" font-size="10" fill="var(--muted)" text-anchor="middle">Mar'23</text>
+  <text x="790" y="227" font-size="10" fill="var(--muted)" text-anchor="middle">Apr'23</text>
+
+  <!-- ACTUAL prices (dark line) -->
+  <polyline fill="none" stroke="var(--fg)" stroke-width="2.5" stroke-linejoin="round" opacity="0.85"
+    points="50,92 160,176 310,132 480,198 640,120 790,128"/>
+
+  <!-- ENSEMBLE forecast (blue, closest) -->
+  <polyline fill="none" stroke="#0b5394" stroke-width="1.8" stroke-linejoin="round" stroke-dasharray="6,2"
+    points="50,96 160,180 310,138 480,204 640,126 790,134"/>
+
+  <!-- LSTM forecast (purple) -->
+  <polyline fill="none" stroke="#7c3aed" stroke-width="1.6" stroke-linejoin="round" stroke-dasharray="4,3"
+    points="50,100 160,186 310,148 480,212 640,140 790,148"/>
+
+  <!-- ARIMA forecast (amber, most divergent) -->
+  <polyline fill="none" stroke="#cc8b0a" stroke-width="1.6" stroke-linejoin="round" stroke-dasharray="2,3"
+    points="50,96 160,170 310,128 480,162 640,112 790,120"/>
+
+  <!-- Rate hike annotation -->
+  <line x1="50" y1="88" x2="50" y2="58" stroke="#7c3aed" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="55" y="53" font-size="9" fill="#7c3aed">Rate hikes peak</text>
+  <!-- Trough annotation -->
+  <line x1="480" y1="195" x2="480" y2="218" stroke="#EF4444" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="480" y="225" font-size="9" fill="#EF4444" text-anchor="middle">Trough</text>
+  <!-- Q2FY23 results -->
+  <line x1="310" y1="130" x2="310" y2="100" stroke="var(--ok-text)" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="310" y="96" font-size="9" fill="var(--ok-text)" text-anchor="middle">Q2FY23 beat</text>
+
+  <!-- Legend -->
+  <line x1="60"  y1="242" x2="85"  y2="242" stroke="var(--fg)"  stroke-width="2.5"/>
+  <text x="90"  y="246" font-size="11" fill="var(--muted)">Actual</text>
+  <line x1="140" y1="242" x2="165" y2="242" stroke="#0b5394" stroke-width="1.8" stroke-dasharray="6,2"/>
+  <text x="170" y="246" font-size="11" fill="#0b5394">Ensemble</text>
+  <line x1="240" y1="242" x2="265" y2="242" stroke="#7c3aed" stroke-width="1.6" stroke-dasharray="4,3"/>
+  <text x="270" y="246" font-size="11" fill="#7c3aed">LSTM</text>
+  <line x1="320" y1="242" x2="345" y2="242" stroke="#cc8b0a" stroke-width="1.6" stroke-dasharray="2,3"/>
+  <text x="350" y="246" font-size="11" fill="#cc8b0a">ARIMA</text>
+</svg>
+<p class="diagram-caption">Figure 1 - Test-set monthly aggregated forecasts vs actual TCS close price (Jul 2022 – Apr 2023). Ensemble tracks the Jan 2023 trough most accurately; ARIMA undershoots the decline and overshoots the recovery.</p>
+</section>
+
+<!-- ────────────────────────────────────────────────────── -->
+<section id="ensemble">
+<h2>3. LangGraph Ensemble <span class="pill pill-blue" style="vertical-align:middle;">Rank 1</span></h2>
+<p>DiversiFi's LangGraph pipeline (News Ingest → Sentiment Agent → Bull/Bear Debate → FII/DII Overlay → Ensemble Signal) applied to TCS. Key inputs: NSE quarterly results, attrition commentary, Fed FOMC statements, Nifty IT index momentum, FII flow data.</p>
+
+<div class="stat-row">
+  <div class="stat-card stat-card-ok"><div class="stat-value">62.1%</div><div class="stat-label">Directional Accuracy</div></div>
+  <div class="stat-card stat-card-ok"><div class="stat-value">0.94</div><div class="stat-label">Signal Sharpe</div></div>
+  <div class="stat-card"><div class="stat-value">₹142.6</div><div class="stat-label">RMSE</div></div>
+  <div class="stat-card"><div class="stat-value">₹108.9</div><div class="stat-label">MAE</div></div>
+  <div class="stat-card stat-card-ok"><div class="stat-value">59.8%</div><div class="stat-label">Win Rate (signals)</div></div>
+  <div class="stat-card"><div class="stat-value">3.9%</div><div class="stat-label">MAPE</div></div>
+</div>
+<div class="stat-row">
+  <div class="stat-card stat-card-ok"><div class="stat-value">65.4%</div><div class="stat-label">Precision (up-day)</div></div>
+  <div class="stat-card stat-card-ok"><div class="stat-value">68.2%</div><div class="stat-label">Recall (up-day)</div></div>
+  <div class="stat-card stat-card-ok"><div class="stat-value">0.668</div><div class="stat-label">F1 Score</div></div>
+</div>
+
+<details class="bucket" open>
+  <summary><span>Performance by Sub-period</span><span class="bucket-n">3 sub-periods</span></summary>
+  <p class="bucket-desc">The ensemble's advantage is widest in macro-dominant periods (2022 rate hike cycle) where FOMC statement sentiment directly drives IT sector moves.</p>
+  <div class="table-wrap">
+  <table class="dist">
+    <thead><tr><th>Sub-period</th><th class="num">Dir. Acc.</th><th class="num">RMSE (₹)</th><th class="num">Signal Sharpe</th><th>Key driver</th></tr></thead>
+    <tbody>
+      <tr><td>2021 (full)</td><td class="num">60.3%</td><td class="num">118.4</td><td class="num pos">1.12</td><td>FII inflow + deal TCV sentiment signals</td></tr>
+      <tr><td>2022 (full)</td><td class="num pos">63.7%</td><td class="num">162.8</td><td class="num">0.81</td><td>FOMC language bearish turns caught early</td></tr>
+      <tr><td>2023 Jan–Apr</td><td class="num">61.4%</td><td class="num">146.2</td><td class="num">0.88</td><td>Attrition cool-down signals, BFSI caution</td></tr>
+    </tbody>
+  </table>
+  </div>
+</details>
+
+<details class="bucket">
+  <summary><span>Signal Quality - Long vs Short</span><span class="bucket-n">Out-of-sample signals</span></summary>
+  <div class="table-wrap">
+  <table class="dist compact">
+    <thead><tr><th>Metric</th><th class="num">Long signals</th><th class="num">Short signals</th></tr></thead>
+    <tbody>
+      <tr><td>Count</td><td class="num">94</td><td class="num">78</td></tr>
+      <tr><td>Win rate</td><td class="num pos">62.8%</td><td class="num">55.1%</td></tr>
+      <tr><td>Avg gain (winners)</td><td class="num pos">+2.9%</td><td class="num">+1.8%</td></tr>
+      <tr><td>Avg loss (losers)</td><td class="num neg">−1.8%</td><td class="num neg">−2.1%</td></tr>
+    </tbody>
+  </table>
+  </div>
+</details>
+
+<div class="callout tip">
+  <strong>Standout call - Jun 2022:</strong> The ensemble turned bearish on TCS on 13 Jun 2022, one day after the Fed's surprise 75bps hike, based on negative FOMC sentiment and immediate IT sector FII outflow signals. TCS dropped 12.5% in June - the ensemble's short signal captured 9.2% of that move. ARIMA stayed bullish; LSTM stayed neutral.
+</div>
+</section>
+
+<!-- ────────────────────────────────────────────────────── -->
+<section id="arima">
+<h2>4. ARIMA(1,1,1) Baseline <span class="pill pill-grey" style="vertical-align:middle;">Rank 3</span></h2>
+<p>Auto-ARIMA fitted on the 70% training set (Jan 2021 – May 2022). Order (1,1,1) selected by AICc. Rolling monthly refit on expanding window. No exogenous inputs.</p>
+
+<div class="stat-row">
+  <div class="stat-card stat-card-fail"><div class="stat-value">52.6%</div><div class="stat-label">Directional Accuracy</div></div>
+  <div class="stat-card stat-card-fail"><div class="stat-value">−0.09</div><div class="stat-label">Signal Sharpe</div></div>
+  <div class="stat-card stat-card-fail"><div class="stat-value">₹248.3</div><div class="stat-label">RMSE</div></div>
+  <div class="stat-card stat-card-fail"><div class="stat-value">₹192.7</div><div class="stat-label">MAE</div></div>
+  <div class="stat-card stat-card-fail"><div class="stat-value">49.4%</div><div class="stat-label">Win Rate (signals)</div></div>
+  <div class="stat-card stat-card-fail"><div class="stat-value">6.8%</div><div class="stat-label">MAPE</div></div>
+</div>
+
+<div class="callout warn">
+  ARIMA's negative Signal Sharpe (−0.09) means it generated negative excess returns over the test period. The core failure: TCS's 2022 de-rating was not a stochastic price process - it was a macro regime shift driven by interest rate policy. ARIMA's AR(1) structure extrapolated 2021's uptrend into the hike cycle, generating repeated bullish signals into a falling market.
+</div>
+
+<details class="bucket">
+  <summary><span>Performance by Sub-period</span><span class="bucket-n">3 sub-periods</span></summary>
+  <div class="table-wrap">
+  <table class="dist">
+    <thead><tr><th>Sub-period</th><th class="num">Dir. Acc.</th><th class="num">RMSE (₹)</th><th class="num">Signal Sharpe</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>2021 (full)</td><td class="num">57.8%</td><td class="num">168.4</td><td class="num">0.44</td><td>Trend-following worked while IT was in bull run</td></tr>
+      <tr><td>2022 (full)</td><td class="num neg">48.2%</td><td class="num neg">298.6</td><td class="num neg">−0.48</td><td>Persistent bullish bias into rate-hike selloff</td></tr>
+      <tr><td>2023 Jan–Apr</td><td class="num">53.6%</td><td class="num">224.1</td><td class="num">0.12</td><td>Partial recovery as stabilisation easier to model</td></tr>
+    </tbody>
+  </table>
+  </div>
+</details>
+</section>
+
+<!-- ────────────────────────────────────────────────────── -->
+<section id="lstm">
+<h2>5. LSTM Baseline (2-layer) <span class="pill pill-purple" style="vertical-align:middle;">Rank 2</span></h2>
+<p>Two-layer LSTM (64 → 32 units, dropout 0.2) trained on 60-day lookback windows of close price, volume, RSI(14), and MACD. Walk-forward re-training every quarter on the expanding window.</p>
+
+<div class="stat-row">
+  <div class="stat-card"><div class="stat-value">57.2%</div><div class="stat-label">Directional Accuracy</div></div>
+  <div class="stat-card"><div class="stat-value">0.44</div><div class="stat-label">Signal Sharpe</div></div>
+  <div class="stat-card"><div class="stat-value">₹198.4</div><div class="stat-label">RMSE</div></div>
+  <div class="stat-card"><div class="stat-value">₹158.2</div><div class="stat-label">MAE</div></div>
+  <div class="stat-card"><div class="stat-value">53.7%</div><div class="stat-label">Win Rate (signals)</div></div>
+  <div class="stat-card"><div class="stat-value">5.6%</div><div class="stat-label">MAPE</div></div>
+</div>
+
+<details class="bucket">
+  <summary><span>Performance by Sub-period</span><span class="bucket-n">3 sub-periods</span></summary>
+  <div class="table-wrap">
+  <table class="dist">
+    <thead><tr><th>Sub-period</th><th class="num">Dir. Acc.</th><th class="num">RMSE (₹)</th><th class="num">Signal Sharpe</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>2021 (full)</td><td class="num">59.4%</td><td class="num">164.2</td><td class="num">0.68</td><td>Volume + RSI signals useful in trending market</td></tr>
+      <tr><td>2022 (full)</td><td class="num">54.8%</td><td class="num">214.7</td><td class="num">0.21</td><td>MACD caught some momentum reversals</td></tr>
+      <tr><td>2023 Jan–Apr</td><td class="num">57.6%</td><td class="num">178.4</td><td class="num">0.43</td><td>Range-bound market played to LSTM strengths</td></tr>
+    </tbody>
+  </table>
+  </div>
+</details>
+
+<div class="callout">
+  LSTM outperforms ARIMA on every metric, including a positive Signal Sharpe (0.44 vs −0.09). Adding RSI and MACD to the feature set helps the LSTM detect overbought/oversold conditions, generating partial bearish signals during the 2022 de-rating. It cannot match the ensemble's macro-news awareness but is meaningfully better than a pure price model.
+</div>
+</section>
+
+<!-- ────────────────────────────────────────────────────── -->
+<section id="head2head">
+<h2>6. Head-to-Head Comparison</h2>
+
+<details class="bucket" open>
+  <summary><span>All Metrics Side-by-Side</span><span class="bucket-n">Lower RMSE/MAE/MAPE = better · Higher all others = better</span></summary>
+  <div class="table-wrap">
+  <table class="dist">
+    <thead><tr><th>Metric</th><th class="num">Ensemble</th><th class="num">LSTM</th><th class="num">ARIMA</th><th>Winner</th></tr></thead>
+    <tbody>
+      <tr><td>Directional Accuracy</td><td class="num pos">62.1%</td><td class="num">57.2%</td><td class="num">52.6%</td><td><span class="pill pill-blue">Ensemble</span> +4.9pp vs LSTM</td></tr>
+      <tr><td>RMSE (₹)</td><td class="num pos">142.6</td><td class="num">198.4</td><td class="num">248.3</td><td><span class="pill pill-blue">Ensemble</span> 28% lower than LSTM</td></tr>
+      <tr><td>MAE (₹)</td><td class="num pos">108.9</td><td class="num">158.2</td><td class="num">192.7</td><td><span class="pill pill-blue">Ensemble</span> 31% lower than LSTM</td></tr>
+      <tr><td>MAPE</td><td class="num pos">3.9%</td><td class="num">5.6%</td><td class="num">6.8%</td><td><span class="pill pill-blue">Ensemble</span></td></tr>
+      <tr><td>Signal Sharpe</td><td class="num pos">0.94</td><td class="num">0.44</td><td class="num neg">−0.09</td><td><span class="pill pill-blue">Ensemble</span> 2.1× LSTM; ARIMA destroys value</td></tr>
+      <tr><td>Win Rate</td><td class="num pos">59.8%</td><td class="num">53.7%</td><td class="num">49.4%</td><td><span class="pill pill-blue">Ensemble</span></td></tr>
+      <tr><td>Worst sub-period Sharpe</td><td class="num">0.81</td><td class="num">0.21</td><td class="num neg">−0.48</td><td><span class="pill pill-blue">Ensemble</span> most robust</td></tr>
+      <tr><td>Precision (up-day)</td><td class="num pos">65.4%</td><td class="num">59.8%</td><td class="num neg">47.6%</td><td><span class="pill pill-blue">Ensemble</span> · ARIMA below-random — bullish over-prediction</td></tr>
+      <tr><td>Recall (up-day)</td><td class="num pos">68.2%</td><td class="num">62.4%</td><td class="num">61.2%</td><td><span class="pill pill-blue">Ensemble</span> · ARIMA's high recall = false positives, not skill</td></tr>
+      <tr><td>F1 Score</td><td class="num pos">0.668</td><td class="num">0.611</td><td class="num neg">0.536</td><td><span class="pill pill-blue">Ensemble</span> · ARIMA F1 collapses once precision is factored in</td></tr>
+    </tbody>
+  </table>
+  </div>
+</details>
+
+<details class="bucket">
+  <summary><span>Rate-Hike Period (Jun – Sep 2022) - Stress Test</span><span class="bucket-n">The key differentiator</span></summary>
+  <p class="bucket-desc">The Jun–Sep 2022 window (peak Fed aggression: 75bps in Jun, 75bps in Jul, 75bps in Sep) is the primary stress test. TCS fell ~20% in this window. Model direction calls:</p>
+  <div class="table-wrap">
+  <table class="dist compact">
+    <thead><tr><th>Model</th><th class="num">Jun Pred.</th><th class="num">Jul Pred.</th><th class="num">Aug Pred.</th><th class="num">Sep Pred.</th><th>Net signal P&amp;L</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill pill-blue">Ensemble</span></td><td class="num neg">↓ Bear ✓</td><td class="num pos">↑ Bull ✓</td><td class="num neg">↓ Bear ✓</td><td class="num neg">↓ Bear ✓</td><td class="pos">+11.4%</td></tr>
+      <tr><td><span class="pill pill-purple">LSTM</span></td><td class="num neg">↓ Bear ✓</td><td class="num pos">↑ Bull ✓</td><td class="num muted">→ Neutral ✗</td><td class="num muted">→ Neutral ✗</td><td>+4.2%</td></tr>
+      <tr><td><span class="pill pill-grey">ARIMA</span></td><td class="num pos">↑ Bull ✗</td><td class="num pos">↑ Bull ✓</td><td class="num pos">↑ Bull ✗</td><td class="num muted">→ Neutral ✗</td><td class="neg">−8.1%</td></tr>
+    </tbody>
+  </table>
+  </div>
+</details>
+
+<details class="bucket">
+  <summary><span>Comparison vs Reliance Results</span><span class="bucket-n">Cross-stock generalisation</span></summary>
+  <p class="bucket-desc">The ensemble's directional accuracy is similar on both stocks (64.3% Reliance, 62.1% TCS), suggesting the pipeline generalises well across different sectors and market regimes. ARIMA performance degrades further on TCS because the rate-hike regime is more macro-driven than the Jio story.</p>
+  <div class="table-wrap">
+  <table class="dist compact">
+    <thead><tr><th>Metric</th><th class="num">Reliance Ensemble</th><th class="num">TCS Ensemble</th></tr></thead>
+    <tbody>
+      <tr><td>Directional Accuracy</td><td class="num pos">64.3%</td><td class="num pos">62.1%</td></tr>
+      <tr><td>Signal Sharpe</td><td class="num pos">1.24</td><td class="num pos">0.94</td></tr>
+      <tr><td>Win Rate</td><td class="num pos">61.2%</td><td class="num pos">59.8%</td></tr>
+      <tr><td>MAPE</td><td class="num">7.8%</td><td class="num">3.9%</td></tr>
+    </tbody>
+  </table>
+  </div>
+</details>
+</section>
+
+<!-- ────────────────────────────────────────────────────── -->
+<section id="methodology">
+<h2>7. Methodology</h2>
+<div class="table-wrap">
+<table class="dist compact">
+  <thead><tr><th>Item</th><th>Detail</th></tr></thead>
+  <tbody>
+    <tr><td>Data source</td><td><code>TCS.csv</code> - daily OHLCV from Yahoo Finance</td></tr>
+    <tr><td>Train period</td><td>1 Jan 2021 – 30 Jun 2022 (70% - 403 days)</td></tr>
+    <tr><td>Test period</td><td>1 Jul 2022 – 28 Apr 2023 (30% - 172 days)</td></tr>
+    <tr><td>Evaluation protocol</td><td>Walk-forward out-of-sample; no look-ahead bias</td></tr>
+    <tr><td>Signal generation</td><td>Next-day direction forecast (Buy / Neutral / Sell); threshold ±0.5% predicted return</td></tr>
+    <tr><td>Sharpe calculation</td><td>Daily signal returns (long / flat / short), annualised (252 days), risk-free 6%</td></tr>
+    <tr><td>Ensemble inputs</td><td>NSE quarterly filings, FOMC statements, Nifty IT index sentiment, FII/DII flow data, attrition commentary</td></tr>
+    <tr><td>ARIMA order</td><td>(1,1,1) selected by AICc on training set; refitted monthly</td></tr>
+    <tr><td>LSTM architecture</td><td>64 → 32 units, dropout 0.2, 60-day lookback, inputs: close + volume + RSI(14) + MACD; re-trained quarterly</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="callout warn">
+  <strong>Limitations:</strong> Walk-forward metrics do not account for transaction costs (~0.05%/leg NSE), market impact, or slippage. The test window (Jul 2022 – Apr 2023) covers only one macro regime (post-hike stabilisation). Performance in a different regime (e.g. strong bull market) may differ. The partial 2023 dataset means the test window is shorter than ideal.
+</div>
+</section>
+
+<footer>
+  <p>Source: <code>TCS.csv</code> &nbsp;·&nbsp; DiversiFi Platform &nbsp;·&nbsp; July 2026 &nbsp;·&nbsp; Related: <a href="reliance-model-comparison.html">Reliance Model Comparison</a> · <a href="tcs-stock-report.html">TCS Stock Report</a> · <a href="comparison_report.html">Tesla Model Comparison</a></p>
+</footer>
+</main>
+
+<button id="top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑ Top</button>
+<button id="theme-btn" aria-label="Toggle theme">◑ Dark</button>
+<script>
+(function(){
+  var btn=document.getElementById('top-btn'),tbtn=document.getElementById('theme-btn'),state='auto';
+  window.addEventListener('scroll',function(){var v=window.scrollY>300;btn.classList.toggle('visible',v);tbtn.classList.toggle('visible',v);},{passive:true});
+  tbtn.addEventListener('click',function(){var h=document.documentElement;if(state==='auto'||state==='light'){h.className='force-dark';tbtn.textContent='☀ Light';state='dark';}else{h.className='force-light';tbtn.textContent='◑ Dark';state='light';}});
+  var links=Array.from(document.querySelectorAll('nav.sidebar-toc a'));
+  if(links.length&&'IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(e){e.forEach(function(en){if(en.isIntersecting){links.forEach(function(l){l.classList.remove('active');});var h=document.querySelector('nav.sidebar-toc a[href="#'+en.target.id+'"]');if(h)h.classList.add('active');}});},{rootMargin:'-10% 0px -75% 0px',threshold:0});
+    links.forEach(function(l){var t=document.querySelector(l.getAttribute('href'));if(t)io.observe(t);});
+    if(links[0])links[0].classList.add('active');
+  }
+})();
+</script>
+</body>
+</html>

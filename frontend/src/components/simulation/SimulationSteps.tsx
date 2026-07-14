@@ -327,7 +327,7 @@ export function InvestmentPlanStep({
                           className="flex-1 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-lg px-2 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#00D09C]"
                         >
                           <option value="">Select stock...</option>
-                          {stocks.map((s) => <option key={s.symbol} value={s.symbol}>{s.symbol} — {s.name || s.symbol}</option>)}
+                          {stocks.map((s) => <option key={s.symbol} value={s.symbol}>{s.symbol} - {s.name || s.symbol}</option>)}
                         </select>
                         <input
                           type="number"
