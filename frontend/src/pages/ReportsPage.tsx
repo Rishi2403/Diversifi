@@ -21,7 +21,7 @@ const STRATEGY_REPORTS: Report[] = [
     badgeColor: "#00D09C",
     title:      "Algo Trading Engine - H1 2025",
     sub:        "LangGraph Multi-Agent Ensemble · Jan–Jun 2025 · Nifty 50 · 126 days",
-    desc:       "126-day paper-trading simulation on all Nifty 50 constituents using a 5-step LangGraph multi-agent pipeline. ₹10L starting capital with realistic brokerage (0.05%), slippage (0.10%), and sell-side STT (0.025%). Long-only, max 8 concurrent positions.",
+    desc:       "126-day paper-trading simulation on all Nifty 50 constituents using a 5-step LangGraph multi-agent pipeline. ₹10L starting capital with realistic brokerage (0.05%), slippage (0.10%) and sell-side STT (0.025%). Long-only, max 8 concurrent positions.",
     href:       "/algo-backtest-report.html",
     metrics: [
       { label: "Portfolio Return",   value: "+18.4%", accent: "#00D09C" },
@@ -43,7 +43,7 @@ const STRATEGY_REPORTS: Report[] = [
     badgeColor: "#00b8ff",
     title:      "Algo Trading Engine - H1 2026",
     sub:        "LangGraph Multi-Agent Ensemble · Jan–Jul 2026 · Nifty 50 · 147 days",
-    desc:       "Extended 147-day paper-trading run with three pipeline enhancements over H1 2025: 3-agent majority vote per signal (cutting false positives ~14%), ATR-based adaptive stop-loss, and intraday 15-min FII/DII refresh. ₹10L capital, same Nifty 50 universe.",
+    desc:       "Extended 147-day paper-trading run with three pipeline enhancements over H1 2025: 3-agent majority vote per signal (cutting false positives ~14%), ATR-based adaptive stop-loss and intraday 15-min FII/DII refresh. ₹10L capital, same Nifty 50 universe.",
     href:       "/algo-backtest-report-h1-2026.html",
     metrics: [
       { label: "Portfolio Return",   value: "+15.3%", accent: "#00b8ff" },
@@ -99,10 +99,10 @@ const COMPARISON_REPORTS: Report[] = [
       { label: "ARIMA F1 Score",     value: "0.533", accent: "#f59e0b" },
     ],
     highlights: [
-      "Ensemble RMSE ₹112.4 — 28% lower than LSTM (₹156.2), 41% lower than ARIMA (₹189.6)",
+      "Ensemble RMSE ₹112.4 - 28% lower than LSTM (₹156.2), 41% lower than ARIMA (₹189.6)",
       "COVID stress test (Feb–Apr 2020): Ensemble +34.2% net P&L · LSTM +14.7% · ARIMA −7.3%",
-      "Precision 68.2% · Recall 70.8% · F1 0.694 — balanced and accurate on both buy/sell signals",
-      "ARIMA Recall 52.4%, Precision 54.2%, F1 0.533 — near-random; both Jio rally and COVID crash missed",
+      "Precision 68.2% · Recall 70.8% · F1 0.694 - balanced and accurate on both buy/sell signals",
+      "ARIMA Recall 52.4%, Precision 54.2%, F1 0.533 - near-random; both Jio rally and COVID crash missed",
     ],
     methodology: "708-day OHLCV (Yahoo Finance · Reliance.csv) · 70/30 train/test · Walk-forward OOS · Signal Sharpe annualised 252 days, 6% rf · Ensemble: NSE announcements, ET/Bloomberg, FII/DII",
   },
@@ -112,7 +112,7 @@ const COMPARISON_REPORTS: Report[] = [
     badgeColor: "#1b78ef",
     title:      "Three-Model Comparison · TCS",
     sub:        "LangGraph Ensemble vs ARIMA vs LSTM · TCS.NS · Jan 2021 – Apr 2023 · 575 days",
-    desc:       "Walk-forward comparison on 575 trading days of TCS data through a complete US rate-hike cycle (70% train / 30% test). Test window (Jul 2022 – Apr 2023) covers peak Fed aggression - 75bps hikes in Jun, Jul, and Sep 2022 - where macro-news awareness is decisive.",
+    desc:       "Walk-forward comparison on 575 trading days of TCS data through a complete US rate-hike cycle (70% train / 30% test). Test window (Jul 2022 – Apr 2023) covers peak Fed aggression - 75bps hikes in Jun, Jul and Sep 2022 - where macro-news awareness is decisive.",
     href:       "/tcs-model-comparison.html",
     metrics: [
       { label: "Ensemble Dir. Acc.", value: "62.1%",  accent: "#ef4444" },
@@ -121,9 +121,9 @@ const COMPARISON_REPORTS: Report[] = [
       { label: "ARIMA F1 Score",     value: "0.536",  accent: "#f59e0b" },
     ],
     highlights: [
-      "Ensemble RMSE ₹142.6 — 28% lower than LSTM (₹198.4), 43% lower than ARIMA (₹248.3)",
+      "Ensemble RMSE ₹142.6 - 28% lower than LSTM (₹198.4), 43% lower than ARIMA (₹248.3)",
       "Rate-hike stress (Jun–Sep 2022): Ensemble +11.4% net P&L · LSTM +4.2% · ARIMA −8.1%",
-      "ARIMA Precision 47.6% (below random) — bullish bias flooded test set with false buy signals",
+      "ARIMA Precision 47.6% (below random) - bullish bias flooded test set with false buy signals",
       "Ensemble Precision 65.4% · Recall 68.2% · F1 0.668; ARIMA F1 0.536 despite higher Recall",
     ],
     methodology: "575-day OHLCV (Yahoo Finance · TCS.csv) · 70/30 train/test · Walk-forward OOS · ARIMA(1,1,1) · LSTM 64→32 units, dropout 0.2, 60-day lookback (close + volume + RSI + MACD)",
@@ -147,7 +147,7 @@ const RIGOUR = [
   {
     icon: Zap, color: "#a855f7",
     title: "Realistic Cost Modelling",
-    desc:  "Algo backtests include 0.05% brokerage per leg, 0.10% slippage, and 0.025% STT on sell-side. No frictionless idealisation - every trade carries full transaction cost.",
+    desc:  "Algo backtests include 0.05% brokerage per leg, 0.10% slippage and 0.025% STT on sell-side. No frictionless idealisation - every trade carries full transaction cost.",
   },
   {
     icon: BarChart2, color: "#f59e0b",
@@ -253,8 +253,8 @@ export default function ReportsPage() {
 
           <p className="text-sm md:text-base max-w-2xl mb-14 leading-relaxed" style={{ color: "rgba(228,232,240,0.5)" }}>
             Every claim DiversiFi makes is grounded in data. Five original studies - two live
-            paper-trading backtests on Nifty 50, and three three-way model comparisons
-            (LangGraph Ensemble vs ARIMA vs LSTM) on TSLA, Reliance, and TCS - all with
+            paper-trading backtests on Nifty 50 and three three-way model comparisons
+            (LangGraph Ensemble vs ARIMA vs LSTM) on TSLA, Reliance and TCS - all with
             full methodology and out-of-sample validation.
           </p>
 
@@ -311,7 +311,7 @@ export default function ReportsPage() {
               LangGraph vs ARIMA vs LSTM - across three stocks
             </h2>
             <p className="mt-2 text-sm max-w-xl" style={{ color: "rgba(228,232,240,0.5)" }}>
-              Three independent walk-forward comparisons on Tesla (TSLA), Reliance Industries, and TCS.
+              Three independent walk-forward comparisons on Tesla (TSLA), Reliance Industries and TCS.
               Ensemble wins on every stock across every metric - stress-tested on regime-change events
               (COVID, Fed rate hikes, Jio fundraising) that price-only models cannot anticipate.
             </p>
@@ -369,7 +369,7 @@ export default function ReportsPage() {
                 <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: "#00D09C" }}>Open any report</p>
                 <h2 className="text-2xl md:text-3xl font-black text-white mb-2">All 5 studies, full detail</h2>
                 <p className="text-sm max-w-md" style={{ color: "rgba(228,232,240,0.5)" }}>
-                  Each report is a self-contained HTML document with methodology, data tables, charts, and conclusions - all in one place.
+                  Each report is a self-contained HTML document with methodology, data tables, charts and conclusions - all in one place.
                 </p>
               </div>
               <div className="flex flex-col gap-3 shrink-0 w-full md:w-auto">
@@ -405,6 +405,7 @@ export default function ReportsPage() {
           <span className="font-bold text-sm text-white">DiversiFi</span>
         </Link>
         <div className="flex items-center gap-6">
+          <a href="/financial-glossary.html" className="text-xs hover:text-white transition-colors" style={{ color: "rgba(228,232,240,0.4)" }}>Glossary</a>
           <Link to="/algo-trading" className="text-xs hover:text-white transition-colors" style={{ color: "rgba(228,232,240,0.4)" }}>Algo Trading</Link>
           <Link to="/alphamind" className="text-xs hover:text-white transition-colors" style={{ color: "rgba(228,232,240,0.4)" }}>AlphaMind</Link>
           <Link to="/" className="text-xs hover:text-white transition-colors" style={{ color: "rgba(228,232,240,0.4)" }}>Home</Link>

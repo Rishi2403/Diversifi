@@ -182,7 +182,7 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--border);color
 <section id="system-arch">
 <h2>2. System Architecture</h2>
 
-<p>The Jan–Jul 2026 simulation uses a modified version of the LangGraph pipeline from H1 2025, with three configuration changes: (1) multi-sample LLM ensemble (N=3 runs per signal, majority vote), (2) 48-hour rolling news lookback (up from 24 h), and (3) QuantConnect LEAN integration for event-driven execution simulation.</p>
+<p>The Jan–Jul 2026 simulation uses a modified version of the LangGraph pipeline from H1 2025, with three configuration changes: (1) multi-sample LLM ensemble (N=3 runs per signal, majority vote), (2) 48-hour rolling news lookback (up from 24 h) and (3) QuantConnect LEAN integration for event-driven execution simulation.</p>
 
 <svg viewBox="0 0 940 240" overflow="visible" class="diagram" role="img" aria-label="System architecture: LangGraph signal pipeline feeding QuantConnect LEAN execution simulator">
   <defs>
@@ -341,7 +341,7 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--border);color
 </div>
 
 <h3>Backtesting Infrastructure - QuantConnect LEAN</h3>
-<p>Trade execution simulation and portfolio accounting for this period were run through the <strong>QuantConnect LEAN</strong> open-source engine. LEAN replays historical NSE OHLCV data in strict chronological order - eliminating look-ahead bias and providing institutional-grade fill simulation including order queuing, partial fills, and realistic cost accounting.</p>
+<p>Trade execution simulation and portfolio accounting for this period were run through the <strong>QuantConnect LEAN</strong> open-source engine. LEAN replays historical NSE OHLCV data in strict chronological order - eliminating look-ahead bias and providing institutional-grade fill simulation including order queuing, partial fills and realistic cost accounting.</p>
 <div class="table-wrap">
 <table class="dist compact">
   <thead><tr><th>Responsibility</th><th>Component</th></tr></thead>
@@ -723,9 +723,9 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--border);color
 <h2>11. Limitations &amp; Disclaimers</h2>
 
 <ul>
-  <li><strong>Simulated data, not live trading:</strong> All results are from a paper-trading simulation using historical data. Live trading involves execution risk, market impact, and slippage that simulations cannot fully capture.</li>
+  <li><strong>Simulated data, not live trading:</strong> All results are from a paper-trading simulation using historical data. Live trading involves execution risk, market impact and slippage that simulations cannot fully capture.</li>
   <li><strong>QuantConnect LEAN simulation assumptions:</strong> LEAN's fill model assumes trades execute at the next-day open price. In reality, especially during the February 2026 stress event, opening gaps could have led to significantly worse fill prices than modelled.</li>
-  <li><strong>GNews API coverage gaps:</strong> News from tier-2 business sources, vernacular media, and analyst conference calls is not captured. Significant market-moving information from these sources may have been missed.</li>
+  <li><strong>GNews API coverage gaps:</strong> News from tier-2 business sources, vernacular media and analyst conference calls is not captured. Significant market-moving information from these sources may have been missed.</li>
   <li><strong>LLM non-determinism:</strong> Even with N=3 ensemble majority voting, Claude Sonnet responses retain some variance. A different seed run may produce materially different conviction scores for borderline signals.</li>
   <li><strong>Narrow universe:</strong> Only Nifty 50 stocks were included. The information asymmetry advantage that drives LLM-based alpha is likely higher in mid- and small-caps.</li>
   <li><strong>February 2026 event not forecastable:</strong> The global risk-off event in February was not predictable from the input signal set (domestic news + FII flows). A macro risk overlay (e.g., VIX threshold, global equity correlation alert) could have reduced exposure before the event.</li>

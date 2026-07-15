@@ -163,7 +163,7 @@
 </div>
 
 <div class="callout tip">
-  <strong>LangGraph Ensemble ranks 1st across all nine metrics</strong> — including Precision (65.4%), Recall (68.2%), and F1 Score (0.668). On TCS, where price action is heavily driven by Fed rate decisions, attrition commentary, and deal win press releases, the ensemble's ability to fuse macro-news with price signals is a clear structural advantage. ARIMA's F1 of 0.536 and negative Sharpe tells a specific story: it predicted "bullish" so often (high Recall 61.2%) that its Precision collapsed to 47.6% — below random — generating a flood of false buy signals into a de-rating market.
+  <strong>LangGraph Ensemble ranks 1st across all nine metrics</strong> - including Precision (65.4%), Recall (68.2%) and F1 Score (0.668). On TCS, where price action is heavily driven by Fed rate decisions, attrition commentary and deal win press releases, the ensemble's ability to fuse macro-news with price signals is a clear structural advantage. ARIMA's F1 of 0.536 and negative Sharpe tells a specific story: it predicted "bullish" so often (high Recall 61.2%) that its Precision collapsed to 47.6% - below random - generating a flood of false buy signals into a de-rating market.
 </div>
 
 <h3>KPI Summary</h3>
@@ -172,11 +172,11 @@
   <div class="stat-card stat-card-ok"><div class="stat-value">0.668</div><div class="stat-label">Best F1 Score (Ensemble)</div></div>
   <div class="stat-card stat-card-ok"><div class="stat-value">68.2%</div><div class="stat-label">Best Recall (Ensemble)</div></div>
   <div class="stat-card stat-card-ok"><div class="stat-value">0.94</div><div class="stat-label">Best Signal Sharpe (Ensemble)</div></div>
-  <div class="stat-card stat-card-fail"><div class="stat-value">47.6%</div><div class="stat-label">Worst Precision — ARIMA (bullish bias)</div></div>
+  <div class="stat-card stat-card-fail"><div class="stat-value">47.6%</div><div class="stat-label">Worst Precision - ARIMA (bullish bias)</div></div>
   <div class="stat-card"><div class="stat-value">575</div><div class="stat-label">Total Trading Days</div></div>
 </div>
 <div class="callout warn" style="margin-top:10px;">
-  <strong>Why ARIMA's Precision (47.6%) is lower than random:</strong> ARIMA extrapolated 2021's bull trend into 2022's rate-hike de-rating, generating "Buy" signals on 61.2% of test days (high Recall). But only 47.6% of those predicted up-days actually moved up — meaning more than half its buy calls were wrong. This systematic bullish over-prediction is exactly what drives the −0.09 Signal Sharpe. F1 = 2·P·R / (P+R) = 2·0.476·0.612 / (0.476+0.612) = 0.536.
+  <strong>Why ARIMA's Precision (47.6%) is lower than random:</strong> ARIMA extrapolated 2021's bull trend into 2022's rate-hike de-rating, generating "Buy" signals on 61.2% of test days (high Recall). But only 47.6% of those predicted up-days actually moved up - meaning more than half its buy calls were wrong. This systematic bullish over-prediction is exactly what drives the −0.09 Signal Sharpe. F1 = 2·P·R / (P+R) = 2·0.476·0.612 / (0.476+0.612) = 0.536.
 </div>
 <div class="callout" style="margin-top:8px;">
   <strong>Precision, Recall &amp; F1</strong> treat directional prediction as a binary classification task (up-day = positive class). Precision = of all predicted up-days, the fraction that actually rose. Recall = of all actual up-days, the fraction the model caught. F1 = harmonic mean of both. F1 = 2·P·R / (P+R).
@@ -341,7 +341,7 @@
 <!-- ────────────────────────────────────────────────────── -->
 <section id="lstm">
 <h2>5. LSTM Baseline (2-layer) <span class="pill pill-purple" style="vertical-align:middle;">Rank 2</span></h2>
-<p>Two-layer LSTM (64 → 32 units, dropout 0.2) trained on 60-day lookback windows of close price, volume, RSI(14), and MACD. Walk-forward re-training every quarter on the expanding window.</p>
+<p>Two-layer LSTM (64 → 32 units, dropout 0.2) trained on 60-day lookback windows of close price, volume, RSI(14) and MACD. Walk-forward re-training every quarter on the expanding window.</p>
 
 <div class="stat-row">
   <div class="stat-card"><div class="stat-value">57.2%</div><div class="stat-label">Directional Accuracy</div></div>
@@ -388,7 +388,7 @@
       <tr><td>Signal Sharpe</td><td class="num pos">0.94</td><td class="num">0.44</td><td class="num neg">−0.09</td><td><span class="pill pill-blue">Ensemble</span> 2.1× LSTM; ARIMA destroys value</td></tr>
       <tr><td>Win Rate</td><td class="num pos">59.8%</td><td class="num">53.7%</td><td class="num">49.4%</td><td><span class="pill pill-blue">Ensemble</span></td></tr>
       <tr><td>Worst sub-period Sharpe</td><td class="num">0.81</td><td class="num">0.21</td><td class="num neg">−0.48</td><td><span class="pill pill-blue">Ensemble</span> most robust</td></tr>
-      <tr><td>Precision (up-day)</td><td class="num pos">65.4%</td><td class="num">59.8%</td><td class="num neg">47.6%</td><td><span class="pill pill-blue">Ensemble</span> · ARIMA below-random — bullish over-prediction</td></tr>
+      <tr><td>Precision (up-day)</td><td class="num pos">65.4%</td><td class="num">59.8%</td><td class="num neg">47.6%</td><td><span class="pill pill-blue">Ensemble</span> · ARIMA below-random - bullish over-prediction</td></tr>
       <tr><td>Recall (up-day)</td><td class="num pos">68.2%</td><td class="num">62.4%</td><td class="num">61.2%</td><td><span class="pill pill-blue">Ensemble</span> · ARIMA's high recall = false positives, not skill</td></tr>
       <tr><td>F1 Score</td><td class="num pos">0.668</td><td class="num">0.611</td><td class="num neg">0.536</td><td><span class="pill pill-blue">Ensemble</span> · ARIMA F1 collapses once precision is factored in</td></tr>
     </tbody>

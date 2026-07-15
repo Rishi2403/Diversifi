@@ -9,14 +9,14 @@ const sections = [
     title: "1. Acceptance of Terms",
     content: [
       "By accessing or using DiversiFi, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the platform.",
-      "These terms apply to all visitors, users, and anyone who accesses or uses DiversiFi.",
+      "These terms apply to all visitors, users and anyone who accesses or uses DiversiFi.",
     ],
   },
   {
     title: "2. Nature of the Service",
     content: [
       "**Academic research project** - DiversiFi is developed as a final-year academic project. It is provided for educational and research demonstration purposes only.",
-      "**Not financial advice** - Nothing on DiversiFi constitutes financial, investment, tax, or legal advice. Portfolio scores, AI verdicts, simulations, and all other outputs are for informational and demonstration purposes only.",
+      "**Not financial advice** - Nothing on DiversiFi constitutes financial, investment, tax, or legal advice. Portfolio scores, AI verdicts, simulations and all other outputs are for informational and demonstration purposes only.",
       "**Not a registered advisor** - DiversiFi is not a SEBI-registered investment advisor, stockbroker, or any other regulated financial entity.",
     ],
   },
@@ -24,7 +24,7 @@ const sections = [
     title: "3. No Liability for Investment Decisions",
     content: [
       "Any investment decision you make based on information presented on DiversiFi is entirely your own responsibility.",
-      "The DiversiFi team, contributors, and affiliated institutions expressly disclaim all liability for any losses, damages, or consequences - direct or indirect - arising from reliance on this platform.",
+      "The DiversiFi team, contributors and affiliated institutions expressly disclaim all liability for any losses, damages, or consequences - direct or indirect - arising from reliance on this platform.",
       "Past simulated performance shown (including the Algo Trading Engine backtest results) does not guarantee future returns.",
     ],
   },
@@ -39,8 +39,8 @@ const sections = [
   {
     title: "5. Intellectual Property",
     content: [
-      "The DiversiFi codebase, design, and content are the intellectual property of the development team. Unauthorised reproduction or commercial use is prohibited.",
-      "Third-party data, APIs, and libraries used within DiversiFi remain the property of their respective owners and are governed by their own licenses.",
+      "The DiversiFi codebase, design and content are the intellectual property of the development team. Unauthorised reproduction or commercial use is prohibited.",
+      "Third-party data, APIs and libraries used within DiversiFi remain the property of their respective owners and are governed by their own licenses.",
     ],
   },
   {
@@ -103,7 +103,7 @@ export default function TermsPage() {
         <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-5 py-4 mb-10">
           <p className="text-red-700 dark:text-red-400 text-sm font-semibold">Not Financial Advice</p>
           <p className="text-red-700/80 dark:text-red-400/80 text-xs mt-1 leading-relaxed">
-            DiversiFi is an academic research project. All analysis, scores, simulations, and AI
+            DiversiFi is an academic research project. All analysis, scores, simulations and AI
             verdicts are for informational and demonstration purposes only. Do not make investment
             decisions based solely on this platform.
           </p>

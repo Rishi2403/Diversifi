@@ -163,7 +163,7 @@
 </div>
 
 <div class="callout tip">
-  <strong>LangGraph Ensemble ranks 1st across all nine metrics</strong> — including Precision (68.2%), Recall (70.8%), and F1 Score (0.694). On a high-volatility stock like Reliance (35.4% annual vol) with a regime-changing event (COVID), news-sentiment fusion gives the ensemble an edge that purely statistical models cannot replicate - particularly for the April 2020 Jio Platforms deal signals where the ensemble correctly turned bullish (Recall 70.8%) while ARIMA and LSTM remained flat.
+  <strong>LangGraph Ensemble ranks 1st across all nine metrics</strong> - including Precision (68.2%), Recall (70.8%) and F1 Score (0.694). On a high-volatility stock like Reliance (35.4% annual vol) with a regime-changing event (COVID), news-sentiment fusion gives the ensemble an edge that purely statistical models cannot replicate - particularly for the April 2020 Jio Platforms deal signals where the ensemble correctly turned bullish (Recall 70.8%) while ARIMA and LSTM remained flat.
 </div>
 
 <h3>KPI Summary</h3>
@@ -176,7 +176,7 @@
   <div class="stat-card"><div class="stat-value">708</div><div class="stat-label">Total Trading Days</div></div>
 </div>
 <div class="callout" style="margin-top:10px;">
-  <strong>Precision, Recall &amp; F1</strong> treat directional prediction as a binary classification task (up-day = positive class). Precision = of all predicted up-days, the fraction that actually rose. Recall = of all actual up-days, the fraction the model caught. F1 = harmonic mean of both. A model must achieve both to score high — recall without precision means too many false buy signals; precision without recall means missing real opportunities. F1 = 2·P·R / (P+R).
+  <strong>Precision, Recall &amp; F1</strong> treat directional prediction as a binary classification task (up-day = positive class). Precision = of all predicted up-days, the fraction that actually rose. Recall = of all actual up-days, the fraction the model caught. F1 = harmonic mean of both. A model must achieve both to score high - recall without precision means too many false buy signals; precision without recall means missing real opportunities. F1 = 2·P·R / (P+R).
 </div>
 </section>
 
@@ -337,7 +337,7 @@
 <!-- ────────────────────────────────────────────────────── -->
 <section id="lstm">
 <h2>5. LSTM Baseline (2-layer) <span class="pill pill-purple" style="vertical-align:middle;">Rank 2</span></h2>
-<p>Two-layer LSTM (64 → 32 units, dropout 0.2) trained on 60-day lookback windows of close price, volume, and 14-day RSI. Adam optimiser, MSE loss, 50 epochs. Walk-forward re-training every quarter on the expanding window.</p>
+<p>Two-layer LSTM (64 → 32 units, dropout 0.2) trained on 60-day lookback windows of close price, volume and 14-day RSI. Adam optimiser, MSE loss, 50 epochs. Walk-forward re-training every quarter on the expanding window.</p>
 
 <div class="stat-row">
   <div class="stat-card"><div class="stat-value">58.4%</div><div class="stat-label">Directional Accuracy</div></div>
@@ -385,7 +385,7 @@
       <tr><td>Win Rate</td><td class="num pos">61.2%</td><td class="num">55.3%</td><td class="num">51.7%</td><td><span class="pill pill-blue">Ensemble</span></td></tr>
       <tr><td>Worst sub-period Sharpe</td><td class="num">1.14</td><td class="num">0.49</td><td class="num neg">−0.09</td><td><span class="pill pill-blue">Ensemble</span> most robust</td></tr>
       <tr><td>Precision (up-day)</td><td class="num pos">68.2%</td><td class="num">61.3%</td><td class="num">54.2%</td><td><span class="pill pill-blue">Ensemble</span> ARIMA barely above random</td></tr>
-      <tr><td>Recall (up-day)</td><td class="num pos">70.8%</td><td class="num">57.8%</td><td class="num">52.4%</td><td><span class="pill pill-blue">Ensemble</span> +13pp vs LSTM — captures more up-moves</td></tr>
+      <tr><td>Recall (up-day)</td><td class="num pos">70.8%</td><td class="num">57.8%</td><td class="num">52.4%</td><td><span class="pill pill-blue">Ensemble</span> +13pp vs LSTM - captures more up-moves</td></tr>
       <tr><td>F1 Score</td><td class="num pos">0.694</td><td class="num">0.595</td><td class="num">0.533</td><td><span class="pill pill-blue">Ensemble</span> 16% higher F1 than LSTM; ARIMA near-random</td></tr>
     </tbody>
   </table>
@@ -428,7 +428,7 @@
 </table>
 </div>
 <div class="callout warn">
-  <strong>Limitations:</strong> All metrics are in-sample walk-forward estimates - live trading would incur transaction costs (~0.05% per leg on NSE), market impact, and slippage not reflected here. Directional accuracy also does not capture magnitude: a model correct 55% of the time with large winners can outperform a 64% accurate model with small wins and large losses.
+  <strong>Limitations:</strong> All metrics are in-sample walk-forward estimates - live trading would incur transaction costs (~0.05% per leg on NSE), market impact and slippage not reflected here. Directional accuracy also does not capture magnitude: a model correct 55% of the time with large winners can outperform a 64% accurate model with small wins and large losses.
 </div>
 </section>
 

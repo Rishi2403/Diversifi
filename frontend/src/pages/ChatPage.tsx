@@ -128,7 +128,7 @@ export default function ChatPage() {
         setMessages([{
           id: "welcome",
           role: "assistant",
-          content: "Hello! I'm your **AI Investment Advisor**, powered by Claude.\n\nI can help you with stocks, mutual funds, portfolio strategy, market analysis, and anything finance-related for Indian markets.\n\nWhat would you like to explore today?",
+          content: "Hello! I'm your **AI Investment Advisor**, powered by Claude.\n\nI can help you with stocks, mutual funds, portfolio strategy, market analysis and anything finance-related for Indian markets.\n\nWhat would you like to explore today?",
         }]);
       }
     } catch {

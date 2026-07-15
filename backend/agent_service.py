@@ -191,16 +191,16 @@ def _compute_alerts(holdings_with_prices: list[dict], prev_alerts: list[dict],
 
         if chg <= imm_day or (trend >= imm_trend and chg < 0):
             if chg <= imm_day:
-                issue = f"Down {abs(chg):.1f}% today — sharp single-day decline"
+                issue = f"Down {abs(chg):.1f}% today - sharp single-day decline"
             else:
-                issue = f"{trend} consecutive down days — sustained decline trend"
+                issue = f"{trend} consecutive down days - sustained decline trend"
             immediate.append({**base, "issue": issue,
                                "action": f"Review {sym} position. Consider stop-loss or partial exit."})
         elif chg <= cau_day or (trend >= cau_trend and chg < 0):
             if chg <= cau_day:
                 issue = f"Down {abs(chg):.1f}% today"
             else:
-                issue = f"{trend} consecutive down days — watch for continued weakness"
+                issue = f"{trend} consecutive down days - watch for continued weakness"
             caution.append({**base, "issue": issue,
                             "action": f"Monitor {sym} closely and check for adverse news."})
 
@@ -220,7 +220,7 @@ def _claude_verdict(user_data: dict, immediate: list, caution: list, prices: dic
 
     api_key  = os.getenv("ANTHROPIC_API_KEY", "")
     resource = os.getenv("ANTHROPIC_FOUNDRY_RESOURCE", "")
-    # Pass timeout at SDK level — this is the correct way to cap wall-clock time.
+    # Pass timeout at SDK level - this is the correct way to cap wall-clock time.
     # ThreadPoolExecutor.as_context_manager waits for threads on exit, defeating timeouts.
     if resource:
         client = anthropic.AnthropicFoundry(api_key=api_key, resource=resource, timeout=45.0)
@@ -275,7 +275,7 @@ def _claude_verdict(user_data: dict, immediate: list, caution: list, prices: dic
     # Horizon-calibrated instruction
     if is_long_term:
         patience_note = (
-            f"\nIMPORTANT — LONG-TERM INVESTOR ({horizon_years}-year horizon for {', '.join(goals)}): "
+            f"\nIMPORTANT - LONG-TERM INVESTOR ({horizon_years}-year horizon for {', '.join(goals)}): "
             "Daily price moves < 10% are market noise. Do NOT use 'Immediate Action' for them. "
             f"Reserve 'Immediate Action' for: single-day drops > 15%, or {max(8, horizon_years//2)}+ "
             "consecutive down days. Frame every recommendation around the long-term goal."
@@ -288,13 +288,13 @@ def _claude_verdict(user_data: dict, immediate: list, caution: list, prices: dic
 
     prompt = f"""You are a concise Indian portfolio advisor AI acting autonomously on behalf of the investor. Analyse this portfolio and respond with JSON only.{patience_note}
 
-TONE RULE: Write as the agent reporting what it observes or is doing — never instruct the investor. Use declarative language ("is being monitored", "has been flagged", "the agent will escalate if...") not imperative ("monitor this", "consider selling", "check the news", "review position"). The investor is not expected to take any action.
+TONE RULE: Write as the agent reporting what it observes or is doing - never instruct the investor. Use declarative language ("is being monitored", "has been flagged", "the agent will escalate if...") not imperative ("monitor this", "consider selling", "check the news", "review position"). The investor is not expected to take any action.
 
 Investor profile (captured at onboarding):
 - Risk appetite: {risk_appetite}
 - Goal(s): {', '.join(goals)}
 - Horizon: {horizon} ({horizon_years} years)
-- Investment style: {inv_style} — monthly: ₹{monthly_inv:,}{sip_gap}{sector_lines}
+- Investment style: {inv_style} - monthly: ₹{monthly_inv:,}{sip_gap}{sector_lines}
 
 Portfolio:
 - {len(stocks)} equity holdings, {len(mfs)} mutual funds
@@ -309,10 +309,10 @@ Rule-based alerts (review in context of the investor's profile):
 Respond with ONLY this JSON (no markdown):
 {{
   "verdict": "All Good" | "Caution" | "Immediate Action",
-  "verdictReason": "one sentence — reference the specific goal and horizon",
+  "verdictReason": "one sentence - reference the specific goal and horizon",
   "overallSummary": "2-3 sentences: today's portfolio moves, overall health, one forward-looking insight tied to the goal",
   "topAlerts": [
-    {{"holding": "symbol or 'Portfolio'", "issue": "specific issue", "action": "what the agent is doing or will do — e.g. 'Being monitored for further weakness', 'Will escalate if decline continues past X days'"}}
+    {{"holding": "symbol or 'Portfolio'", "issue": "specific issue", "action": "what the agent is doing or will do - e.g. 'Being monitored for further weakness', 'Will escalate if decline continues past X days'"}}
   ]
 }}"""
 
@@ -372,7 +372,7 @@ def _analyse_user(email: str, data_file: str) -> None:
     agent_st  = user.setdefault("agentState", {})
     act_log   = agent_st.setdefault("activityLog", [])
 
-    # Initialise all outputs — always persisted even on partial failure
+    # Initialise all outputs - always persisted even on partial failure
     activity:    list[dict] = []
     prices:      dict       = {}
     news_map:    dict       = {}
@@ -421,7 +421,7 @@ def _analyse_user(email: str, data_file: str) -> None:
                 _emit(icon, f"{sym} news sentiment: {sent['label']} ({len(sent['headlines'])} articles)")
                 _push(email, {"type": "sentiment_update", "symbol": sym, "sentiment": sent})
 
-        # ── 3. Trend tracking — ONE update per trading day per symbol ──────────
+        # ── 3. Trend tracking - ONE update per trading day per symbol ──────────
         today_str = datetime.datetime.now().strftime("%Y-%m-%d")
         enriched = []
         for s in stocks:
@@ -459,11 +459,11 @@ def _analyse_user(email: str, data_file: str) -> None:
 
         if immediate:
             for a in immediate:
-                _emit("🚨", f"ALERT: {a['symbol']} — {a['issue']}", "error")
+                _emit("🚨", f"ALERT: {a['symbol']} - {a['issue']}", "error")
                 _push(email, {"type": "alert_added", "alert": {**a, "tier": "immediate"}})
         if caution:
             for a in caution:
-                _emit("⚠️", f"CAUTION: {a['symbol']} — {a['issue']}", "warn")
+                _emit("⚠️", f"CAUTION: {a['symbol']} - {a['issue']}", "warn")
                 _push(email, {"type": "alert_added", "alert": {**a, "tier": "caution"}})
         if not immediate and not caution:
             _emit("✅", "All holdings within normal range", "success")
@@ -476,7 +476,7 @@ def _analyse_user(email: str, data_file: str) -> None:
         icon_map  = {"All Good": "✅", "Caution": "⚠️", "Immediate Action": "🚨"}
         level_map = {"All Good": "success", "Caution": "warn", "Immediate Action": "error"}
         _emit(icon_map.get(verdict, "✅"),
-              f"Analysis complete — Verdict: {verdict}. {verdict_data.get('verdictReason', '')}",
+              f"Analysis complete - Verdict: {verdict}. {verdict_data.get('verdictReason', '')}",
               level_map.get(verdict, "info"))
 
         _push(email, {"type": "verdict_update",
@@ -515,7 +515,7 @@ def _analyse_user(email: str, data_file: str) -> None:
                 "topAlerts": [],
             }
 
-    # ── 6. Persist — always runs, even on partial failure ────────────────────
+    # ── 6. Persist - always runs, even on partial failure ────────────────────
     now_iso = datetime.datetime.now().isoformat()
     act_log = (activity + act_log)[:MAX_ACTIVITY_LOG]
 

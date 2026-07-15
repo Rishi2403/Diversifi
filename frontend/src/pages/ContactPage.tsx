@@ -83,7 +83,7 @@ export default function ContactPage() {
           <h1 className="text-3xl font-bold text-foreground">Get in Touch</h1>
           <p className="text-muted-foreground mt-2 text-sm leading-relaxed max-w-xl">
             DiversiFi is an academic research project. We're a small team of students -
-            we welcome feedback, bug reports, and questions.
+            we welcome feedback, bug reports and questions.
           </p>
         </div>
 
@@ -161,7 +161,7 @@ export default function ContactPage() {
           <p className="text-xs text-muted-foreground leading-relaxed">
             <strong className="text-foreground">Academic Disclaimer:</strong> DiversiFi is developed
             as a final-year research project and is not a commercial product. All features,
-            analyses, and AI outputs are for demonstration and research purposes only and do not
+            analyses and AI outputs are for demonstration and research purposes only and do not
             constitute financial advice.
           </p>
         </div>

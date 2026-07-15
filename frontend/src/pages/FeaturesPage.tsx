@@ -27,7 +27,7 @@ const FEATURES = [
     accentBorder: "rgba(0,208,156,0.22)",
     badge: "Portfolio Intelligence",
     headline: "Know exactly where\nyour portfolio stands",
-    sub: "AI-powered health scoring breaks down diversification, overlap, concentration risk, and benchmark alignment - then tells you what to do about it.",
+    sub: "AI-powered health scoring breaks down diversification, overlap, concentration risk and benchmark alignment - then tells you what to do about it.",
     capabilities: [
       "0-100 health score across 6 sub-dimensions",
       "Mutual fund overlap detection across holdings",
@@ -57,10 +57,10 @@ const FEATURES = [
     accentBorder: "rgba(168,85,247,0.22)",
     badge: "Monte Carlo Engine",
     headline: "See every possible future\nbefore you invest",
-    sub: "5,000-path GBM simulation with year-wise SIP/SWP planning, AI-mapped industry and geopolitical scenarios, and a Sharpe-calibrated fan chart.",
+    sub: "5,000-path GBM simulation with year-wise SIP/SWP planning, AI-mapped industry and geopolitical scenarios and a Sharpe-calibrated fan chart.",
     capabilities: [
       "5,000 Monte Carlo paths (GBM model)",
-      "Year-wise SIP, SWP, and lumpsum planning",
+      "Year-wise SIP, SWP and lumpsum planning",
       "Fund-wise or auto-allocated SIP modes",
       "Industry, geopolitical & inflation scenarios",
       "AI per-holding scenario impact analysis",
@@ -86,7 +86,7 @@ const FEATURES = [
     accentBorder: "rgba(0,184,255,0.22)",
     badge: "Deep Stock Research",
     headline: "Research any stock\nin seconds, not hours",
-    sub: "Multi-agent AI synthesises fundamentals, technical signals, news sentiment, and peer comparisons into a single structured research report.",
+    sub: "Multi-agent AI synthesises fundamentals, technical signals, news sentiment and peer comparisons into a single structured research report.",
     capabilities: [
       "AI-generated full research report",
       "Fundamental analysis (P/E, ROE, margins)",
@@ -117,7 +117,7 @@ const FEATURES = [
     accentBorder: "rgba(245,158,11,0.22)",
     badge: "Live Market Intelligence",
     headline: "Global markets, indices,\ncommodities - in INR",
-    sub: "Real-time prices for 10+ global equity indices, gold, silver, crude oil, and crypto - all converted to INR for instant context.",
+    sub: "Real-time prices for 10+ global equity indices, gold, silver, crude oil and crypto - all converted to INR for instant context.",
     capabilities: [
       "10+ global index prices (Nifty, S&P, Nasdaq…)",
       "Commodities in INR: Gold, Silver, Oil, Gas",
@@ -588,7 +588,7 @@ export default function FeaturesPage() {
             {/* <Link to="/algo-trading" className="text-xs font-semibold flex items-center gap-1" style={{ color: "#00D09C" }}>
               <Cpu className="w-3 h-3" /> Algo Trading
             </Link> */}
-            <Link to="/financial-glossary.html" className="text-xs text-white/35 hover:text-white/65 transition-colors">Glossary</Link>
+            <a href="/financial-glossary.html" className="text-xs text-white/35 hover:text-white/65 transition-colors">Glossary</a>
             <Link to="/reports" className="text-xs text-white/35 hover:text-white/65 transition-colors">Reports</Link>
             <Link to="/privacy" className="text-xs text-white/35 hover:text-white/65 transition-colors">Privacy</Link>
           </div>
