@@ -585,9 +585,10 @@ export default function FeaturesPage() {
           </div>
           <div className="flex items-center gap-5 flex-wrap justify-center">
             <Link to="/" className="text-xs text-white/35 hover:text-white/65 transition-colors">Home</Link>
-            <Link to="/algo-trading" className="text-xs font-semibold flex items-center gap-1" style={{ color: "#00D09C" }}>
+            {/* <Link to="/algo-trading" className="text-xs font-semibold flex items-center gap-1" style={{ color: "#00D09C" }}>
               <Cpu className="w-3 h-3" /> Algo Trading
-            </Link>
+            </Link> */}
+            <Link to="/financial-glossary.html" className="text-xs text-white/35 hover:text-white/65 transition-colors">Glossary</Link>
             <Link to="/reports" className="text-xs text-white/35 hover:text-white/65 transition-colors">Reports</Link>
             <Link to="/privacy" className="text-xs text-white/35 hover:text-white/65 transition-colors">Privacy</Link>
           </div>

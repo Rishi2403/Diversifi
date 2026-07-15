@@ -17,16 +17,17 @@ interface LogEntry { timestamp: string; icon: string; message: string; level: st
 interface AlertItem { symbol: string; name?: string; is_mf?: boolean; issue: string; action: string; change_pct?: number; tier?: string; holding?: string; }
 
 interface AgentState {
-  lastChecked:    string | null;
-  verdict:        string;
-  verdictReason:  string;
-  overallSummary: string;
-  topAlerts:      AlertItem[];
-  alerts:         AlertItem[];
-  watchlist:      AlertItem[];
-  activityLog:    LogEntry[];
-  lastReportSentAt: string | null;
-  newsSentiment:  Record<string, { label: string; score: number; headlines: string[] }>;
+  lastChecked:       string | null;
+  verdict:           string;
+  verdictReason:     string;
+  overallSummary:    string;
+  llmVerdictContent: string;
+  topAlerts:         AlertItem[];
+  alerts:            AlertItem[];
+  watchlist:         AlertItem[];
+  activityLog:       LogEntry[];
+  lastReportSentAt:  string | null;
+  newsSentiment:     Record<string, { label: string; score: number; headlines: string[] }>;
 }
 
 interface DashboardData {
@@ -80,7 +81,8 @@ export default function AgentPage() {
   const [liveAlerts, setLiveAlerts] = useState<AlertItem[]>([]);
   const [verdict, setVerdict]       = useState("Analysing…");
   const [verdictReason, setVerdictReason] = useState("First analysis in progress…");
-  const [verdictSummary, setVerdictSummary] = useState("");
+  const [verdictSummary, setVerdictSummary]         = useState("");
+  const [llmVerdictContent, setLlmVerdictContent]   = useState("");
   const [topAlerts, setTopAlerts]   = useState<AlertItem[]>([]);
   const [prices, setPrices]         = useState<Record<string, { price: number; change1d: number }>>({});
 
@@ -107,7 +109,10 @@ export default function AgentPage() {
       setVerdict(st.verdict      || "All Good");
       setVerdictReason(st.verdictReason || "");
       setVerdictSummary(st.overallSummary || "");
+      setLlmVerdictContent(st.llmVerdictContent || st.overallSummary || "");
       setTopAlerts(st.topAlerts  || []);
+      // If still awaiting first analysis, keep analysing spinner on
+      if (!st.lastChecked) setAnalysing(true);
     } catch { /* ignore */ }
   }, []);
 
@@ -121,6 +126,8 @@ export default function AgentPage() {
         return;
       }
       setChecking(false);
+      // Show analysing spinner immediately if first analysis hasn't completed yet
+      if (!json.isAnalysisPresent) setAnalysing(true);
       await loadDashboard(email);
       connectSSE(email);
     }
@@ -153,6 +160,7 @@ export default function AgentPage() {
             setVerdict(ev.verdict);
             setVerdictReason(ev.reason || "");
             setVerdictSummary(ev.summary || "");
+            setLlmVerdictContent(ev.llmVerdictContent || ev.summary || "");
             setTopAlerts(ev.topAlerts || []);
             break;
           case "alert_added":
@@ -171,7 +179,10 @@ export default function AgentPage() {
       } catch { /* ignore */ }
     };
 
-    es.onerror = () => setTimeout(() => connectSSE(em), 5000);
+    es.onerror = () => {
+      // Reload persisted state before reconnecting so UI reflects last known analysis
+      loadDashboard(em).finally(() => setTimeout(() => connectSSE(em), 5000));
+    };
   }
 
   async function triggerRefresh() {
@@ -254,6 +265,7 @@ export default function AgentPage() {
             verdict={verdict}
             reason={verdictReason}
             summary={verdictSummary}
+            llmVerdictContent={llmVerdictContent}
             totalCurrent={summary.totalCurrent}
             totalPnL={summary.totalPnL}
             pnlPct={summary.pnlPct}

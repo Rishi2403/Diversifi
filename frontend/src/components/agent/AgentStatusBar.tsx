@@ -93,7 +93,7 @@ export default function AgentStatusBar({ lastChecked, verdict, onRefresh, analys
           onClick={onRefresh}
           disabled={analysing || !marketOpen}
           className="flex items-center gap-1 hover:text-foreground disabled:opacity-30 transition-colors"
-          title={!marketOpen ? "Only available during market hours" : "Refresh now"}
+          title={!marketOpen ? "Only available during market hours (9:15–15:30 IST)" : analysing ? "Analysis in progress…" : "Refresh now"}
         >
           <RefreshCw className={`w-3.5 h-3.5 ${analysing ? "animate-spin" : ""}`} />
           <span>Refresh</span>

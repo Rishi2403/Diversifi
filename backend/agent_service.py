@@ -154,27 +154,55 @@ def _news_sentiment(symbol: str) -> dict:
 # Alert logic
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _compute_alerts(holdings_with_prices: list[dict], prev_alerts: list[dict]) -> tuple[list[dict], list[dict]]:
-    """Returns (immediate_alerts, caution_alerts)."""
+def _compute_alerts(holdings_with_prices: list[dict], prev_alerts: list[dict],
+                    profile: dict | None = None) -> tuple[list[dict], list[dict]]:
+    """Returns (immediate_alerts, caution_alerts) using horizon-aware thresholds.
+
+    Long-term investors (horizon contains 'long', 'retire', or ≥10-year keywords):
+      - Caution:   single-day ≤ -8%  OR  ≥5 consecutive down days
+      - Immediate: single-day ≤ -15% OR  ≥10 consecutive down days
+    Short/medium-term:
+      - Caution:   single-day ≤ -3%  OR  ≥2 consecutive down days
+      - Immediate: single-day ≤ -8%  OR  ≥4 consecutive down days
+    """
+    import re as _re
     immediate, caution = [], []
-    prev_map = {a["symbol"]: a for a in prev_alerts}
+    horizon = str((profile or {}).get("horizon") or "")
+    m = _re.search(r"(\d+)", horizon)
+    horizon_years = int(m.group(1)) if m else (10 if "long" in horizon.lower() else 5)
+    long_term = horizon_years >= 7
+
+    if long_term:
+        imm_day, imm_trend = -15, 10
+        cau_day, cau_trend = -8,  5
+    else:
+        imm_day, imm_trend = -8,  4
+        cau_day, cau_trend = -3,  2
 
     for h in holdings_with_prices:
-        sym  = h.get("symbol", "")
-        chg  = h.get("change_pct")
+        sym   = h.get("symbol", "")
+        chg   = h.get("change_pct")
         if chg is None:
             continue
-        trend = h.get("trend_down_count", 0)  # consecutive down checks
+        trend = h.get("trend_down_count", 0)
 
         base = {"symbol": sym, "name": h.get("name", sym), "is_mf": h.get("is_mf", False),
                 "change_pct": chg, "current_value": h.get("current_value", 0)}
 
-        if chg <= -8 or (trend >= 3 and chg < 0):
-            immediate.append({**base, "issue": f"Down {abs(chg):.1f}% today - significant single-day decline",
-                               "action": f"Review position in {sym}. Consider partial exit or stop-loss review."})
-        elif chg <= -3 or (trend >= 2 and chg < 0):
-            caution.append({**base, "issue": f"Down {abs(chg):.1f}% today ({trend} consecutive declines)",
-                            "action": f"Monitor {sym} closely. Check for adverse news."})
+        if chg <= imm_day or (trend >= imm_trend and chg < 0):
+            if chg <= imm_day:
+                issue = f"Down {abs(chg):.1f}% today — sharp single-day decline"
+            else:
+                issue = f"{trend} consecutive down days — sustained decline trend"
+            immediate.append({**base, "issue": issue,
+                               "action": f"Review {sym} position. Consider stop-loss or partial exit."})
+        elif chg <= cau_day or (trend >= cau_trend and chg < 0):
+            if chg <= cau_day:
+                issue = f"Down {abs(chg):.1f}% today"
+            else:
+                issue = f"{trend} consecutive down days — watch for continued weakness"
+            caution.append({**base, "issue": issue,
+                            "action": f"Monitor {sym} closely and check for adverse news."})
 
     return immediate, caution
 
@@ -183,80 +211,138 @@ def _compute_alerts(holdings_with_prices: list[dict], prev_alerts: list[dict]) -
 # Claude verdict
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _claude_verdict(user_data: dict, immediate: list, caution: list, prices: dict) -> dict:
-    """Returns {verdict, verdictReason, topAlerts, overallSummary}."""
+def _claude_verdict(user_data: dict, immediate: list, caution: list, prices: dict,
+                    emit_fn=None) -> dict:
+    """Returns {verdict, verdictReason, topAlerts, overallSummary}. SDK timeout 45 s."""
     from dotenv import load_dotenv, find_dotenv
     load_dotenv(find_dotenv())
     import anthropic, os
 
     api_key  = os.getenv("ANTHROPIC_API_KEY", "")
     resource = os.getenv("ANTHROPIC_FOUNDRY_RESOURCE", "")
-    client   = anthropic.AnthropicFoundry(api_key=api_key, resource=resource) if resource else anthropic.Anthropic(api_key=api_key)
+    # Pass timeout at SDK level — this is the correct way to cap wall-clock time.
+    # ThreadPoolExecutor.as_context_manager waits for threads on exit, defeating timeouts.
+    if resource:
+        client = anthropic.AnthropicFoundry(api_key=api_key, resource=resource, timeout=45.0)
+    else:
+        client = anthropic.Anthropic(api_key=api_key, timeout=45.0)
+
+    import re as _re
 
     profile  = user_data.get("profile", {})
     holdings = user_data.get("holdings", {})
     stocks   = holdings.get("stocks", [])
     mfs      = holdings.get("mutualFunds", [])
-    total_cv = sum(float(s.get("currentValue", 0)) for s in stocks) + \
-               sum(float(m.get("currentValue", 0)) for m in mfs)
+    total_cv = sum(float(s.get("currentValue") or 0) for s in stocks) + \
+               sum(float(m.get("currentValue") or 0) for m in mfs)
+
+    # ── All onboarding fields, with safe fallbacks ───────────────────────────
+    horizon       = profile.get("horizon") or "long term"
+    risk_appetite = profile.get("riskAppetite") or "Moderate"
+    goals         = profile.get("goals") or ["wealth creation"]
+    inv_style     = profile.get("investmentStyle") or "SIP"
+    monthly_inv   = profile.get("monthlyInvestment") or 0
+    focus_sectors = profile.get("focusSectors") or []
+    avoid_sectors = profile.get("avoidSectors") or []
+
+    # Parse horizon into years for calibrated advice
+    m = _re.search(r"(\d+)", horizon)
+    horizon_years = int(m.group(1)) if m else (10 if "long" in horizon.lower() else 5)
+    is_long_term  = horizon_years >= 7
 
     price_lines = "\n".join(
-        f"  {sym}: {d['price']} ({'+' if d['change_pct']>=0 else ''}{d['change_pct']}%)"
+        f"  {sym}: ₹{d['price']} ({'+' if d['change_pct']>=0 else ''}{d['change_pct']}%)"
         for sym, d in list(prices.items())[:10]
     ) or "  (no live prices available)"
 
-    prompt = f"""You are a concise Indian portfolio advisor AI. Analyse this portfolio situation and respond in JSON.
+    # Sector preference notes
+    sector_lines = ""
+    if focus_sectors:
+        sector_lines += f"\n- Preferred sectors: {', '.join(focus_sectors)}"
+    if avoid_sectors:
+        sector_lines += f"\n- Sectors to avoid: {', '.join(avoid_sectors)}"
+        avoid_lower = {s.lower() for s in avoid_sectors}
+        avoid_hits  = [s["symbol"] for s in stocks
+                       if any(av in (s.get("sector") or "").lower() for av in avoid_lower)]
+        if avoid_hits:
+            sector_lines += f" (holdings possibly in avoided sectors: {', '.join(avoid_hits)})"
 
-User profile:
-- Risk appetite: {profile.get('riskAppetite', 'Moderate')}
-- Goals: {', '.join(profile.get('goals', ['wealth creation']))}
-- Horizon: {profile.get('horizon', 'long term')}
-- Monthly investment: ₹{profile.get('monthlyInvestment', 0):,}
+    sip_gap = (
+        "\n  ⚠ Investment style is SIP but no monthly amount is recorded."
+        if "sip" in inv_style.lower() and monthly_inv == 0 else ""
+    )
+
+    # Horizon-calibrated instruction
+    if is_long_term:
+        patience_note = (
+            f"\nIMPORTANT — LONG-TERM INVESTOR ({horizon_years}-year horizon for {', '.join(goals)}): "
+            "Daily price moves < 10% are market noise. Do NOT use 'Immediate Action' for them. "
+            f"Reserve 'Immediate Action' for: single-day drops > 15%, or {max(8, horizon_years//2)}+ "
+            "consecutive down days. Frame every recommendation around the long-term goal."
+        )
+    else:
+        patience_note = (
+            f"\nHorizon is {horizon_years} years. Use standard thresholds: "
+            "flag > 8% drops as Immediate Action, > 3% or 2+ down days as Caution."
+        )
+
+    prompt = f"""You are a concise Indian portfolio advisor AI acting autonomously on behalf of the investor. Analyse this portfolio and respond with JSON only.{patience_note}
+
+TONE RULE: Write as the agent reporting what it observes or is doing — never instruct the investor. Use declarative language ("is being monitored", "has been flagged", "the agent will escalate if...") not imperative ("monitor this", "consider selling", "check the news", "review position"). The investor is not expected to take any action.
+
+Investor profile (captured at onboarding):
+- Risk appetite: {risk_appetite}
+- Goal(s): {', '.join(goals)}
+- Horizon: {horizon} ({horizon_years} years)
+- Investment style: {inv_style} — monthly: ₹{monthly_inv:,}{sip_gap}{sector_lines}
 
 Portfolio:
-- {len(stocks)} stocks, {len(mfs)} mutual funds
-- Total current value: ₹{total_cv:,.0f}
-- Today's live prices:
+- {len(stocks)} equity holdings, {len(mfs)} mutual funds
+- Total value: ₹{total_cv:,.0f}
+- Live prices today:
 {price_lines}
 
-Immediate alerts ({len(immediate)}): {[a['symbol'] + ' ' + a['issue'] for a in immediate]}
-Caution items ({len(caution)}): {[a['symbol'] + ' ' + a['issue'] for a in caution]}
+Rule-based alerts (review in context of the investor's profile):
+  Immediate ({len(immediate)}): {[a['symbol'] + ': ' + a['issue'] for a in immediate] or 'none'}
+  Caution   ({len(caution)}):   {[a['symbol'] + ': ' + a['issue'] for a in caution] or 'none'}
 
 Respond with ONLY this JSON (no markdown):
 {{
   "verdict": "All Good" | "Caution" | "Immediate Action",
-  "verdictReason": "one sentence explaining the verdict",
-  "overallSummary": "2-3 sentence summary of portfolio health and market context today",
+  "verdictReason": "one sentence — reference the specific goal and horizon",
+  "overallSummary": "2-3 sentences: today's portfolio moves, overall health, one forward-looking insight tied to the goal",
   "topAlerts": [
-    {{"holding": "symbol", "issue": "short issue", "action": "short recommended action"}}
+    {{"holding": "symbol or 'Portfolio'", "issue": "specific issue", "action": "what the agent is doing or will do — e.g. 'Being monitored for further weakness', 'Will escalate if decline continues past X days'"}}
   ]
 }}"""
 
+    def _fallback():
+        if immediate:
+            v, r = "Immediate Action", f"{len(immediate)} holding(s) showing significant decline."
+        elif caution:
+            v, r = "Caution", f"{len(caution)} holding(s) worth monitoring closely."
+        else:
+            v, r = "All Good", "All holdings within normal range for this market session."
+        return {"verdict": v, "verdictReason": r, "overallSummary": r,
+                "topAlerts": (immediate + caution)[:3]}
+
     try:
         msg = client.messages.create(
-            model="claude-sonnet-4-6", max_tokens=512,
+            model="claude-sonnet-4-6", max_tokens=1024,
             messages=[{"role": "user", "content": prompt}]
         )
         raw = msg.content[0].text.strip()
-        # strip markdown fences if present
         if raw.startswith("```"):
             raw = raw.split("```")[1]
             if raw.startswith("json"):
                 raw = raw[4:]
         return json.loads(raw.strip())
     except Exception as e:
-        # fallback based on alert counts
-        if immediate:
-            v, r = "Immediate Action", f"{len(immediate)} holding(s) showing sharp decline today."
-        elif caution:
-            v, r = "Caution", f"{len(caution)} holding(s) need monitoring."
-        else:
-            v, r = "All Good", "Portfolio is performing within expected parameters."
-        return {
-            "verdict": v, "verdictReason": r,
-            "overallSummary": r,
-            "topAlerts": (immediate + caution)[:3]
-        }
+        err_msg = f"{type(e).__name__}: {str(e)[:120]}"
+        print(f"[agent] claude_verdict error: {err_msg}")
+        if emit_fn:
+            emit_fn("⚠️", f"AI error: {err_msg}", "warn")
+        return _fallback()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -285,9 +371,21 @@ def _analyse_user(email: str, data_file: str) -> None:
     mfs       = holdings.get("mutualFunds", [])
     agent_st  = user.setdefault("agentState", {})
     act_log   = agent_st.setdefault("activityLog", [])
-    prev_prices: dict = agent_st.get("lastPrices", {})
 
-    activity: list[dict] = []
+    # Initialise all outputs — always persisted even on partial failure
+    activity:    list[dict] = []
+    prices:      dict       = {}
+    news_map:    dict       = {}
+    trend_state: dict       = agent_st.get("trendState", {})
+    immediate:   list       = []
+    caution:     list       = []
+    verdict      = agent_st.get("verdict", "All Good")
+    verdict_data: dict = {
+        "verdict": verdict,
+        "verdictReason": agent_st.get("verdictReason", ""),
+        "overallSummary": agent_st.get("overallSummary", ""),
+        "topAlerts": agent_st.get("topAlerts", []),
+    }
 
     def _emit(icon, msg, level="info"):
         entry = _log_entry(icon, msg, level)
@@ -297,112 +395,161 @@ def _analyse_user(email: str, data_file: str) -> None:
     _push(email, {"type": "analysis_start"})
     _emit("🔄", "Starting portfolio analysis…")
 
-    # ── 1. Live prices ──────────────────────────────────────────────────────
-    stock_syms = [s["symbol"] for s in stocks if s.get("symbol")]
-    prices     = {}
-    if stock_syms:
-        _emit("📡", f"Fetching live prices for {len(stock_syms)} stocks…")
-        prices = _fetch_prices(stock_syms)
-        for sym, d in prices.items():
-            chg = d["change_pct"]
-            icon = "📈" if chg >= 0 else "📉"
-            level = "warn" if chg <= -3 else ("success" if chg >= 2 else "info")
-            _emit(icon, f"{sym} ₹{d['price']} ({'+' if chg>=0 else ''}{chg}%)", level)
-            _push(email, {"type": "price_update", "symbol": sym,
-                          "price": d["price"], "change1d": chg})
+    try:
+        # ── 1. Live prices ──────────────────────────────────────────────────
+        stock_syms = [s["symbol"] for s in stocks if s.get("symbol")]
+        if stock_syms:
+            _emit("📡", f"Fetching live prices for {len(stock_syms)} stocks…")
+            prices = _fetch_prices(stock_syms)
+            for sym, d in prices.items():
+                chg = d["change_pct"]
+                icon = "📈" if chg >= 0 else "📉"
+                level = "warn" if chg <= -3 else ("success" if chg >= 2 else "info")
+                _emit(icon, f"{sym} ₹{d['price']} ({'+' if chg>=0 else ''}{chg}%)", level)
+                _push(email, {"type": "price_update", "symbol": sym,
+                              "price": d["price"], "change1d": chg})
 
-    # ── 2. News sentiment for top 5 by value ────────────────────────────────
-    sorted_stocks = sorted(stocks, key=lambda s: float(s.get("currentValue", 0)), reverse=True)
-    top5 = [s["symbol"] for s in sorted_stocks[:5] if s.get("symbol")]
-    news_map: dict[str, dict] = {}
-    if top5:
-        _emit("🔍", f"Scanning news for top holdings: {', '.join(top5)}")
-        for sym in top5:
-            sent = _news_sentiment(sym)
-            news_map[sym] = sent
-            icon = "🟢" if sent["label"] == "Bullish" else ("🔴" if sent["label"] == "Bearish" else "⚪")
-            _emit(icon, f"{sym} news sentiment: {sent['label']} ({len(sent['headlines'])} articles)")
-            _push(email, {"type": "sentiment_update", "symbol": sym, "sentiment": sent})
+        # ── 2. News sentiment for top 5 by value ────────────────────────────
+        sorted_stocks = sorted(stocks, key=lambda s: float(s.get("currentValue") or 0), reverse=True)
+        top5 = [s["symbol"] for s in sorted_stocks[:5] if s.get("symbol")]
+        if top5:
+            _emit("🔍", f"Scanning news for top holdings: {', '.join(top5)}")
+            for sym in top5:
+                sent = _news_sentiment(sym)
+                news_map[sym] = sent
+                icon = "🟢" if sent["label"] == "Bullish" else ("🔴" if sent["label"] == "Bearish" else "⚪")
+                _emit(icon, f"{sym} news sentiment: {sent['label']} ({len(sent['headlines'])} articles)")
+                _push(email, {"type": "sentiment_update", "symbol": sym, "sentiment": sent})
 
-    # ── 3. Trend tracking (rolling 3-run window) ────────────────────────────
-    trend_state: dict = agent_st.get("trendState", {})
-    enriched = []
-    for s in stocks:
-        sym = s.get("symbol", "")
-        cv  = float(s.get("currentValue", 0))
-        pdata = prices.get(sym)
-        chg   = pdata["change_pct"] if pdata else None
+        # ── 3. Trend tracking — ONE update per trading day per symbol ──────────
+        today_str = datetime.datetime.now().strftime("%Y-%m-%d")
+        enriched = []
+        for s in stocks:
+            sym   = s.get("symbol", "")
+            cv    = float(s.get("currentValue") or 0)
+            pdata = prices.get(sym)
+            chg   = pdata["change_pct"] if pdata else None
 
-        # update trend counter
-        t = trend_state.get(sym, {"down_count": 0})
-        if chg is not None and chg < 0:
-            t["down_count"] = t.get("down_count", 0) + 1
-        elif chg is not None and chg >= 0:
-            t["down_count"] = 0
-        trend_state[sym] = t
+            t = trend_state.get(sym, {"down_count": 0, "last_date": ""})
+            # Guard: reset stale counters that have no last_date (old format)
+            if "last_date" not in t:
+                t = {"down_count": 0, "last_date": ""}
 
-        enriched.append({**s, "change_pct": chg, "trend_down_count": t["down_count"],
-                         "current_value": cv, "is_mf": False})
+            # Only increment/reset once per calendar day
+            if chg is not None and t.get("last_date") != today_str:
+                if chg < 0:
+                    t["down_count"] = t.get("down_count", 0) + 1
+                else:
+                    t["down_count"] = 0
+                t["last_date"] = today_str
+            trend_state[sym] = t
 
-    for mf in mfs:
-        enriched.append({**mf, "change_pct": None, "trend_down_count": 0,
-                         "current_value": float(mf.get("currentValue", 0)), "is_mf": True})
+            enriched.append({**s, "change_pct": chg, "trend_down_count": t["down_count"],
+                             "current_value": cv, "is_mf": False})
 
-    # ── 4. Alerts ────────────────────────────────────────────────────────────
-    _emit("🧮", "Computing portfolio alerts…")
-    prev_alerts = agent_st.get("alerts", [])
-    immediate, caution = _compute_alerts(enriched, prev_alerts)
+        for mf in mfs:
+            enriched.append({**mf, "change_pct": None, "trend_down_count": 0,
+                             "current_value": float(mf.get("currentValue") or 0), "is_mf": True})
 
-    if immediate:
-        for a in immediate:
-            _emit("🚨", f"ALERT: {a['symbol']} - {a['issue']}", "error")
-            _push(email, {"type": "alert_added", "alert": {**a, "tier": "immediate"}})
-    if caution:
-        for a in caution:
-            _emit("⚠️",  f"CAUTION: {a['symbol']} - {a['issue']}", "warn")
-            _push(email, {"type": "alert_added", "alert": {**a, "tier": "caution"}})
-    if not immediate and not caution:
-        _emit("✅", "All holdings within normal range", "success")
+        # ── 4. Alerts ────────────────────────────────────────────────────────
+        profile = user.get("profile", {})
+        _emit("🧮", "Computing portfolio alerts…")
+        prev_alerts = agent_st.get("alerts", [])
+        immediate, caution = _compute_alerts(enriched, prev_alerts, profile)
 
-    # ── 5. Claude verdict ────────────────────────────────────────────────────
-    _emit("🤖", "Synthesising portfolio verdict with AI…")
-    verdict_data = _claude_verdict(user, immediate, caution, prices)
-    verdict      = verdict_data.get("verdict", "All Good")
+        if immediate:
+            for a in immediate:
+                _emit("🚨", f"ALERT: {a['symbol']} — {a['issue']}", "error")
+                _push(email, {"type": "alert_added", "alert": {**a, "tier": "immediate"}})
+        if caution:
+            for a in caution:
+                _emit("⚠️", f"CAUTION: {a['symbol']} — {a['issue']}", "warn")
+                _push(email, {"type": "alert_added", "alert": {**a, "tier": "caution"}})
+        if not immediate and not caution:
+            _emit("✅", "All holdings within normal range", "success")
 
-    icon_map = {"All Good": "✅", "Caution": "⚠️", "Immediate Action": "🚨"}
-    level_map = {"All Good": "success", "Caution": "warn", "Immediate Action": "error"}
-    _emit(icon_map.get(verdict, "✅"),
-          f"Analysis complete - Verdict: {verdict}. {verdict_data.get('verdictReason', '')}",
-          level_map.get(verdict, "info"))
+        # ── 5. Claude verdict (45-second timeout enforced inside) ────────────
+        _emit("🤖", "Synthesising portfolio verdict with AI…")
+        verdict_data = _claude_verdict(user, immediate, caution, prices, emit_fn=_emit)
+        verdict      = verdict_data.get("verdict", "All Good")
 
-    _push(email, {"type": "verdict_update",
-                  "verdict": verdict,
-                  "reason": verdict_data.get("verdictReason", ""),
-                  "summary": verdict_data.get("overallSummary", ""),
-                  "topAlerts": verdict_data.get("topAlerts", [])})
+        icon_map  = {"All Good": "✅", "Caution": "⚠️", "Immediate Action": "🚨"}
+        level_map = {"All Good": "success", "Caution": "warn", "Immediate Action": "error"}
+        _emit(icon_map.get(verdict, "✅"),
+              f"Analysis complete — Verdict: {verdict}. {verdict_data.get('verdictReason', '')}",
+              level_map.get(verdict, "info"))
 
-    # ── 6. Persist ───────────────────────────────────────────────────────────
+        _push(email, {"type": "verdict_update",
+                      "verdict": verdict,
+                      "reason": verdict_data.get("verdictReason", ""),
+                      "summary": verdict_data.get("overallSummary", ""),
+                      "llmVerdictContent": verdict_data.get("overallSummary", ""),
+                      "topAlerts": verdict_data.get("topAlerts", [])})
+
+    except Exception as err:
+        print(f"[agent] _analyse_user error for {email}: {err}")
+        _emit("⚠️", f"Analysis warning: {str(err)[:60]}", "warn")
+        # Compute a rule-based fallback verdict from whatever alerts were gathered
+        if immediate:
+            verdict = "Immediate Action"
+            verdict_data = {
+                "verdict": "Immediate Action",
+                "verdictReason": f"{len(immediate)} holding(s) showing significant decline.",
+                "overallSummary": f"{len(immediate)} holding(s) require attention.",
+                "topAlerts": immediate[:3],
+            }
+        elif caution:
+            verdict = "Caution"
+            verdict_data = {
+                "verdict": "Caution",
+                "verdictReason": f"{len(caution)} holding(s) worth monitoring closely.",
+                "overallSummary": f"{len(caution)} holding(s) showing signs of weakness.",
+                "topAlerts": caution[:3],
+            }
+        else:
+            verdict = "All Good"
+            verdict_data = {
+                "verdict": "All Good",
+                "verdictReason": "All holdings within normal range.",
+                "overallSummary": "No significant issues detected this cycle.",
+                "topAlerts": [],
+            }
+
+    # ── 6. Persist — always runs, even on partial failure ────────────────────
     now_iso = datetime.datetime.now().isoformat()
-
-    # merge new activity into log, keep last MAX_ACTIVITY_LOG entries
     act_log = (activity + act_log)[:MAX_ACTIVITY_LOG]
 
     agent_st.update({
-        "lastChecked":   now_iso,
-        "verdict":       verdict,
-        "verdictReason": verdict_data.get("verdictReason", ""),
-        "overallSummary": verdict_data.get("overallSummary", ""),
-        "topAlerts":     verdict_data.get("topAlerts", []),
-        "alerts":        [{**a, "tier": "immediate"} for a in immediate] + [{**a, "tier": "caution"} for a in caution],
-        "watchlist":     [{**a, "tier": "caution"} for a in caution],
-        "activityLog":   act_log,
-        "lastPrices":    prices,
-        "trendState":    trend_state,
-        "newsSentiment": news_map,
+        "lastChecked":       now_iso,
+        "verdict":           verdict,
+        "verdictReason":     verdict_data.get("verdictReason", ""),
+        "overallSummary":    verdict_data.get("overallSummary", ""),
+        "llmVerdictContent": verdict_data.get("overallSummary", ""),
+        "topAlerts":         verdict_data.get("topAlerts", []),
+        "alerts":         [{**a, "tier": "immediate"} for a in immediate] +
+                          [{**a, "tier": "caution"}   for a in caution],
+        "watchlist":      [{**a, "tier": "caution"}   for a in caution],
+        "activityLog":    act_log,
+        "lastPrices":     prices if prices else agent_st.get("lastPrices", {}),
+        "trendState":     trend_state,
+        "newsSentiment":  news_map if news_map else agent_st.get("newsSentiment", {}),
     })
     user["agentState"] = agent_st
-    _save_user(data_file, user)
+    try:
+        _save_user(data_file, user)
+    except Exception as save_err:
+        print(f"[agent] save error for {email}: {save_err}")
+
     _push(email, {"type": "analysis_complete", "lastChecked": now_iso})
+
+    # Mark first analysis complete in the index
+    try:
+        idx = _load_index()
+        if email in idx and not idx[email].get("isAnalysisPresent"):
+            idx[email]["isAnalysisPresent"] = True
+            _save_index(idx)
+    except Exception:
+        pass
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -503,7 +650,11 @@ def get_agent_status(email: str) -> dict:
     meta = index[email]
     if not meta.get("isDataPresent"):
         return {"status": "needs_onboarding"}
-    return {"status": "active", "dataFile": meta["dataFile"]}
+    return {
+        "status": "active",
+        "dataFile": meta["dataFile"],
+        "isAnalysisPresent": meta.get("isAnalysisPresent", False),
+    }
 
 
 def onboard_user(email: str, holdings: dict, profile: dict) -> dict:
@@ -538,7 +689,8 @@ def onboard_user(email: str, holdings: dict, profile: dict) -> dict:
     }
     _save_user(data_file, user_data)
 
-    index[email]["isDataPresent"] = True
+    index[email]["isDataPresent"]    = True
+    index[email]["isAnalysisPresent"] = False   # set True after first run completes
     _save_index(index)
 
     # trigger analysis in background immediately

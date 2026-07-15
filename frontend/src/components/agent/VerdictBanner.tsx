@@ -1,15 +1,16 @@
-import { ShieldCheck, AlertTriangle, Siren } from "lucide-react";
+import { ShieldCheck, AlertTriangle, Siren, Bot } from "lucide-react";
 
 interface Props {
   verdict: string;
   reason: string;
   summary: string;
+  llmVerdictContent: string;
   totalCurrent: number;
   totalPnL: number;
   pnlPct: number;
 }
 
-export default function VerdictBanner({ verdict, reason, summary, totalCurrent, totalPnL, pnlPct }: Props) {
+export default function VerdictBanner({ verdict, reason, summary, llmVerdictContent, totalCurrent, totalPnL, pnlPct }: Props) {
   const configs = {
     "All Good": {
       wrapper: "border-emerald-500/25 bg-emerald-500/5",
@@ -40,15 +41,22 @@ export default function VerdictBanner({ verdict, reason, summary, totalCurrent, 
     <div className={`rounded-xl border px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${cfg.wrapper} transition-all duration-500`}>
       <div className="flex items-start gap-3 flex-1 min-w-0">
         {cfg.icon}
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
             <span className={`inline-flex px-3 py-1 rounded-full text-sm font-bold ${cfg.badge}`}>
               {verdict}
             </span>
           </div>
-          <p className="text-foreground text-sm mt-1.5 font-medium">{reason}</p>
-          {summary && (
-            <p className="text-muted-foreground text-xs mt-1 leading-relaxed max-w-2xl">{summary}</p>
+          <p key={reason} className="text-foreground text-sm mt-1.5 font-medium animate-in fade-in duration-500">
+            {reason}
+          </p>
+          {llmVerdictContent && llmVerdictContent !== reason && (
+            <div key={llmVerdictContent} className="mt-3 flex items-start gap-2.5 animate-in fade-in slide-in-from-bottom-1 duration-700">
+              <div className="w-5 h-5 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5">
+                <Bot className="w-3 h-3 text-primary" />
+              </div>
+              <p className="text-sm text-foreground/80 leading-relaxed">{llmVerdictContent}</p>
+            </div>
           )}
         </div>
       </div>

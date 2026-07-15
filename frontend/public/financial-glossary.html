@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DiversiFi — Financial Metrics & Terms Glossary</title>
+<style>
+:root {
+  --fg:           #1a1a1a;
+  --muted:        #555;
+  --accent:       #0b5394;
+  --accent-light: #d6e4f1;
+  --border:       #d7d7d7;
+  --bg:           #f5f6f8;
+  --sidebar-bg:   #ffffff;
+  --sidebar-hdr:  #f8f9fb;
+  --code-bg:      #eef1f5;
+  --warn:         #a14b2d;
+  --warn-light:   #fdf0eb;
+  --bar:          #0b5394;
+  --fail-bg:      #f6e2dd;
+  --fail-text:    #7a1a0a;
+  --ok-bg:        #eaf4ec;
+  --ok-border:    #2d7a3a;
+  --ok-text:      #1a5c27;
+  --green:        #00D09C;
+  --amber:        #F59E0B;
+  --red:          #EF4444;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg:           #e4e4e4;
+    --muted:        #a0a0a0;
+    --accent:       #78b2ef;
+    --accent-light: #1b2a3b;
+    --border:       #3a3a3a;
+    --bg:           #1a1a1c;
+    --sidebar-bg:   #1f2023;
+    --sidebar-hdr:  #26282d;
+    --code-bg:      #26282d;
+    --warn:         #ef9b7a;
+    --warn-light:   #2d1a10;
+    --bar:          #78b2ef;
+    --fail-bg:      #3d1a1a;
+    --fail-text:    #f6b2a0;
+    --ok-bg:        #0f2d14;
+    --ok-border:    #4aaa5a;
+    --ok-text:      #7adc8a;
+  }
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px; line-height: 1.6; color: var(--fg); background: var(--bg);
+  margin: 0; display: flex; min-height: 100vh;
+}
+nav.sidebar-toc {
+  position: fixed; left: 0; top: 0; bottom: 0; width: 260px;
+  background: var(--sidebar-bg); border-right: 2px solid var(--border);
+  box-shadow: 2px 0 8px rgba(0,0,0,0.06); overflow-y: auto;
+  z-index: 1000; box-sizing: border-box; display: flex; flex-direction: column;
+}
+.sidebar-header { padding: 18px 20px 14px; border-bottom: 1px solid var(--border); background: var(--sidebar-hdr); flex-shrink: 0; }
+.sidebar-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); }
+.sidebar-brand { font-size: 14px; font-weight: 700; color: var(--fg); display: block; margin-bottom: 2px; }
+nav.sidebar-toc ol { margin: 0; padding: 10px 0 24px; list-style: none; flex: 1; overflow-y: auto; }
+nav.sidebar-toc li { margin: 1px 0; }
+nav.sidebar-toc a {
+  display: block; padding: 8px 20px; color: var(--fg); font-size: 13px;
+  font-weight: 500; line-height: 1.4; border-left: 3px solid transparent;
+  text-decoration: none; transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+nav.sidebar-toc .nav-summary { display: block; font-size: 11px; font-weight: 400; color: var(--muted); margin-top: 1px; }
+nav.sidebar-toc a:hover { background: var(--accent-light); color: var(--accent); border-left-color: var(--accent); }
+nav.sidebar-toc a.active { background: var(--accent-light); color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+main { margin-left: 260px; flex: 1; min-width: 0; padding: 32px 40px 80px; max-width: 1100px; box-sizing: border-box; }
+header { border-bottom: 1px solid var(--border); margin-bottom: 32px; padding-bottom: 16px; }
+h1 { font-size: 30px; margin: 0 0 6px; letter-spacing: -0.01em; }
+h2 { font-size: 22px; margin: 48px 0 12px; padding-top: 8px; border-bottom: 2px solid var(--accent-light); padding-bottom: 6px; }
+h3 { font-size: 17px; margin: 28px 0 8px; color: var(--accent); }
+.subtitle { color: var(--muted); font-size: 16px; margin: 0 0 4px; }
+.meta { color: var(--muted); font-size: 13px; margin: 4px 0 0; }
+code {
+  background: var(--code-bg); padding: 2px 6px; border-radius: 3px;
+  font-family: "SF Mono","Consolas","Liberation Mono",monospace; font-size: 13px;
+}
+pre {
+  background: var(--code-bg); padding: 12px 16px; border-radius: 6px;
+  overflow-x: auto; font-family: "SF Mono","Consolas","Liberation Mono",monospace;
+  font-size: 13px; line-height: 1.6; border: 1px solid var(--border);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.stat-row { display: flex; gap: 14px; flex-wrap: wrap; margin: 20px 0; }
+.stat-card { flex: 1; min-width: 130px; border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; text-align: center; background: var(--bg); }
+.stat-card .stat-value { font-size: 28px; font-weight: 700; line-height: 1.1; color: var(--fg); }
+.stat-card .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.stat-card-ok { border-color: var(--ok-border); background: var(--ok-bg); }
+.stat-card-ok .stat-value { color: var(--ok-text); }
+.stat-card-fail { border-color: var(--warn); background: var(--fail-bg); }
+.stat-card-fail .stat-value { color: var(--warn); }
+.callout { border-left: 4px solid var(--accent); background: var(--accent-light); padding: 10px 14px; border-radius: 0 4px 4px 0; margin: 14px 0; font-size: 14px; }
+.callout.warn { border-left-color: var(--warn); background: var(--warn-light); }
+.callout.tip { border-left-color: var(--ok-border); background: var(--ok-bg); }
+.table-wrap { overflow-x: auto; margin: 12px 0; }
+table.dist { border-collapse: collapse; width: 100%; font-size: 14px; }
+table.dist th, table.dist td { border: 1px solid var(--border); padding: 7px 10px; text-align: left; }
+table.dist th { background: var(--accent-light); font-weight: 600; }
+table.dist td.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.dist .muted { color: var(--muted); }
+.formula-box { background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 14px 18px; margin: 14px 0; font-family: "SF Mono","Consolas",monospace; font-size: 13.5px; line-height: 1.8; }
+.pill { font-size: 11px; padding: 2px 8px; border-radius: 10px; white-space: nowrap; font-weight: 600; }
+.pill-green { background: #d7e9cc; color: #1a4a0a; }
+.pill-amber { background: #fce8c1; color: #5c3d00; }
+.pill-red   { background: var(--fail-bg); color: var(--fail-text); }
+.pill-blue  { background: var(--accent-light); color: var(--accent); }
+.pill-grey  { background: #e8e8e8; color: #444; }
+@media (prefers-color-scheme: dark) {
+  .pill-green { background: #1a4a0a; color: #d7e9cc; }
+  .pill-amber { background: #5c3d00; color: #fce8c1; }
+  .pill-blue  { background: #1b3a5c; color: #78b2ef; }
+  .pill-grey  { background: #333; color: #bbb; }
+}
+.score-row { display: flex; gap: 0; margin: 16px 0; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.score-seg { flex: 1; padding: 10px 12px; text-align: center; font-size: 13px; }
+.score-seg .seg-label { font-weight: 700; font-size: 15px; }
+.score-seg .seg-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.seg-tech    { background: #1b2a3b; color: #78b2ef; }
+.seg-mom     { background: #2d1a10; color: #ef9b7a; }
+.seg-fund    { background: #1a4a0a; color: #7adc8a; }
+.seg-sent    { background: #2d1a2d; color: #c084fc; }
+@media (prefers-color-scheme: light) {
+  .seg-tech { background: #d6e4f1; color: #0b5394; }
+  .seg-mom  { background: #fce8c1; color: #5c3d00; }
+  .seg-fund { background: #d7e9cc; color: #1a4a0a; }
+  .seg-sent { background: #ede9fe; color: #4c1d95; }
+}
+.diagram { display: block; margin: 20px auto; max-width: 100%; }
+.diagram-caption { text-align: center; font-size: 13px; color: var(--muted); margin: -10px auto 24px; }
+nav.toc { background: var(--accent-light); border-radius: 6px; padding: 14px 18px; margin: 0 0 24px; font-size: 14px; display: none; }
+nav.toc ol { margin: 6px 0 0; padding-left: 22px; }
+nav.toc li { margin: 2px 0; }
+footer { margin-top: 60px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; }
+#top-btn {
+  position: fixed; bottom: 28px; right: 28px;
+  background: var(--accent); color: #fff; border: none; border-radius: 6px;
+  padding: 8px 14px; font-size: 13px; cursor: pointer; opacity: 0; pointer-events: none;
+  transition: opacity 0.2s; z-index: 100;
+}
+#top-btn.visible { opacity: 1; pointer-events: auto; }
+@media (max-width: 900px) {
+  body { display: block; }
+  nav.sidebar-toc { display: none; }
+  nav.toc { display: block !important; }
+  main { margin-left: 0; padding: 32px 20px 72px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="sidebar-toc" aria-label="Sidebar navigation">
+  <div class="sidebar-header">
+    <span class="sidebar-brand">DiversiFi</span>
+    <span class="sidebar-title">Financial Glossary</span>
+  </div>
+  <ol>
+    <li><a href="#signal-score">Signal Score (0–100)<span class="nav-summary">Technical + Momentum + Fundamental + Sentiment</span></a></li>
+    <li><a href="#technical">Technical Indicators<span class="nav-summary">RSI, MACD, DMA, Bollinger Bands</span></a></li>
+    <li><a href="#portfolio-metrics">Portfolio Metrics<span class="nav-summary">Beta, Alpha, Sharpe, CAPM</span></a></li>
+    <li><a href="#mf-score">MF Score (0–100)<span class="nav-summary">Returns + Momentum + Consistency</span></a></li>
+    <li><a href="#mf-terms">Mutual Fund Terms<span class="nav-summary">NAV, AUM, Expense Ratio, SIP</span></a></li>
+    <li><a href="#diversification">Diversification Score<span class="nav-summary">Sector spread, concentration, overlap</span></a></li>
+    <li><a href="#fundamental">Fundamental Metrics<span class="nav-summary">PE, PB, EPS, ROE, D/E</span></a></li>
+    <li><a href="#algo-trading">Algo Trading Metrics<span class="nav-summary">Win rate, VaR, drawdown, alpha</span></a></li>
+    <li><a href="#market-structure">Market Structure<span class="nav-summary">FII, DII, indices, sectors</span></a></li>
+    <li><a href="#global-markets">Global Markets<span class="nav-summary">Carry trade, forex, correlations</span></a></li>
+    <li><a href="#simulation">Monte Carlo Simulation<span class="nav-summary">GBM, scenarios, CAGR</span></a></li>
+    <li><a href="#verdict">Verdict System<span class="nav-summary">All Good / Watch / Caution / Critical</span></a></li>
+  </ol>
+</nav>
+
+<main>
+<header>
+  <h1>Financial Metrics &amp; Terms</h1>
+  <p class="subtitle">Complete glossary for every metric, score, and term used across DiversiFi — explained in plain English.</p>
+  <p class="meta">DiversiFi · July 2026 · Sources: <code>research_service.py</code>, <code>portfolio_analysis.py</code>, <code>mf_service.py</code>, <code>portfolioEngine.ts</code>, <code>advancedSimulation.ts</code></p>
+</header>
+
+<nav class="toc" aria-label="Table of contents">
+  <strong>Contents</strong>
+  <ol>
+    <li><a href="#signal-score">Signal Score (0–100)</a></li>
+    <li><a href="#technical">Technical Indicators</a></li>
+    <li><a href="#portfolio-metrics">Portfolio Metrics (Beta, Alpha, Sharpe)</a></li>
+    <li><a href="#mf-score">MF Score (0–100)</a></li>
+    <li><a href="#mf-terms">Mutual Fund Terms</a></li>
+    <li><a href="#diversification">Diversification Score</a></li>
+    <li><a href="#fundamental">Fundamental Metrics</a></li>
+    <li><a href="#algo-trading">Algo Trading Metrics</a></li>
+    <li><a href="#market-structure">Market Structure (FII/DII)</a></li>
+    <li><a href="#global-markets">Global Markets &amp; Geopolitics</a></li>
+    <li><a href="#simulation">Monte Carlo Simulation</a></li>
+    <li><a href="#verdict">Verdict &amp; Alert System</a></li>
+  </ol>
+</nav>
+
+<!-- ──────────────────────────────────────────────────────── -->
+<section id="signal-score">
+<h2>1. Signal Score (0–100)</h2>
+<p>The Signal Score is DiversiFi's proprietary stock rating. It combines four independent pillars into a single 0–100 number. A higher score means the stock looks attractive across technical momentum, price action, financials, and news sentiment <em>right now</em>.</p>
+
+<div class="score-row">
+  <div class="score-seg seg-tech"><div class="seg-label">35 pts</div><div class="seg-sub">Technical</div></div>
+  <div class="score-seg seg-mom"><div class="seg-label">25 pts</div><div class="seg-sub">Momentum</div></div>
+  <div class="score-seg seg-fund"><div class="seg-label">20 pts</div><div class="seg-sub">Fundamental</div></div>
+  <div class="score-seg seg-sent"><div class="seg-label">20 pts</div><div class="seg-sub">Sentiment</div></div>
+</div>
+
+<h3>Pillar 1 — Technical (max 35 pts)</h3>
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Sub-metric</th><th>Max pts</th><th>How it scores</th></tr></thead>
+  <tbody>
+    <tr><td>RSI</td><td class="num">15</td><td>RSI ≥ 60 → 15 pts &nbsp;|&nbsp; ≥ 50 → 10 pts &nbsp;|&nbsp; ≥ 40 → 6 pts &nbsp;|&nbsp; &lt; 40 → 2 pts</td></tr>
+    <tr><td>20DMA / 50DMA crossover</td><td class="num">12</td><td>Price &gt; 20DMA &gt; 50DMA → 12 pts (bullish stack) &nbsp;|&nbsp; Price &gt; 20DMA only → 8 &nbsp;|&nbsp; Price &gt; 50DMA only → 4 &nbsp;|&nbsp; Below all → 1</td></tr>
+    <tr><td>MACD signal</td><td class="num">8</td><td>MACD line above signal line (bullish) → 8 pts &nbsp;|&nbsp; below → 2 pts</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Pillar 2 — Momentum (max 25 pts)</h3>
+<div class="callout">Momentum measures recent price performance. Short-term and medium-term strength both matter — and unusual volume spikes add extra confidence.</div>
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Sub-metric</th><th>Max pts</th><th>Scoring bands</th></tr></thead>
+  <tbody>
+    <tr><td>5-day return (r5)</td><td class="num">10</td><td>&gt; 3% → 10 &nbsp;|&nbsp; &gt; 1% → 7 &nbsp;|&nbsp; &gt; 0% → 4 &nbsp;|&nbsp; ≤ 0% → 1</td></tr>
+    <tr><td>30-day return (r30)</td><td class="num">10</td><td>&gt; 10% → 10 &nbsp;|&nbsp; &gt; 5% → 7 &nbsp;|&nbsp; &gt; 0% → 4 &nbsp;|&nbsp; ≤ 0% → 1</td></tr>
+    <tr><td>Volume surge</td><td class="num">5</td><td>5-day avg volume ÷ 30-day avg volume &gt; 1.5 → 5 pts &nbsp;|&nbsp; &gt; 1.1 → 3 &nbsp;|&nbsp; else → 1</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Pillar 3 — Fundamental (max 20 pts)</h3>
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Sub-metric</th><th>Max pts</th><th>Scoring bands</th></tr></thead>
+  <tbody>
+    <tr><td>PE ratio</td><td class="num">12</td><td>PE &lt; 0 (loss-making) → 3 &nbsp;|&nbsp; ≤ 20 (cheap) → 12 &nbsp;|&nbsp; ≤ 35 → 9 &nbsp;|&nbsp; ≤ 50 → 6 &nbsp;|&nbsp; &gt; 50 (expensive) → 4</td></tr>
+    <tr><td>EPS (Earnings Per Share)</td><td class="num">8</td><td>EPS &gt; 0 (profitable) → 8 pts &nbsp;|&nbsp; EPS ≤ 0 (loss) → 3 pts</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Pillar 4 — Sentiment (max 20 pts)</h3>
+<p>News articles for the stock are run through an NLP model. The model returns a <em>positive ratio</em> (pr) and <em>negative ratio</em> (nr) — the fraction of articles that are positive/negative.</p>
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Condition</th><th>Score</th></tr></thead>
+  <tbody>
+    <tr><td>Positive ratio &gt; 0.6 (very bullish news)</td><td class="num">20</td></tr>
+    <tr><td>Positive ratio &gt; 0.4</td><td class="num">14</td></tr>
+    <tr><td>Negative ratio &gt; 0.6 (very bearish news)</td><td class="num">4</td></tr>
+    <tr><td>Negative ratio &gt; 0.4</td><td class="num">8</td></tr>
+    <tr><td>Mixed / neutral</td><td class="num">11</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Signal Labels &amp; Recommendations</h3>
+<div class="stat-row">
+  <div class="stat-card stat-card-ok"><div class="stat-value">≥ 65</div><div class="stat-label">🔥 HOT</div></div>
+  <div class="stat-card"><div class="stat-value">41–64</div><div class="stat-label">NEUTRAL</div></div>
+  <div class="stat-card stat-card-fail"><div class="stat-value">≤ 40</div><div class="stat-label">❄️ COLD</div></div>
+</div>
+<div class="table-wrap">
+<table class="dist compact">
+  <thead><tr><th>Score range</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>≥ 85</td><td><span class="pill pill-green">Strong Buy</span></td></tr>
+    <tr><td>≥ 65</td><td><span class="pill pill-green">Buy</span></td></tr>
+    <tr><td>≥ 55</td><td><span class="pill pill-blue">Hold</span></td></tr>
+    <tr><td>≥ 40</td><td><span class="pill pill-amber">Caution</span></td></tr>
+    <tr><td>&lt; 40</td><td><span class="pill pill-red">Avoid</span></td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<!-- ──────────────────────────────────────────────────────── -->
+<section id="technical">
+<h2>2. Technical Indicators</h2>
+<p>Technical indicators are calculated purely from a stock's price and volume history — no balance sheets involved. They help identify trends, momentum shifts, and potential reversal points.</p>
+
+<h3>RSI — Relative Strength Index</h3>
+<p><strong>What it is:</strong> A 0–100 oscillator that measures how fast and how much a price has moved recently. Calculated over 14 trading days by default.</p>
+<div class="formula-box">
+RSI = 100 − ( 100 ÷ (1 + RS) )<br/>
+RS  = Average Gain over 14 days ÷ Average Loss over 14 days
+</div>
+<div class="table-wrap">
+<table class="dist compact">
+  <thead><tr><th>RSI value</th><th>Interpretation</th></tr></thead>
+  <tbody>
+    <tr><td>&gt; 70</td><td>Overbought — stock may be due for a pullback</td></tr>
+    <tr><td>50 – 70</td><td>Bullish zone — upward momentum</td></tr>
+    <tr><td>30 – 50</td><td>Neutral to slightly bearish</td></tr>
+    <tr><td>&lt; 30</td><td>Oversold — potential bounce opportunity</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="callout">DiversiFi uses RSI ≥ 60 as the high-score threshold (15 pts). A reading of 60 doesn't mean overbought — it signals healthy, sustained buying interest.</div>
+
+<h3>MACD — Moving Average Convergence Divergence</h3>
+<p><strong>What it is:</strong> The difference between a 12-day and 26-day Exponential Moving Average (EMA). A 9-day EMA of that difference is called the "signal line."</p>
+<div class="formula-box">
+MACD Line   = EMA(12) − EMA(26)<br/>
+Signal Line = EMA(9) of MACD Line<br/>
+Histogram   = MACD Line − Signal Line
+</div>
+<ul>
+  <li><strong>Bullish crossover:</strong> MACD line crosses above signal line → buying pressure increasing</li>
+  <li><strong>Bearish crossover:</strong> MACD line drops below signal line → momentum fading</li>
+</ul>
+<p>In DiversiFi: MACD bullish = +8 pts, bearish = +2 pts in the Signal Score.</p>
+
+<h3>Moving Averages — SMA vs EMA</h3>
+<p><strong>SMA (Simple Moving Average):</strong> The plain average of closing prices over N days. Each day has equal weight.</p>
+<div class="formula-box">SMA(N) = (P₁ + P₂ + … + Pₙ) ÷ N</div>
+<p><strong>EMA (Exponential Moving Average):</strong> Weights recent prices more heavily. Reacts faster to new data than SMA.</p>
+<div class="formula-box">EMA = Price × k + EMA(prev) × (1 − k) &nbsp;&nbsp; where k = 2 ÷ (N + 1)</div>
+
+<h3>20DMA and 50DMA</h3>
+<p>The 20-day and 50-day Simple Moving Averages are the two most-watched trend filters in Indian equities trading.</p>
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Configuration</th><th>Signal Score</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>Price &gt; 20DMA &gt; 50DMA</td><td class="num">12 pts</td><td>Full bullish stack — both short and medium-term trends up</td></tr>
+    <tr><td>Price &gt; 20DMA only</td><td class="num">8 pts</td><td>Short-term bullish, medium-term mixed</td></tr>
+    <tr><td>Price &gt; 50DMA only</td><td class="num">4 pts</td><td>Medium-term support holding but short-term weak</td></tr>
+    <tr><td>Price &lt; both DMAs</td><td class="num">1 pt</td><td>Downtrend — both moving averages acting as resistance</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="callout tip">A "golden cross" (20DMA crossing above 50DMA) is one of the strongest bullish signals in technical analysis. A "death cross" (20DMA falling below 50DMA) is bearish.</div>
+
+<h3>Bollinger Bands</h3>
+<p><strong>What they are:</strong> A 20-day SMA surrounded by bands set ±2 standard deviations apart. They automatically widen during volatile periods and narrow during quiet ones.</p>
+<div class="formula-box">
+Middle Band = SMA(20)<br/>
+Upper Band  = SMA(20) + 2 × StdDev(20)<br/>
+Lower Band  = SMA(20) − 2 × StdDev(20)
+</div>
+<ul>
+  <li>Price touching the <strong>upper band</strong>: stock is relatively expensive vs recent range — watch for reversal</li>
+  <li>Price touching the <strong>lower band</strong>: oversold relative to recent range — watch for bounce</li>
+  <li><strong>Band squeeze</strong> (bands tightening): low volatility phase, often precedes a big move</li>
+</ul>
+
+<h3>Volume</h3>
+<p>Volume is the number of shares traded in a session. DiversiFi calculates a <strong>volume surge ratio</strong>: the 5-day average divided by the 30-day average.</p>
+<div class="formula-box">Volume Surge = (avg volume last 5 days) ÷ (avg volume last 30 days)</div>
+<p>A ratio &gt; 1.5 means today's trading is 50% heavier than normal — which confirms a price move is driven by real conviction, not just noise.</p>
+</section>
+
+<!-- ──────────────────────────────────────────────────────── -->
+<section id="portfolio-metrics">
+<h2>3. Portfolio Metrics — Beta, Alpha, Sharpe</h2>
+<p>These three metrics tell you whether your portfolio is taking the right amount of risk and whether that risk is being rewarded. DiversiFi computes all three using <strong>6 months of daily prices</strong> benchmarked against Nifty 50 (^NSEI) or Nifty 500 (^CRSLDX).</p>
+
+<h3>Beta — Market Sensitivity</h3>
+<p><strong>What it means:</strong> How much your portfolio moves when the overall market moves. A beta of 1.0 means your portfolio tracks the market exactly.</p>
+<div class="formula-box">
+Beta = Covariance(portfolio daily returns, benchmark daily returns)<br/>
+       ÷ Variance(benchmark daily returns)
+</div>
+<div class="table-wrap">
+<table class="dist compact">
+  <thead><tr><th>Beta value</th><th>What it means</th></tr></thead>
+  <tbody>
+    <tr><td>&lt; 0.8</td><td>Defensive — less volatile than market. Good for conservative investors.</td></tr>
+    <tr><td>0.8 – 1.2</td><td>Market-neutral — moves roughly with the index.</td></tr>
+    <tr><td>&gt; 1.2</td><td>Aggressive — amplifies market moves. Higher risk, higher potential reward.</td></tr>
+    <tr><td>Negative</td><td>Moves opposite to market (rare — e.g. gold miners during crash)</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="callout">DiversiFi algo paper-trading portfolio had a beta of 0.74 — meaning it captured market upside with less downside exposure.</div>
+
+<h3>Alpha — Excess Return</h3>
+<p><strong>What it means:</strong> How much return you earned <em>above and beyond</em> what you were compensated for by simply taking market risk. Positive alpha = skill (or luck). Negative alpha = underperformance.</p>
+<div class="formula-box">
+Alpha = Portfolio Annual Return<br/>
+        − [ Risk-Free Rate + Beta × (Benchmark Return − Risk-Free Rate) ]
+</div>
+<p>This is the <strong>CAPM formula</strong> (Capital Asset Pricing Model). The risk-free rate used is the approximate Indian T-bill rate (≈ 6.5%). The term in brackets is what you <em>should</em> have earned given your beta — alpha is what you earned on top of that.</p>
+<div class="callout tip">If your portfolio returned 18% and CAPM says you should have earned 14% given your beta, your alpha is +4%. That's genuine outperformance.</div>
+
+<h3>Sharpe Ratio — Risk-Adjusted Return</h3>
+<p><strong>What it means:</strong> How much return you got for each unit of volatility you accepted. Higher is better. A Sharpe of 1.0+ is considered good; 2.0+ is excellent.</p>
+<div class="formula-box">
+Sharpe = (Portfolio Annual Return − Risk-Free Rate)<br/>
+          ÷ (Portfolio Daily StdDev × √252)
+</div>
+<p>The <code>× √252</code> converts daily volatility to annual volatility (252 trading days in a year).</p>
+<div class="table-wrap">
+<table class="dist compact">
+  <thead><tr><th>Sharpe Ratio</th><th>Assessment</th></tr></thead>
+  <tbody>
+    <tr><td>&lt; 0</td><td>Losing money on a risk-adjusted basis</td></tr>
+    <tr><td>0 – 0.5</td><td>Poor — not being compensated for the risk taken</td></tr>
+    <tr><td>0.5 – 1.0</td><td>Acceptable</td></tr>
+    <tr><td>1.0 – 2.0</td><td>Good</td></tr>
+    <tr><td>&gt; 2.0</td><td>Excellent (rare, often unsustainable)</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="callout">DiversiFi's algo paper-trading portfolio achieved a Sharpe of 1.84 over H1 2025, indicating strong risk-adjusted returns against Nifty 50.</div>
+
+<h3>6-Month Return vs Benchmark</h3>
+<p>A simple comparison: your portfolio's cumulative return over 6 months vs the benchmark (Nifty 50 or Nifty 500). Expressed as a percentage. If the market went up 8% and your portfolio went up 12%, you outperformed by 4 percentage points.</p>
+
+<h3>P&amp;L (Profit and Loss)</h3>
+<p>The total gain or loss on your holdings. DiversiFi shows:</p>
+<ul>
+  <li><strong>Absolute P&amp;L</strong> (₹): Current Value − Amount Invested</li>
+  <li><strong>P&amp;L %</strong>: (Absolute P&amp;L ÷ Invested) × 100</li>
+</ul>
+</section>
+
+<!-- ──────────────────────────────────────────────────────── -->
+<section id="mf-score">
+<h2>4. MF Score (0–100)</h2>
+<p>The MF Score rates mutual funds on recent performance and consistency. It is independent of the Signal Score and designed specifically for the mutual fund universe.</p>
+
+<div class="score-row">
+  <div class="score-seg seg-tech"><div class="seg-label">40 pts</div><div class="seg-sub">1-Year Returns</div></div>
+  <div class="score-seg seg-mom"><div class="seg-label">20 pts</div><div class="seg-sub">3-Month Returns</div></div>
+  <div class="score-seg seg-fund"><div class="seg-label">15 pts</div><div class="seg-sub">1-Month Momentum</div></div>
+  <div class="score-seg seg-sent"><div class="seg-label">25 pts</div><div class="seg-sub">Consistency</div></div>
+</div>
+
+<h3>1-Year Returns (max 40 pts)</h3>
+<div class="table-wrap">
+<table class="dist compact">
+  <thead><tr><th>1Y Return</th><th>Points</th></tr></thead>
+  <tbody>
+    <tr><td>&gt; 30%</td><td class="num">40</td></tr>
+    <tr><td>&gt; 20%</td><td class="num">35</td></tr>
+    <tr><td>&gt; 15%</td><td class="num">30</td></tr>
+    <tr><td>&gt; 10%</td><td class="num">24</td></tr>
+    <tr><td>&gt; 5%</td><td class="num">18</td></tr>
+    <tr><td>&gt; 0%</td><td class="num">12</td></tr>
+    <tr><td>≤ 0%</td><td class="num">6</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>3-Month Returns (max 20 pts)</h3>
+<div class="table-wrap">
+<table class="dist compact">
+  <thead><tr><th>3M Return</th><th>Points</th></tr></thead>
+  <tbody>
+    <tr><td>&gt; 10%</td><td class="num">20</td></tr>
+    <tr><td>&gt; 6%</td><td class="num">15</td></tr>
+    <tr><td>&gt; 3%</td><td class="num">10</td></tr>
+    <tr><td>&gt; 0%</td><td class="num">6</td></tr>
+    <tr><td>≤ 0%</td><td class="num">2</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Consistency Score (max 25 pts)</h3>
+<p>Consistency measures how steadily the fund has performed — avoiding extreme drawdowns and delivering year-on-year growth. A fund that returned 15% every year scores higher than one that returned 60% one year and lost 30% the next, even if average returns are similar.</p>
+<div class="callout">Consistency is calculated from the fund's NAV history: low volatility of annual returns + absence of large negative years = high consistency score.</div>
+</section>
+
+<!-- ──────────────────────────────────────────────────────── -->
+<section id="mf-terms">
+<h2>5. Mutual Fund Terms</h2>
+
+<h3>NAV — Net Asset Value</h3>
+<p><strong>What it is:</strong> The price of one unit of a mutual fund. Calculated daily after market close.</p>
+<div class="formula-box">NAV = (Total Assets of Fund − Liabilities) ÷ Number of Units Outstanding</div>
+<p>If a fund's NAV is ₹45 and you invest ₹10,000, you receive 10,000 ÷ 45 = 222.22 units. When the fund's holdings rise in value, the NAV rises too, and your investment grows.</p>
+<div class="callout">A high NAV (e.g. ₹500) vs a low NAV (e.g. ₹15) does NOT mean one fund is better or more expensive than the other. What matters is percentage returns, not the absolute NAV price.</div>
+
+<h3>AUM — Assets Under Management</h3>
+<p>The total market value of all money invested in a fund. Large AUM (&gt; ₹10,000 crore) means the fund is popular and liquid, but very large funds in small/mid-cap categories can struggle to deploy capital efficiently.</p>
+
+<h3>Expense Ratio</h3>
+<p>The annual fee the fund house charges for managing the fund, expressed as a percentage of AUM. This is deducted daily from NAV — you never pay it directly.</p>
+<div class="table-wrap">
+<table class="dist compact">
+  <thead><tr><th>Fund type</th><th>Typical expense ratio</th></tr></thead>
+  <tbody>
+    <tr><td>Index Fund / ETF</td><td>0.1% – 0.3%</td></tr>
+    <tr><td>Large Cap active fund</td><td>0.5% – 1.5%</td></tr>
+    <tr><td>Mid / Small Cap active</td><td>1.0% – 2.0%</td></tr>
+    <tr><td>ELSS (tax-saving)</td><td>1.0% – 2.5%</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="callout warn">Over 20 years, a 1.5% vs 0.3% expense ratio difference can cost you 20–25% of final corpus due to compounding drag. Always compare expense ratios.</div>
+
+<h3>SIP — Systematic Investment Plan</h3>
+<p>A method of investing a fixed amount at regular intervals (monthly, weekly) regardless of market conditions. The key benefit is <strong>Rupee Cost Averaging</strong>: you automatically buy more units when prices are low and fewer when prices are high.</p>
+
+<h3>SIP Corpus Formula</h3>
+<p>DiversiFi projects the future value of a SIP using the standard future value of an annuity formula:</p>
+<div class="formula-box">
+Corpus = P × [ ((1 + r)ⁿ − 1) ÷ r ] × (1 + r)<br/><br/>
+Where:<br/>
+  P = Monthly SIP amount (₹)<br/>
+  r = Monthly interest rate = Annual Rate ÷ 12<br/>
+  n = Total months = Years × 12
+</div>
+<p>Example: ₹10,000/month for 10 years at 12% p.a.</p>
+<pre>r = 12% ÷ 12 = 1% = 0.01
+n = 10 × 12 = 120 months
+Corpus = 10000 × [ (1.01¹²⁰ − 1) / 0.01 ] × 1.01
+       ≈ ₹23.2 lakhs (invested ₹12 lakhs, gain ₹11.2 lakhs)</pre>
+
+<h3>Lumpsum Investment</h3>
+<p>A one-time investment instead of periodic contributions. Suitable when markets have corrected sharply or when you receive a windfall. Higher risk than SIP because you are fully exposed to market timing.</p>
+
+<h3>Mutual Fund Categories (SEBI Classification)</h3>
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Category</th><th>Mandate</th><th>Risk level</th></tr></thead>
+  <tbody>
+    <tr><td>Large Cap</td><td>≥ 80% in top-100 companies by market cap</td><td>Low-Medium</td></tr>
+    <tr><td>Mid Cap</td><td>≥ 65% in 101–250 ranked companies</td><td>Medium-High</td></tr>
+    <tr><td>Small Cap</td><td>≥ 65% in 251+ ranked companies</td><td>High</td></tr>
+    <tr><td>Flexi Cap</td><td>Any mix of large/mid/small with no minimum</td><td>Varies</td></tr>
+    <tr><td>ELSS</td><td>≥ 80% equity, 3-year lock-in, tax deduction u/s 80C</td><td>Medium-High</td></tr>
+    <tr><td>Index Fund</td><td>Replicates an index (Nifty 50, Sensex, etc.)</td><td>Medium</td></tr>
+    <tr><td>Sectoral / Thematic</td><td>Concentrated in one sector (tech, pharma, banking)</td><td>Very High</td></tr>
+    <tr><td>Hybrid</td><td>Mix of equity + debt (e.g. 60% equity / 40% debt)</td><td>Low-Medium</td></tr>
+    <tr><td>Value</td><td>Invests in undervalued companies</td><td>Medium</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>MF Overlap</h3>
+<p>When two funds you hold invest in many of the same underlying stocks. Overlap reduces the actual diversification benefit of holding multiple funds.</p>
+<div class="callout warn">Example: Holding both a Nifty 50 Index Fund and a Large Cap Active Fund gives you ~75% overlap — you effectively own the same 50 stocks twice, paying two expense ratios.</div>
+<p>DiversiFi uses SEBI category mandates to estimate overlap even without knowing exact holdings:</p>
+<div class="table-wrap">
+<table class="dist compact">
+  <thead><tr><th>Pair</th><th>Estimated Overlap</th></tr></thead>
+  <tbody>
+    <tr><td>Large Cap ↔ Index Fund</td><td class="num">~75%</td></tr>
+    <tr><td>Large Cap ↔ Flexi Cap</td><td class="num">~55%</td></tr>
+    <tr><td>Mid Cap ↔ Small Cap</td><td class="num">~15%</td></tr>
+    <tr><td>Large Cap ↔ Small Cap</td><td class="num">~3%</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<!-- ──────────────────────────────────────────────────────── -->
+<section id="diversification">
+<h2>6. Diversification Score (0–100)</h2>
+<p>The Diversification Score measures how well-spread your overall portfolio (stocks + mutual funds) is across sectors, asset types, and company sizes. It penalises concentration risk and mutual fund overlap.</p>
+
+<div class="stat-row">
+  <div class="stat-card"><div class="stat-value">25</div><div class="stat-label">Sector Spread</div></div>
+  <div class="stat-card"><div class="stat-value">20</div><div class="stat-label">Asset Class Spread</div></div>
+  <div class="stat-card"><div class="stat-value">30</div><div class="stat-label">Concentration Safe</div></div>
+  <div class="stat-card"><div class="stat-value">15</div><div class="stat-label">MF Overlap Safe</div></div>
+  <div class="stat-card"><div class="stat-value">10</div><div class="stat-label">Risk Alignment</div></div>
+</div>
+
+<h3>Sector Spread (max 25 pts)</h3>
+<p>Counts how many of the 8 major NSE sectors you have meaningful exposure to. More active sectors = better spread.</p>
+<div class="formula-box">Sector Spread pts = min(25, round((activeSectors ÷ 8) × 25))</div>
+
+<h3>Asset Class Spread (max 20 pts)</h3>
+<p>How many distinct asset types you hold: stocks, large-cap MFs, mid-cap MFs, small-cap MFs, debt/hybrid funds, ELSS, etc. Each distinct type adds 7 pts up to 20.</p>
+
+<h3>Concentration Risk</h3>
+<p>Flags when any single position dominates the portfolio. DiversiFi raises a concentration flag when:</p>
+<ul>
+  <li>Any single stock exceeds <strong>15%</strong> of the stock portion of your portfolio</li>
+  <li>Any single sector exceeds <strong>25%</strong> of the total portfolio</li>
+  <li>Top 3 holdings together exceed <strong>50%</strong> of portfolio</li>
+</ul>
+<div class="callout warn">Concentration risk is evaluated on stock value only (not including MF value) for stock-level checks — including MF NAV would unfairly dilute the signal and hide genuine over-concentration in individual stocks.</div>
+
+<h3>Sector Allocation vs Benchmark</h3>
+<p>Your sector weights are compared to the Nifty 50 or Nifty 500 benchmark weights. A delta &gt; +5% = overweight, &lt; −5% = underweight. Having ≥ 5 sectors within ±10% of benchmark adds 10 pts to the diversification score.</p>
+</section>
+
+<!-- ──────────────────────────────────────────────────────── -->
+<section id="fundamental">
+<h2>7. Fundamental Metrics</h2>
+<p>Fundamental metrics come from a company's financial statements — not from price charts. They tell you whether a business is healthy, growing, and reasonably valued.</p>
+
+<h3>PE Ratio — Price to Earnings</h3>
+<p><strong>What it is:</strong> How much the market is willing to pay for ₹1 of the company's earnings.</p>
+<div class="formula-box">PE = Market Price per Share ÷ Earnings Per Share (EPS)</div>
+<div class="table-wrap">
+<table class="dist compact">
+  <thead><tr><th>PE Range</th><th>Interpretation (Indian market context)</th><th>Signal Score</th></tr></thead>
+  <tbody>
+    <tr><td>&lt; 0</td><td>Company is loss-making</td><td class="num">3 pts</td></tr>
+    <tr><td>≤ 20</td><td>Cheap / value zone</td><td class="num">12 pts</td></tr>
+    <tr><td>≤ 35</td><td>Fair value for quality companies</td><td class="num">9 pts</td></tr>
+    <tr><td>≤ 50</td><td>Expensive but justifiable for high-growth</td><td class="num">6 pts</td></tr>
+    <tr><td>&gt; 50</td><td>Very expensive — requires exceptional growth</td><td class="num">4 pts</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="callout">Nifty 50 PE historically trades between 18–28. PE &gt; 30 is expensive by historical standards. PE of growth stocks (like tech) can legitimately be 50–100 if earnings are growing fast.</div>
+
+<h3>PB Ratio — Price to Book</h3>
+<p><strong>What it is:</strong> The ratio of market price to the company's book value (net assets per share). Useful for asset-heavy industries like banks, NBFCs, and industrials.</p>
+<div class="formula-box">PB = Market Price ÷ (Total Assets − Total Liabilities) per share</div>
+<ul>
+  <li>PB &lt; 1: Trading below net assets — potentially undervalued (or the assets are impaired)</li>
+  <li>PB 1–3: Fair value range for most Indian companies</li>
+  <li>PB &gt; 5: Premium valuation — market expects high returns on equity</li>
+</ul>
+
+<h3>EPS — Earnings Per Share</h3>
+<p>The share of annual net profit attributable to each outstanding share.</p>
+<div class="formula-box">EPS = Net Profit After Tax ÷ Total Shares Outstanding</div>
+<p>Positive EPS means the company is profitable. DiversiFi awards +8 pts in the Signal Score for positive EPS, and +3 pts for loss-making companies.</p>
+
+<h3>ROE — Return on Equity</h3>
+<p><strong>What it is:</strong> How much profit the company generates for each rupee of shareholders' capital. A measure of management efficiency.</p>
+<div class="formula-box">ROE = Net Profit ÷ Shareholder Equity × 100%</div>
+<p>ROE &gt; 15% is generally considered good for Indian businesses. High ROE + reasonable debt = quality business.</p>
+
+<h3>D/E Ratio — Debt to Equity</h3>
+<p>How much debt the company carries relative to its equity base.</p>
+<div class="formula-box">D/E = Total Debt ÷ Total Shareholders' Equity</div>
+<ul>
+  <li>D/E &lt; 0.5: Conservative, low financial risk</li>
+  <li>D/E 0.5–1.5: Moderate leverage, normal for most industries</li>
+  <li>D/E &gt; 2: High leverage — interest payments may eat into profits in downturns</li>
+  <li>Capital-intensive industries (power, infra, banking) naturally carry higher D/E</li>
+</ul>
+</section>
+
+<!-- ──────────────────────────────────────────────────────── -->
+<section id="algo-trading">
+<h2>8. Algo Trading Metrics</h2>
+<p>The DiversiFi Algo Engine runs a 6-agent LangGraph pipeline for paper trading against Nifty 50 constituents. These metrics evaluate its performance (H1 2025 backtest, 47 trades).</p>
+
+<div class="stat-row">
+  <div class="stat-card stat-card-ok"><div class="stat-value">+18.4%</div><div class="stat-label">Total Return</div></div>
+  <div class="stat-card stat-card-ok"><div class="stat-value">+7.2%</div><div class="stat-label">Alpha vs Nifty 50</div></div>
+  <div class="stat-card stat-card-ok"><div class="stat-value">1.84</div><div class="stat-label">Sharpe Ratio</div></div>
+  <div class="stat-card stat-card-ok"><div class="stat-value">64.2%</div><div class="stat-label">Win Rate</div></div>
+</div>
+
+<h3>Win Rate</h3>
+<p>The percentage of trades that closed with a profit.</p>
+<div class="formula-box">Win Rate = (Profitable Trades ÷ Total Trades) × 100%</div>
+<p>A 64.2% win rate on 47 trades means 30 profitable trades out of 47. Professional systematic strategies typically target 55–65%. Higher win rates alone are not sufficient — the magnitude of wins vs losses also matters (Risk:Reward ratio).</p>
+
+<h3>Max Drawdown</h3>
+<p>The largest peak-to-trough decline in portfolio value during the period. Measures worst-case loss if you had invested at the peak and exited at the trough.</p>
+<div class="formula-box">Max Drawdown = (Trough Value − Peak Value) ÷ Peak Value × 100%</div>
+<p>DiversiFi algo recorded −8.3% max drawdown. For context, Nifty 50 has had drawdowns of −50% (2008), −40% (2020). A −8.3% max drawdown is very conservative.</p>
+
+<h3>VaR — Value at Risk</h3>
+<p>A statistical measure of the maximum loss you should expect on a single day, with 95% confidence. DiversiFi's algo showed VaR (95%, 1d) = −1.2%.</p>
+<div class="callout">VaR (95%, 1d) = −1.2% means: on 95% of trading days, your daily loss should not exceed 1.2%. On the remaining 5% of days (the tail), losses could exceed this. VaR does NOT tell you how bad those tail losses could be — that requires CVaR (Conditional VaR).</div>
+
+<h3>Annualised Alpha</h3>
+<p>Alpha calculated and expressed as a yearly figure, making it comparable across strategies of different durations.</p>
+<div class="formula-box">Annualised Alpha = CAPM Alpha × (252 ÷ trading days in period)</div>
+<p>DiversiFi algo: +14.4% annualised alpha over Nifty 50, meaning the strategy generated 14.4 percentage points of excess return per year above what its beta predicted.</p>
+
+<h3>The 6-Agent Pipeline</h3>
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Agent</th><th>Role</th></tr></thead>
+  <tbody>
+    <tr><td>News Ingest</td><td>Fetches and preprocesses real-time news from NSE, BSE, financial APIs</td></tr>
+    <tr><td>Sentiment Agent</td><td>NLP scoring of news articles — positive/negative/neutral classification</td></tr>
+    <tr><td>Technical Agent</td><td>Computes RSI, MACD, DMA crossovers, Bollinger Bands for each stock</td></tr>
+    <tr><td>Fundamental Agent</td><td>Retrieves PE, EPS, quarterly earnings data from financial APIs</td></tr>
+    <tr><td>Risk Manager</td><td>Position sizing, stop-loss limits, portfolio concentration checks</td></tr>
+    <tr><td>Execution Router</td><td>Generates buy/sell orders based on all upstream signals</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Three Algo Strategies</h3>
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Strategy</th><th>Return</th><th>Win Rate</th><th>Trades</th><th>Logic</th></tr></thead>
+  <tbody>
+    <tr><td>Momentum Breakout</td><td class="num">+11.2%</td><td class="num">68.4%</td><td class="num">19</td><td>Buy when price breaks above 52-week high on volume surge; follow the trend</td></tr>
+    <tr><td>Sentiment Reversal</td><td class="num">+4.8%</td><td class="num">61.5%</td><td class="num">13</td><td>Buy oversold stocks with rapidly improving news sentiment</td></tr>
+    <tr><td>Factor Rotation</td><td class="num">+2.4%</td><td class="num">60.0%</td><td class="num">15</td><td>Rotate between sectors based on macro and momentum factors</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<!-- ──────────────────────────────────────────────────────── -->
+<section id="market-structure">
+<h2>9. Market Structure — FII, DII, Indices, Sectors</h2>
+
+<h3>FII — Foreign Institutional Investors</h3>
+<p>Large foreign entities (pension funds, hedge funds, sovereign wealth funds) that invest in Indian markets. FII flows are a major driver of Nifty 50 direction.</p>
+<div class="table-wrap">
+<table class="dist compact">
+  <thead><tr><th>Metric</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>FII Buy</td><td>Total value of Indian stocks/bonds purchased by FIIs today (₹ crore)</td></tr>
+    <tr><td>FII Sell</td><td>Total value sold</td></tr>
+    <tr><td>FII Net</td><td>Buy − Sell. Positive = net inflow into India. Negative = capital leaving India.</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="callout warn">Large FII outflows (net selling) often coincide with rupee depreciation and Nifty corrections. A sustained 5+ session FII sell streak is a red flag for portfolio risk.</div>
+
+<h3>DII — Domestic Institutional Investors</h3>
+<p>Indian institutions — mutual funds, insurance companies (LIC), pension funds. DIIs often buy when FIIs sell, providing a stabilising counter-force to foreign volatility.</p>
+<p>When FII Net is deeply negative but DII Net is strongly positive, the market often holds support — domestic money absorbs the foreign selling. This is why SEBI's push for SIP culture (₹20,000+ crore/month SIP inflows) has made Indian markets more resilient.</p>
+
+<h3>NSE Sectors (used in DiversiFi)</h3>
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Sector</th><th>Key stocks</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>IT / Technology</td><td>TCS, Infosys, Wipro, HCL Tech</td><td>60%+ revenue from USA — dollar exposure</td></tr>
+    <tr><td>Banking &amp; Finance</td><td>HDFC Bank, ICICI Bank, SBI, Axis Bank</td><td>Largest Nifty 50 weight (~35%)</td></tr>
+    <tr><td>Pharmaceuticals</td><td>Sun Pharma, Dr. Reddy's, Cipla</td><td>USD revenue from US generic drugs</td></tr>
+    <tr><td>Metals &amp; Mining</td><td>Tata Steel, JSW Steel, NMDC, Hindalco</td><td>Sensitive to China steel/coal prices</td></tr>
+    <tr><td>Oil &amp; Gas</td><td>Reliance, ONGC, BPCL, Indian Oil</td><td>Crude oil price risk — Brent + USD/INR</td></tr>
+    <tr><td>FMCG</td><td>HUL, ITC, Nestle, Britannia</td><td>Defensive — performs well in downturns</td></tr>
+    <tr><td>Auto</td><td>Maruti, Tata Motors, M&amp;M, Bajaj Auto</td><td>Sensitive to commodity input costs</td></tr>
+    <tr><td>Real Estate</td><td>DLF, Prestige, Lodha</td><td>Sensitive to interest rates and RBI policy</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Key Indices</h3>
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Index</th><th>Composition</th><th>Used for</th></tr></thead>
+  <tbody>
+    <tr><td>Nifty 50</td><td>Top 50 NSE stocks by free-float market cap</td><td>Primary equity benchmark for most DiversiFi metrics</td></tr>
+    <tr><td>Nifty 500</td><td>Top 500 NSE stocks</td><td>Broader benchmark for large+mid+small cap portfolios</td></tr>
+    <tr><td>Sensex</td><td>Top 30 BSE stocks</td><td>Alternative large-cap benchmark</td></tr>
+    <tr><td>Nifty Bank</td><td>Top 12 banking stocks</td><td>Sector benchmark</td></tr>
+    <tr><td>Nifty IT</td><td>IT sector stocks</td><td>Sector benchmark</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<!-- ──────────────────────────────────────────────────────── -->
+<section id="global-markets">
+<h2>10. Global Markets &amp; Geopolitical Impact</h2>
+
+<h3>Country → India Impact Correlations</h3>
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Country</th><th>Primary channel</th><th>Key Indian sectors affected</th></tr></thead>
+  <tbody>
+    <tr><td>🇺🇸 USA</td><td>IT revenue (60%+ of TCS/Infosys earnings come from the US); Fed rate decisions drive FII flows globally</td><td>IT Services, Banking (credit cycles)</td></tr>
+    <tr><td>🇨🇳 China</td><td>Steel dumping pressure on Indian mills; API raw material dependency for pharma; commodity demand</td><td>Metals, Pharma (APIs)</td></tr>
+    <tr><td>🇯🇵 Japan</td><td>JPY weakness → yen carry trade unwind → FII outflows from all emerging markets including India</td><td>All sectors (via FII channel)</td></tr>
+    <tr><td>🇦🇺 Australia</td><td>30% of India's coking coal imports; disruption → steel production cost rise</td><td>Steel (JSW, NMDC, Tata Steel)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Forex — USD/INR Impact</h3>
+<ul>
+  <li><strong>Weak rupee (USD/INR rising)</strong>: Good for IT exporters (earn USD, report in INR — revenue goes up in rupee terms). Bad for oil importers (crude is priced in USD — import bill rises).</li>
+  <li><strong>RBI intervention threshold:</strong> When USD/INR approaches ₹84, the Reserve Bank of India typically intervenes by selling USD reserves to support the rupee.</li>
+</ul>
+
+<h3>Yen Carry Trade</h3>
+<p>Investors borrow cheaply in Japanese Yen (historically near 0% interest) and invest the proceeds in higher-yielding assets like Indian equities. When the Bank of Japan raises rates or JPY appreciates sharply, these trades unwind — investors sell Indian (and other EM) assets to repay yen loans, causing sudden FII outflows and market drops.</p>
+<div class="callout warn">The August 2024 global correction was partly triggered by a yen carry trade unwind after the Bank of Japan raised rates unexpectedly — Nifty fell ~4% in a single week.</div>
+
+<h3>Commodity → Sector Links</h3>
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Commodity</th><th>Price rises hurt</th><th>Price rises help</th></tr></thead>
+  <tbody>
+    <tr><td>Crude oil (Brent)</td><td>Aviation, Paints, Tyres, OMCs (until subsidies adjust)</td><td>ONGC, Cairn, upstream E&amp;P</td></tr>
+    <tr><td>Coking coal</td><td>Steel mills (input cost)</td><td>Coal India</td></tr>
+    <tr><td>Gold</td><td>Jewellery margins</td><td>Gold funds, Muthoot Finance</td></tr>
+    <tr><td>Aluminium</td><td>Auto, packaging</td><td>Hindalco, Nalco</td></tr>
+    <tr><td>Steel</td><td>Construction, auto</td><td>Tata Steel, JSW Steel</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Geopolitical Risk Zones</h3>
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Event</th><th>Risk level</th><th>India impact</th></tr></thead>
+  <tbody>
+    <tr><td>Strait of Hormuz disruption</td><td><span class="pill pill-red">Critical</span></td><td>~85% of India's oil imports transit through Hormuz — supply shock = oil spike = OMC losses + inflation</td></tr>
+    <tr><td>Eastern Europe conflict escalation</td><td><span class="pill pill-amber">High</span></td><td>Wheat/sunflower oil supply → food inflation; energy prices; defence spending globally</td></tr>
+    <tr><td>Durand Line tension (Pak-Afghan)</td><td><span class="pill pill-amber">Moderate</span></td><td>Border tension = defence sector interest; tourism disruption; some trade routes</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<!-- ──────────────────────────────────────────────────────── -->
+<section id="simulation">
+<h2>11. Monte Carlo Simulation &amp; Scenario Analysis</h2>
+
+<h3>What is Monte Carlo Simulation?</h3>
+<p>A technique that runs thousands of randomised "what-if" scenarios for your portfolio's future value. Instead of giving you one projected outcome, it gives you a probability distribution — showing the range of possible outcomes and how likely each is.</p>
+<div class="callout">DiversiFi runs 1,000+ simulations per portfolio using Geometric Brownian Motion (GBM) — the same mathematical model used by professional options traders and risk managers.</div>
+
+<h3>Geometric Brownian Motion (GBM)</h3>
+<p>The standard model for stock price paths. It assumes prices grow exponentially (multiplicative, not additive) and that the random day-to-day fluctuations follow a normal distribution.</p>
+<div class="formula-box">
+dS = μS·dt + σS·dW<br/><br/>
+Where:<br/>
+  S = asset price<br/>
+  μ = expected drift (annualised return − variance adjustment)<br/>
+  σ = volatility (annualised standard deviation of returns)<br/>
+  dW = random Wiener process increment (normally distributed noise)
+</div>
+<p>In practice, each simulation uses <code>randomNormal(mean, stdDev)</code> to generate daily return shocks, compounded month by month.</p>
+
+<h3>CAGR — Compound Annual Growth Rate</h3>
+<p>The steady-state annual growth rate that would turn your initial investment into the final value over the investment period.</p>
+<div class="formula-box">CAGR = (Final Value ÷ Initial Value)^(1 ÷ years) − 1</div>
+<p>Example: ₹1 lakh grows to ₹2.5 lakhs in 8 years → CAGR = (2.5)^(1/8) − 1 = 12.1% p.a.</p>
+
+<h3>Percentile Outcomes</h3>
+<p>After running 1,000 simulations, DiversiFi shows you:</p>
+<div class="table-wrap">
+<table class="dist compact">
+  <thead><tr><th>Percentile</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>10th percentile</td><td>Pessimistic outcome — only 10% of scenarios do worse than this</td></tr>
+    <tr><td>50th percentile (median)</td><td>Middle outcome — half of scenarios are above, half below</td></tr>
+    <tr><td>90th percentile</td><td>Optimistic outcome — only 10% of scenarios do better than this</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Industry &amp; Geopolitical Scenarios</h3>
+<p>On top of random GBM noise, DiversiFi overlays structured macro scenarios:</p>
+<ul>
+  <li><strong>Industry scenarios:</strong> E.g. "IT sector slowdown" — applies a −20% impact shock to IT holdings starting in a specified month</li>
+  <li><strong>Geopolitical scenarios:</strong> E.g. "Global recession" — applies a broad negative impact across all holdings, with degree proportional to each company's global revenue exposure</li>
+  <li><strong>AI holding impact analysis:</strong> For each holding, an LLM evaluates whether it would be affected by each scenario and estimates the impact percentage with reasoning</li>
+</ul>
+<div class="callout">Simulation results are illustrative estimates, not guarantees. Real markets can exhibit fat tails, correlation breakdowns, and liquidity crises not captured by GBM.</div>
+</section>
+
+<!-- ──────────────────────────────────────────────────────── -->
+<section id="verdict">
+<h2>12. Portfolio Agent — Verdict &amp; Alert System</h2>
+<p>The DiversiFi Portfolio Agent monitors your holdings in real time during market hours (9:15 AM – 3:30 PM IST, Monday–Friday). It streams analysis via SSE (Server-Sent Events) and issues a top-level verdict on your portfolio health.</p>
+
+<h3>Verdict Tiers</h3>
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Verdict</th><th>Meaning</th><th>When triggered</th></tr></thead>
+  <tbody>
+    <tr><td><span class="pill pill-green">All Good</span></td><td>Portfolio is healthy, no urgent concerns</td><td>All holdings within normal range, no news risks</td></tr>
+    <tr><td><span class="pill pill-blue">Watch</span></td><td>Minor concerns worth monitoring</td><td>1–2 holdings showing weak signals or slight negative news</td></tr>
+    <tr><td><span class="pill pill-amber">Caution</span></td><td>Meaningful risks identified, consider action</td><td>Multiple holdings with deteriorating signals, sector stress</td></tr>
+    <tr><td><span class="pill pill-red">Critical</span></td><td>Immediate action may be needed</td><td>Severe news event, sharp drawdown, systemic risk detected</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Alert Tiers</h3>
+<ul>
+  <li><strong>Immediate alerts:</strong> Holdings requiring urgent attention — significant price drops, very negative news, strong sell signals</li>
+  <li><strong>Caution alerts:</strong> Holdings to watch — deteriorating but not critical signals, mixed news</li>
+</ul>
+
+<h3>SSE Event Types</h3>
+<div class="table-wrap">
+<table class="dist">
+  <thead><tr><th>Event type</th><th>Payload</th><th>What it triggers in UI</th></tr></thead>
+  <tbody>
+    <tr><td><code>analysis_start</code></td><td>—</td><td>Shows "Analysing…" spinner</td></tr>
+    <tr><td><code>analysis_complete</code></td><td>—</td><td>Hides spinner, reloads dashboard data</td></tr>
+    <tr><td><code>activity_log</code></td><td>timestamp, icon, message, level</td><td>Appends line to live Activity Feed (max 50 entries)</td></tr>
+    <tr><td><code>verdict_update</code></td><td>verdict, reason, summary, topAlerts</td><td>Updates VerdictBanner</td></tr>
+    <tr><td><code>alert_added</code></td><td>alert object (symbol, issue, action, tier)</td><td>Adds to alert cards if not duplicate</td></tr>
+    <tr><td><code>price_update</code></td><td>symbol, price, change1d</td><td>Updates live prices in Holdings Grid</td></tr>
+    <tr><td><code>sentiment_update</code></td><td>symbol, sentiment (label, score, headlines)</td><td>Updates news sentiment feed for that symbol</td></tr>
+    <tr><td><code>market_closed</code></td><td>—</td><td>Stops analysis spinner, shows "Market closed" badge</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>News Sentiment per Holding</h3>
+<p>For each stock in your portfolio, the agent fetches recent news and runs NLP analysis, returning:</p>
+<ul>
+  <li><strong>Label:</strong> Positive / Negative / Neutral / Mixed</li>
+  <li><strong>Score:</strong> 0–1 confidence score</li>
+  <li><strong>Headlines:</strong> Top 3 relevant news snippets</li>
+</ul>
+
+<h3>Email Reports</h3>
+<p>The agent can send email summaries of your portfolio health, verdict, and top alerts. The <code>lastReportSentAt</code> timestamp prevents duplicate sends. Reports are triggered manually or on a scheduled basis.</p>
+</section>
+
+<footer>
+  <p>Source files: <code>research_service.py</code> · <code>portfolio_analysis.py</code> · <code>mf_service.py</code> · <code>portfolioEngine.ts</code> · <code>advancedSimulation.ts</code> · <code>SuggestPage.tsx</code> · <code>AgentPage.tsx</code> · <code>GlobalTradePage.tsx</code><br/>
+  DiversiFi Financial Intelligence Platform · July 2026</p>
+</footer>
+</main>
+
+<button id="top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑ Top</button>
+<script>
+(function(){
+  var btn = document.getElementById('top-btn');
+  window.addEventListener('scroll', function(){ btn.classList.toggle('visible', window.scrollY > 300); }, {passive:true});
+
+  var links = document.querySelectorAll('nav.sidebar-toc a');
+  var sections = Array.from(links).map(function(l){ return document.querySelector(l.getAttribute('href')); }).filter(Boolean);
+  function onScroll(){
+    var pos = window.scrollY + 120;
+    var cur = sections.reduce(function(a, s){ return s.offsetTop <= pos ? s : a; }, sections[0]);
+    links.forEach(function(l){ l.classList.toggle('active', l.getAttribute('href') === '#' + (cur && cur.id)); });
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+})();
+</script>
+</body>
+</html>

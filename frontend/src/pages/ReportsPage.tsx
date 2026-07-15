@@ -109,7 +109,7 @@ const COMPARISON_REPORTS: Report[] = [
   {
     id:         "tcs-comparison",
     badge:      "Model Comparison · TCS.NS",
-    badgeColor: "#ef4444",
+    badgeColor: "#1b78ef",
     title:      "Three-Model Comparison · TCS",
     sub:        "LangGraph Ensemble vs ARIMA vs LSTM · TCS.NS · Jan 2021 – Apr 2023 · 575 days",
     desc:       "Walk-forward comparison on 575 trading days of TCS data through a complete US rate-hike cycle (70% train / 30% test). Test window (Jul 2022 – Apr 2023) covers peak Fed aggression - 75bps hikes in Jun, Jul, and Sep 2022 - where macro-news awareness is decisive.",
