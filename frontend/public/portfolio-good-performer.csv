@@ -1,0 +1,16 @@
+type,symbol,name,qty,avgBuyPrice,currentPrice,currentValue,category,investedAmount,buyDate
+stock,SUNPHARMA,Sun Pharmaceutical Industries,50,580,1952,97600,,,2020-06-15
+stock,NESTLEIND,Nestle India Ltd,30,1280,1427,42810,,,2023-03-10
+stock,POWERGRID,Power Grid Corporation of India,300,155,281,84300,,,2021-02-20
+stock,BAJAJ-AUTO,Bajaj Auto Ltd,8,3100,10323,82584,,,2020-08-05
+stock,TITAN,Titan Company Ltd,30,1000,4574,137220,,,2020-07-12
+stock,BAJFINANCE,Bajaj Finance Ltd,80,430,1021,81680,,,2020-10-08
+stock,JSWSTEEL,JSW Steel Ltd,80,310,1227,98160,,,2021-03-15
+stock,TATAPOWER,Tata Power Company Ltd,300,68,381,114300,,,2021-01-25
+stock,AXISBANK,Axis Bank Ltd,80,480,1312,104960,,,2020-09-22
+stock,COALINDIA,Coal India Ltd,200,128,428,85600,,,2021-04-14
+mf,,Parag Parikh Flexi Cap Fund Direct Growth,,,,248000,Flexi Cap,150000,2020-11-10
+mf,,SBI Small Cap Fund Direct Growth,,,,195000,Small Cap,100000,2021-03-08
+mf,,Kotak Emerging Equity Fund Direct Growth,,,,145000,Mid Cap,80000,2021-06-15
+mf,,Mirae Asset Large Cap Fund Direct Growth,,,,112000,Large Cap,75000,2022-01-20
+mf,,DSP Healthcare Fund Direct Growth,,,,98000,Sectoral,65000,2021-09-01

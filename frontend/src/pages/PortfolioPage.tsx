@@ -210,7 +210,8 @@ interface DeepAnalysis {
     total_pnl: number;
   };
   holdings: any[];
-  chart_data: { date: string; portfolio: number; benchmark: number }[];
+  chart_data:    { date: string; portfolio: number; benchmark: number }[];
+  chart_data_3m: { date: string; portfolio: number; benchmark: number }[];
   tax: any;
 }
 
@@ -540,15 +541,16 @@ export default function PortfolioPage() {
 
             {/* ── DEEP ANALYSIS: Performance Chart ── */}
             <Card
-              title="Portfolio vs Benchmark (6 months)"
-              subtitle={`Normalised to 100 - vs ${input.benchmark === "nifty50" ? "Nifty 50" : "Nifty 500"}`}
+              title="Portfolio vs Benchmark Returns"
+              subtitle={`Return % over period - vs ${input.benchmark === "nifty50" ? "Nifty 50" : "Nifty 500"}`}
               badge={deepLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400 dark:text-white/30" /> : undefined}
             >
               {deepLoading ? (
                 <div className="h-52 bg-gray-100 dark:bg-white/5 rounded-xl animate-pulse" />
               ) : (
                 <PerformanceChart
-                  data={deepAnalysis?.chart_data ?? []}
+                  data6m={deepAnalysis?.chart_data ?? []}
+                  data3m={deepAnalysis?.chart_data_3m ?? []}
                   benchmarkLabel={input.benchmark === "nifty50" ? "Nifty 50" : "Nifty 500"}
                 />
               )}
@@ -583,7 +585,7 @@ export default function PortfolioPage() {
               <Card title="Sector Allocation" subtitle="Your portfolio vs benchmark">
                 <SectorDonutChart allocations={analysis.sectorAllocations} />
               </Card>
-              <Card title="Benchmark Comparison" subtitle={`vs ${input.benchmark === "nifty50" ? "Nifty 50" : "Nifty 500"}`}>
+              <Card title="Diversification Comparison" subtitle={`vs ${input.benchmark === "nifty50" ? "Nifty 50" : "Nifty 500"}`}>
                 <BenchmarkComparisonChart allocations={analysis.sectorAllocations} benchmarkLabel={input.benchmark === "nifty50" ? "Nifty 50" : "Nifty 500"} />
               </Card>
             </div>

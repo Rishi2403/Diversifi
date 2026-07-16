@@ -53,7 +53,7 @@ WATCHLIST = [
     {"symbol": "M&M.NS",        "name": "Mahindra & Mahindra",   "sector": "Auto"},
     {"symbol": "ULTRACEMCO.NS", "name": "UltraTech Cement",      "sector": "Cement"},
     {"symbol": "ASIANPAINT.NS", "name": "Asian Paints",          "sector": "Consumer"},
-    {"symbol": "TATAMOTORS.NS", "name": "Tata Motors",           "sector": "Auto"},
+    {"symbol": "TMPV.NS", "name": "Tata Motors",           "sector": "Auto"},
     {"symbol": "INDUSINDBK.NS", "name": "IndusInd Bank",         "sector": "Banking"},
     {"symbol": "TATACONSUM.NS", "name": "Tata Consumer",         "sector": "FMCG"},
     {"symbol": "BPCL.NS",       "name": "BPCL",                  "sector": "Energy"},

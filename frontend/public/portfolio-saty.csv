@@ -1,0 +1,10 @@
+type,symbol,name,qty,avgBuyPrice,currentPrice,currentValue,category,investedAmount,buyDate
+stock,SUNPHARMA,Sun Pharmaceutical Industries,40,580,1952,78080,,,2020-06-15
+stock,TITAN,Titan Company Ltd,20,1000,4574,91480,,,2020-07-12
+stock,BAJAJ-AUTO,Bajaj Auto Ltd,5,3100,10323,51615,,,2020-08-05
+stock,BAJFINANCE,Bajaj Finance Ltd,80,430,1021,81680,,,2020-10-08
+stock,JSWSTEEL,JSW Steel Ltd,60,310,1227,73620,,,2021-03-15
+mf,,Parag Parikh Flexi Cap Fund Direct Growth,,,,210000,Flexi Cap,120000,2020-11-10
+mf,,SBI Small Cap Fund Direct Growth,,,,158000,Small Cap,80000,2021-03-08
+mf,,Mirae Asset Large Cap Fund Direct Growth,,,,96000,Large Cap,60000,2021-09-15
+mf,,Kotak Emerging Equity Fund Direct Growth,,,,88000,Mid Cap,50000,2022-01-20

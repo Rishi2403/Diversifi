@@ -1,0 +1,10 @@
+type,symbol,name,qty,avgBuyPrice,currentPrice,currentValue,category,investedAmount,buyDate
+stock,TCS,Tata Consultancy Services,15,3800,2189,32835,,,2021-11-15
+stock,INFY,Infosys Ltd,30,1750,1076,32280,,,2021-10-20
+stock,RELIANCE,Reliance Industries Ltd,30,2580,1296,38880,,,2022-01-18
+stock,HINDUNILVR,Hindustan Unilever Ltd,15,2780,2103,31545,,,2021-09-08
+stock,SBIN,State Bank of India,25,820,1030,25750,,,2022-05-12
+stock,DRREDDY,Dr Reddys Laboratories Ltd,15,1020,1230,18450,,,2022-04-20
+mf,,HDFC Flexi Cap Fund Direct Growth,,,,105000,Flexi Cap,80000,2022-03-15
+mf,,Axis Bluechip Fund Direct Growth,,,,73500,Large Cap,60000,2022-06-10
+mf,,DSP Midcap Fund Direct Growth,,,,65000,Mid Cap,50000,2022-08-22

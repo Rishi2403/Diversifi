@@ -8,6 +8,7 @@ import { Header } from "@/components/Header";
 
 // ─── CSV Parser ──────────────────────────────────────────────────────────────
 
+
 function parseCSV(text: string) {
   const lines = text.trim().split("\n").filter(l => l.trim());
   if (lines.length < 2) return { stocks: [], mutualFunds: [] };

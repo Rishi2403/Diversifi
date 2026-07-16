@@ -57,7 +57,7 @@ export function HoldingsPerformanceTable({ holdings }: Props) {
               : "text-red-400";
 
             return (
-              <tr key={i} className="hover:bg-gray-50 dark:hover:bg-white/3 transition-colors">
+              <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-900/20 transition-colors">
                 <td className="py-2.5 pr-2">
                   <div className="flex items-center gap-2">
                     <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${h.is_mf ? "bg-purple-500/15 text-purple-400" : "bg-[#00D09C]/15 text-[#00D09C]"}`}>

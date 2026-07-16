@@ -120,27 +120,27 @@ def _compute_risk_and_chart(
     benchmark_sym: str,
 ) -> tuple[dict | None, list[dict]]:
     """
-    Returns (risk_metrics_dict_or_None, chart_data_list).
+    Returns (risk_metrics_dict_or_None, chart_data_6m_list, chart_data_3m_list).
     Fetches 180 days of daily closes for up to MAX_STOCKS stocks.
     """
     stock_pool = [s for s in stocks if s.get("symbol") and s.get("currentValue")]
     stock_pool = stock_pool[:MAX_STOCKS]
 
     if not stock_pool:
-        return None, []
+        return None, [], [], []
 
     total_stock_value = sum(float(s.get("currentValue", 0)) for s in stock_pool)
     if total_stock_value <= 0:
-        return None, []
+        return None, [], [], []
 
     # Fetch benchmark
     try:
         bench_hist = yf.Ticker(benchmark_sym).history(period="6mo", interval="1d")
         if bench_hist.empty:
-            return None, []
+            return None, [], [], []
         bench_closes = bench_hist["Close"].dropna()
     except Exception:
-        return None, []
+        return None, [], []
 
     # Fetch each stock; weight by current value
     stock_series = {}
@@ -161,12 +161,12 @@ def _compute_risk_and_chart(
             continue
 
     if len(stock_series) < 5:
-        return None, []
+        return None, [], []
 
     # Re-normalise weights for stocks that have data
     w_total = sum(weights.values())
     if w_total <= 0:
-        return None, []
+        return None, [], []
     weights = {k: v / w_total for k, v in weights.items()}
 
     # Align all series to common dates
@@ -178,7 +178,7 @@ def _compute_risk_and_chart(
 
     df = pd.DataFrame(all_series).dropna()
     if len(df) < 20:
-        return None, []
+        return None, [], []
 
     bench_ret = df["_bench"].pct_change().dropna()
 
@@ -191,7 +191,7 @@ def _compute_risk_and_chart(
             port_ret += w * r
 
     if len(port_ret) < 10:
-        return None, []
+        return None, [], []
 
     # Annualised stats
     port_annual  = float(port_ret.mean() * 252)
@@ -201,40 +201,50 @@ def _compute_risk_and_chart(
     cov_matrix = np.cov(port_ret.values, bench_ret.values)
     beta = float(cov_matrix[0, 1] / cov_matrix[1, 1]) if cov_matrix[1, 1] != 0 else None
 
-    alpha  = None
-    sharpe = None
-    if beta is not None:
-        alpha  = round((port_annual - (RISK_FREE_RATE + beta * (bench_annual - RISK_FREE_RATE))) * 100, 2)
-        sharpe = round((port_annual - RISK_FREE_RATE) / (port_std * math.sqrt(252)), 2) if port_std > 0 else None
+    sharpe = round((port_annual - RISK_FREE_RATE) / (port_std * math.sqrt(252)), 2) if port_std > 0 else None
+
+    # Cumulative return % series (starts at 0, not 100)
+    port_cum  = ((1 + port_ret).cumprod() - 1) * 100
+    bench_cum = ((1 + bench_ret).cumprod() - 1) * 100
+
+    port_6m_return  = round(float(port_cum.iloc[-1]), 2)
+    bench_6m_return = round(float(bench_cum.iloc[-1]), 2)
+
+    # Alpha = simple 6M excess return (portfolio outperformance vs benchmark)
+    alpha = round(port_6m_return - bench_6m_return, 2)
 
     risk_metrics = {
-        "beta":        round(beta, 4) if beta is not None else None,
-        "alpha":       alpha,
-        "sharpe":      sharpe,
-        "port_annual": round(port_annual * 100, 2),
-        "bench_annual": round(bench_annual * 100, 2),
+        "beta":             round(beta, 4) if beta is not None else None,
+        "alpha":            alpha,
+        "sharpe":           sharpe,
+        "port_annual":      round(port_annual * 100, 2),
+        "bench_annual":     round(bench_annual * 100, 2),
+        "port_6m_return":   port_6m_return,
+        "bench_6m_return":  bench_6m_return,
     }
 
-    # Chart data - cumulative returns, downsampled every 5 trading days
-    port_cum   = (1 + port_ret).cumprod() * 100
-    bench_cum  = (1 + bench_ret).cumprod() * 100
-
-    risk_metrics["port_6m_return"]  = round(float(port_cum.iloc[-1] - 100), 2)
-    risk_metrics["bench_6m_return"] = round(float(bench_cum.iloc[-1] - 100), 2)
-
+    # 6M chart — downsampled every 5 trading days
     combined = pd.DataFrame({"portfolio": port_cum, "benchmark": bench_cum}).dropna()
     sampled  = combined.iloc[::5]
-
     chart_data = [
-        {
-            "date":      str(idx.date()),
-            "portfolio": round(float(row["portfolio"]), 2),
-            "benchmark": round(float(row["benchmark"]), 2),
-        }
+        {"date": str(idx.date()), "portfolio": round(float(row["portfolio"]), 2), "benchmark": round(float(row["benchmark"]), 2)}
         for idx, row in sampled.iterrows()
     ]
 
-    return risk_metrics, chart_data
+    # 3M chart — last ~63 trading days, rebased from 0
+    THREE_M = 63
+    port_ret_3m  = port_ret.iloc[-THREE_M:]
+    bench_ret_3m = bench_ret.iloc[-THREE_M:]
+    port_cum_3m  = ((1 + port_ret_3m).cumprod() - 1) * 100
+    bench_cum_3m = ((1 + bench_ret_3m).cumprod() - 1) * 100
+    combined_3m  = pd.DataFrame({"portfolio": port_cum_3m, "benchmark": bench_cum_3m}).dropna()
+    sampled_3m   = combined_3m.iloc[::5]
+    chart_data_3m = [
+        {"date": str(idx.date()), "portfolio": round(float(row["portfolio"]), 2), "benchmark": round(float(row["benchmark"]), 2)}
+        for idx, row in sampled_3m.iterrows()
+    ]
+
+    return risk_metrics, chart_data, chart_data_3m
 
 
 # ---------------------------------------------------------------------------
@@ -375,7 +385,7 @@ def compute_portfolio_metrics(
         port_cagr      = _portfolio_cagr(holdings)
 
         # 3. Risk metrics + chart (stocks only)
-        risk_metrics, chart_data = _compute_risk_and_chart(stocks, benchmark_sym)
+        risk_metrics, chart_data, chart_data_3m = _compute_risk_and_chart(stocks, benchmark_sym)
 
         bench_cagr      = None
         alpha           = None
@@ -415,9 +425,10 @@ def compute_portfolio_metrics(
                 "total_current":    round(total_current, 2),
                 "total_pnl":        round(total_pnl, 2),
             },
-            "holdings":   public_holdings,
-            "chart_data": chart_data,
-            "tax":        tax,
+            "holdings":      public_holdings,
+            "chart_data":    chart_data,
+            "chart_data_3m": chart_data_3m,
+            "tax":           tax,
         }
 
     except Exception as e:
