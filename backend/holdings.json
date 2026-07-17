@@ -1,8 +1,8 @@
 {
   "satyaki.dey.ks@gmail.com": {
-    "isDataPresent": true,
+    "isDataPresent": false,
     "dataFile": "sat-ks.json",
-    "isAnalysisPresent": true
+    "isAnalysisPresent": false
   },
   "priyanshuduttakey@gmail.com": {
     "isDataPresent": false,

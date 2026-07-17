@@ -148,7 +148,7 @@ export default function AlgoTradingPage() {
           <span className="text-xs ml-1" style={{ color: "rgba(0,208,156,0.6)" }}>/ Algo</span>
         </Link>
         <a
-          href="/algo-backtest-report.html"
+          href="/reports"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1.5 text-xs font-semibold px-4 py-1.5 rounded-md transition-all"
@@ -258,7 +258,7 @@ export default function AlgoTradingPage() {
           {/* CTAs */}
           <div className="flex flex-wrap gap-3 justify-center">
             <a
-              href="/algo-backtest-report.html"
+              href="/reports"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all hover:opacity-90"
@@ -502,7 +502,7 @@ export default function AlgoTradingPage() {
               and full methodology - all in one report.
             </p>
             <a
-              href="/algo-backtest-report.html"
+              href="/reports"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-sm transition-all hover:opacity-90"

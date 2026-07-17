@@ -320,7 +320,7 @@ export default function SuggestPage() {
   const [investType,  setInvestType]  = useState<InvestType>("lumpsum");
   const [amount,      setAmount]      = useState(100000);      // lumpsum total
   const [sipAmount,   setSipAmount]   = useState(10000);       // monthly SIP
-  const [sipDuration, setSipDuration] = useState(10);          // years
+  const [sipDuration, setSipDuration] = useState(2);          // years
   const [horizon,     setHorizon]     = useState("Medium (1-3 yrs)");
   const [risk,        setRisk]        = useState("Moderate");
   const [sector,      setSector]      = useState("Any");

@@ -354,7 +354,10 @@ def fii_dii_data():
 @flask_app.route("/api/research/pulse", methods=["GET"])
 def research_pulse():
     from research_service import get_pulse_data
-    return jsonify(get_pulse_data())
+    try:
+        return jsonify(get_pulse_data())
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 @flask_app.route("/api/research/analyse", methods=["POST"])

@@ -69,7 +69,7 @@ export default function AdvancedSimulationPage() {
   const [cashBalance, setCashBalance] = useState(0);
 
   // Time horizon
-  const [timeHorizon, setTimeHorizon] = useState(10);
+  const [timeHorizon, setTimeHorizon] = useState(2);
 
   // Investment plans
   const [investmentPlans, setInvestmentPlans] = useState<YearlyInvestmentPlan[]>(

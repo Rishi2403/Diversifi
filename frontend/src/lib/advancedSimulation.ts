@@ -29,8 +29,8 @@ export const INDUSTRIES = [
 ] as const;
 
 export const COUNTRIES = [
-  "India",
   "United States",
+  "India",
   "China",
   "Japan",
   "Germany",

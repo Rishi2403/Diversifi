@@ -7,12 +7,12 @@ import { ResearchNav } from "@/components/ResearchNav";
 
 interface Breakdown { technical: number; momentum: number; fundamental: number; sentiment: number; }
 interface Metrics {
-  rsi: number; macd_bullish: boolean; above_20dma: boolean; above_50dma: boolean;
-  ret_5d: number; ret_30d: number; pe: number | null; eps: number; vol_vs_avg: number;
+  rsi: number | null; macd_bullish: boolean; above_20dma: boolean; above_50dma: boolean;
+  ret_5d: number | null; ret_30d: number | null; pe: number | null; eps: number | null; vol_vs_avg: number | null;
   recent_headlines: string[];
 }
 interface StockSignal {
-  symbol: string; name: string; sector: string; price: number; change_pct: number;
+  symbol: string; name: string; sector: string; price: number | null; change_pct: number | null;
   signal_score: number; signal: "HOT" | "NEUTRAL" | "COLD"; breakdown: Breakdown; metrics: Metrics;
 }
 interface SectorItem { sector: string; price: number; change_pct: number; }
@@ -39,7 +39,7 @@ const heatBg = (pct: number) => {
   if (pct <  0)   return "bg-red-500/10 border-red-500/20 text-red-500";
   return "bg-gray-100 dark:bg-white/5 border-gray-200 dark:border-white/10 text-gray-600 dark:text-white/50";
 };
-const fmt = (n: number) => n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmt = (n: number | null) => n == null ? "—" : n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const retLabel = (n: number | null) => n == null ? "N/A" : `${n > 0 ? "+" : ""}${n.toFixed(2)}%`;
 
 // ── Shared components ──────────────────────────────────────────────────────────
@@ -104,8 +104,8 @@ function StockDetailModal({ stock, onClose }: { stock: StockSignal; onClose: () 
           <div><p className="text-xs text-gray-500 dark:text-white/40">Signal Score</p><p className="text-xs font-medium text-gray-700 dark:text-white/60">out of 100</p></div>
           <div className="ml-auto text-right">
             <p className="text-base font-bold text-gray-900 dark:text-white">₹{fmt(stock.price)}</p>
-            <p className={`text-xs font-semibold ${stock.change_pct >= 0 ? "text-emerald-500" : "text-red-400"}`}>
-              {stock.change_pct >= 0 ? "▲" : "▼"} {Math.abs(stock.change_pct).toFixed(2)}% (5d)
+            <p className={`text-xs font-semibold ${(stock.change_pct ?? 0) >= 0 ? "text-emerald-500" : "text-red-400"}`}>
+              {(stock.change_pct ?? 0) >= 0 ? "▲" : "▼"} {Math.abs(stock.change_pct ?? 0).toFixed(2)}% (5d)
             </p>
           </div>
         </div>
@@ -118,9 +118,9 @@ function StockDetailModal({ stock, onClose }: { stock: StockSignal; onClose: () 
         </div>
         <div className="grid grid-cols-3 gap-2 mb-5">
           {[
-            { label: "RSI (14)",   value: m.rsi },
-            { label: "30-day Ret", value: `${m.ret_30d > 0 ? "+" : ""}${m.ret_30d}%` },
-            { label: "Vol vs Avg", value: `${m.vol_vs_avg.toFixed(2)}×` },
+            { label: "RSI (14)",   value: m.rsi ?? "—" },
+            { label: "30-day Ret", value: m.ret_30d == null ? "—" : `${m.ret_30d > 0 ? "+" : ""}${m.ret_30d}%` },
+            { label: "Vol vs Avg", value: m.vol_vs_avg == null ? "—" : `${m.vol_vs_avg.toFixed(2)}×` },
             { label: "PE Ratio",   value: m.pe ?? "N/A" },
             { label: "EPS",        value: m.eps ?? "N/A" },
             { label: "MACD",       value: m.macd_bullish ? "Bullish" : "Bearish" },
@@ -156,7 +156,7 @@ function StockDetailModal({ stock, onClose }: { stock: StockSignal; onClose: () 
 function StockCard({ stock, delay = 0 }: { stock: StockSignal; delay?: number }) {
   const [open, setOpen] = useState(false);
   const color = scoreColor(stock.signal_score);
-  const up    = stock.change_pct >= 0;
+  const up    = (stock.change_pct ?? 0) >= 0;
   return (
     <>
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}
@@ -168,7 +168,7 @@ function StockCard({ stock, delay = 0 }: { stock: StockSignal; delay?: number })
           </div>
           <div className="text-right">
             <p className="text-sm font-bold text-gray-900 dark:text-white tabular-nums">₹{fmt(stock.price)}</p>
-            <p className={`text-[11px] font-semibold ${up ? "text-emerald-500" : "text-red-400"}`}>{up ? "▲" : "▼"} {Math.abs(stock.change_pct).toFixed(2)}%</p>
+            <p className={`text-[11px] font-semibold ${up ? "text-emerald-500" : "text-red-400"}`}>{up ? "▲" : "▼"} {Math.abs(stock.change_pct ?? 0).toFixed(2)}%</p>
           </div>
         </div>
         <div className="flex items-center gap-2 mb-3">
@@ -190,7 +190,7 @@ function StockCard({ stock, delay = 0 }: { stock: StockSignal; delay?: number })
         </div>
         <div className="flex flex-wrap gap-1 mb-3">
           {[
-            { label: `RSI ${stock.metrics.rsi}`, ok: stock.metrics.rsi >= 50 && stock.metrics.rsi <= 70 },
+            { label: `RSI ${stock.metrics.rsi ?? "—"}`, ok: (stock.metrics.rsi ?? 0) >= 50 && (stock.metrics.rsi ?? 0) <= 70 },
             { label: stock.metrics.macd_bullish ? "MACD ↑" : "MACD ↓", ok: stock.metrics.macd_bullish },
             { label: "20 DMA", ok: stock.metrics.above_20dma },
           ].map(({ label, ok }) => (
@@ -369,38 +369,64 @@ export default function ResearchPage() {
   const [loading,     setLoading]     = useState(true);
   const [refreshing,  setRefreshing]  = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [error,       setError]       = useState<string | null>(null);
 
   const loadStocks = useCallback(async (initial = false) => {
     if (initial) setLoading(true);
     setRefreshing(true);
+    setError(null);
     try {
       const r = await fetch("/api/research/pulse");
+      if (!r.ok) throw new Error(`Server returned ${r.status}`);
       const d = await r.json();
-      if (d.success) { setStockData(d); setLastUpdated(new Date()); }
-    } finally { setLoading(false); setRefreshing(false); }
+      if (d.success) {
+        setStockData(d);
+        setLastUpdated(new Date());
+      } else {
+        setError(d.error ?? "Failed to load market data");
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to fetch market data");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   }, []);
 
   const loadMf = useCallback(async (initial = false) => {
     if (initial) setLoading(true);
     setRefreshing(true);
+    setError(null);
     try {
       const r = await fetch("/api/research/mf/pulse");
+      if (!r.ok) throw new Error(`Server returned ${r.status}`);
       const d = await r.json();
-      if (d.success) { setMfData(d); setLastUpdated(new Date()); }
-    } finally { setLoading(false); setRefreshing(false); }
+      if (d.success) {
+        setMfData(d);
+        setLastUpdated(new Date());
+      } else {
+        setError(d.error ?? "Failed to load MF data");
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to fetch MF data");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   }, []);
 
   useEffect(() => { loadStocks(true); }, [loadStocks]);
 
   const handleModeChange = (m: Mode) => {
     setMode(m);
+    setError(null);
     if (m === "mf" && !mfData) { loadMf(true); return; }
     if (m === "stocks" && !stockData) { loadStocks(true); return; }
     setLoading(false);
   };
 
   const refresh = () => mode === "stocks" ? loadStocks(false) : loadMf(false);
-  const isLoading = loading || (mode === "stocks" ? !stockData : !mfData);
+  const isLoading = loading;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -414,7 +440,7 @@ export default function ResearchPage() {
           </h1>
           <p className="text-xs text-gray-500 dark:text-white/40 mt-0.5">
             {mode === "stocks" ? "AI signal scores across Nifty 50" : "AI return scores across 20 Indian MFs"}
-            {" · "}{lastUpdated ? `Updated ${lastUpdated.toLocaleTimeString()}` : "Loading…"}
+            {" · "}{lastUpdated ? `Updated ${lastUpdated.toLocaleTimeString()}` : isLoading ? "Fetching live data, please wait…" : "—"}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -428,6 +454,15 @@ export default function ResearchPage() {
       </div>
 
       <div className="px-6 md:px-8 py-6 space-y-8 max-w-7xl mx-auto">
+
+        {/* Error banner */}
+        {error && !isLoading && (
+          <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-4 flex items-start gap-3">
+            <span className="text-red-400 text-sm font-semibold">Error:</span>
+            <span className="text-red-400 text-sm">{error}</span>
+            <button onClick={refresh} className="ml-auto text-xs text-red-400 underline shrink-0">Retry</button>
+          </div>
+        )}
 
         {/* Heatmap */}
         <section>

@@ -8,11 +8,22 @@ Score (0-100):
   Consistency  25 pts  positive across 1M/3M/6M/1Y horizons
 """
 
+import math
 import time
 import concurrent.futures
 import requests
 import os
 from typing import Optional
+
+
+def _sanitize(obj):
+    if isinstance(obj, float):
+        return None if (math.isnan(obj) or math.isinf(obj)) else obj
+    if isinstance(obj, dict):
+        return {k: _sanitize(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_sanitize(v) for v in obj]
+    return obj
 
 MF_API_BASE = "https://api.mfapi.in/mf"
 _HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
@@ -98,7 +109,7 @@ MF_RISK_CATEGORIES = {
 }
 
 _mf_pulse_cache: dict = {}
-_CACHE_TTL = 900  # 15 minutes
+_CACHE_TTL = 1800  # 30 minutes
 
 
 def _nav(data: list, idx: int) -> float:
@@ -219,13 +230,13 @@ def get_mf_pulse_data() -> dict:
         scored = [r for r in ex.map(_score_mf, MF_WATCHLIST) if r]
 
     scored.sort(key=lambda x: x["signal_score"], reverse=True)
-    payload = {
+    payload = _sanitize({
         "success":    True,
         "hot":        scored[:3],
         "cold":       list(reversed(scored[-3:])),
         "all":        scored,
         "categories": _category_perf(),
-    }
+    })
     _mf_pulse_cache["data"] = payload
     _mf_pulse_cache["ts"]   = now
     return payload

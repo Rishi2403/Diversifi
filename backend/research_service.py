@@ -8,12 +8,24 @@ Signal Score (0-100):
   Sentiment   20 pts  News headline polarity
 """
 
+import math
 import time
 import concurrent.futures
 import os
 from typing import Optional
 
 from helper_func import analyze_sentiment
+
+
+def _sanitize(obj):
+    """Recursively replace float NaN/Inf with None so jsonify never emits invalid JSON."""
+    if isinstance(obj, float):
+        return None if (math.isnan(obj) or math.isinf(obj)) else obj
+    if isinstance(obj, dict):
+        return {k: _sanitize(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_sanitize(v) for v in obj]
+    return obj
 
 # ── Watchlist ──────────────────────────────────────────────────────────────────
 
@@ -73,7 +85,7 @@ WATCHLIST = [
     {"symbol": "HAVELLS.NS",    "name": "Havells India",         "sector": "Consumer"},
     {"symbol": "SIEMENS.NS",    "name": "Siemens India",         "sector": "Industrial"},
     {"symbol": "DLF.NS",        "name": "DLF",                   "sector": "Realty"},
-    {"symbol": "ZOMATO.NS",     "name": "Zomato",                "sector": "Consumer"},
+    {"symbol": "ETERNAL.NS",     "name": "Zomato",                "sector": "Consumer"},
     {"symbol": "PIDILITIND.NS", "name": "Pidilite Industries",   "sector": "Chemicals"},
     {"symbol": "MARICO.NS",     "name": "Marico",                "sector": "FMCG"},
     {"symbol": "COLPAL.NS",     "name": "Colgate-Palmolive",     "sector": "FMCG"},
@@ -141,7 +153,7 @@ RISK_SECTORS = {
 }
 
 _pulse_cache: dict = {}
-_CACHE_TTL = 900  # 15 minutes
+_CACHE_TTL = 1800  # 30 minutes
 
 
 # ── Indicator helpers ──────────────────────────────────────────────────────────
@@ -276,13 +288,13 @@ def get_pulse_data() -> dict:
         scored = [r for r in ex.map(_score_stock, WATCHLIST) if r]
 
     scored.sort(key=lambda x: x["signal_score"], reverse=True)
-    payload = {
+    payload = _sanitize({
         "success": True,
         "hot":     scored[:3],
         "cold":    list(reversed(scored[-3:])),
         "all":     scored,
         "sectors": _sector_perf(),
-    }
+    })
     _pulse_cache["data"] = payload
     _pulse_cache["ts"]   = now
     return payload
